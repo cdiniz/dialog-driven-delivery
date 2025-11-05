@@ -1,23 +1,23 @@
-# TDD-Driven Product Development Workflow
+# Spec-Driven Product Development Workflow
 
-A comprehensive, project-agnostic methodology for building software products using Test-Driven Development (TDD), Product Requirements Documents (PRDs), and AI-assisted development with Claude Code.
+A comprehensive, project-agnostic methodology for building software products through documentation-first development with Product Requirements Documents (PRDs), feature specifications, and technical design. Optionally includes AI-assisted TDD implementation with Claude Code.
 
 ## Philosophy
 
 This workflow emphasizes:
 
-1. **Documentation-First**: Start with clear product requirements before writing code
-2. **Test-Driven Development**: Write tests before implementation (Red-Green-Refactor)
-3. **Incremental Delivery**: Break features into independently deliverable user stories
-4. **Quality Built-In**: Testing, code review, and refinement are part of the process, not afterthoughts
-5. **AI-Augmented Development**: Leverage Claude Code to automate repetitive tasks while maintaining quality standards
+1. **Specification-First**: Start with clear product requirements and technical design before writing code
+2. **Incremental Delivery**: Break features into independently deliverable user stories
+3. **Quality Through Design**: Thoughtful architecture and specifications prevent issues before they occur
+4. **Flexibility**: Use the parts that add value - structured TDD implementation is optional
+5. **AI-Augmented Development**: Leverage Claude Code for specification generation and optional automated implementation
 
 ## Prerequisites
 
 - **Claude Code** installed and configured
-- **Linear** (or similar issue tracking) for managing user stories
+- **Linear** (or similar issue tracking) for managing user stories (optional)
 - **Git** for version control
-- Project uses **TDD practices** and has a testing framework set up
+- **Testing framework** (optional, required only for automated TDD workflow in steps 4-5)
 
 ## Installation
 
@@ -30,8 +30,10 @@ cp -r .claude/commands /path/to/your/project/.claude/
 # Or clone individual commands you need
 mkdir -p /path/to/your/project/.claude/commands
 cp .claude/commands/generate-prd.md /path/to/your/project/.claude/commands/
-cp .claude/commands/feature-decomposer.md /path/to/your/project/.claude/commands/
-# ... and so on
+cp .claude/commands/create-feature-and-stories.md /path/to/your/project/.claude/commands/
+cp .claude/commands/create-feature-spec.md /path/to/your/project/.claude/commands/
+cp .claude/commands/plan-user-story.md /path/to/your/project/.claude/commands/
+cp .claude/commands/implement-story.md /path/to/your/project/.claude/commands/
 ```
 
 ## The Complete Workflow
@@ -42,126 +44,174 @@ Product Idea
      ├─ 1. Generate PRD (/generate-prd)
      │
      ▼
-Product Requirements Document (PRD)
+Product Requirements Document (Strategic Direction)
      │
-     ├─ 2. Decompose Feature (/feature-decomposer "Feature X.X")
+     ├─ 2. Create Feature + User Stories (/create-feature-and-stories "feature description or transcript")
      │
      ▼
-User Stories in Linear
+Linear Project (Feature) + Feature Spec + User Stories
      │
-     ├─ 3. Create Technical Spec (/create-feature-spec "Feature X.X")
+     ├─ 3. Create Technical Spec (/create-feature-spec PROJECT-KEY)
      │
      ▼
 Technical Specification
      │
-     ├─ 4. Plan User Story (/plan-user-story ISSUE-ID)
+     ├─ 4. [OPTIONAL] Plan User Story (/plan-user-story ISSUE-ID)
      │
      ▼
 TDD Task List
      │
-     ├─ 5. Implement Story (/implement-story path/to/tdd_plan.md)
+     ├─ 5. [OPTIONAL] Implement Story (/implement-story path/to/tdd_plan.md)
      │
      ▼
 Completed, Tested, Reviewed Code
 ```
 
+**Note on Workflow Flexibility:**
+
+Steps 1-3 establish the documentation foundation (PRD, Feature Spec, Technical Spec) which is valuable for any project.
+
+Steps 4-5 are **optional** and provide a structured TDD approach:
+- **Use them if**: You want a systematic TDD workflow with planning, implementation, review, and refinement
+- **Skip them if**: You prefer your own development methodology or want to implement directly with Claude using the technical spec as a guide
+
+The workflow is designed to be modular - use the parts that add value to your team's process.
+
+---
+
 ## Slash Commands Reference
 
 ### 1. `/generate-prd`
 
-**Purpose**: Create a comprehensive Product Requirements Document from a product description.
+**Purpose**: Create a comprehensive Product Requirements Document from a description, meeting transcript, or interactive discussion.
 
 **When to use**: At the very beginning of a new product or major feature initiative.
 
 **What it does**:
-- Asks questions about your product idea
-- Generates a structured PRD with:
+- Accepts optional description or meeting transcript
+- Extracts information from transcript or asks questions interactively
+- Generates a strategic PRD with:
   - Executive summary (vision, problem, solution, metrics)
   - Scope (MVP and out-of-scope items)
   - User personas
-  - Epics and features breakdown
-  - Technical requirements
-  - Implementation priorities
-  - Success criteria
-  - Risk assessment
+  - **Epics**: Not included - features are created on-demand from descriptions
+  - Risk assessment and mitigations
 
 **Example usage**:
+
+Interactive mode (Claude asks questions):
 ```
 /generate-prd
 ```
 
-Claude will ask:
-- Product vision and goals
-- Target users and market
-- Core problems being solved
-- Key features you envision
-- Technical constraints
-- Compliance requirements
+With a product description:
+```
+/generate-prd "Building a project management tool for remote teams. Need task tracking, time management, team collaboration, and reporting. Target market is small to medium businesses with distributed teams."
+```
+
+With a meeting transcript:
+```
+/generate-prd "
+Product Planning Meeting Notes:
+- CEO: We need a solution for managing remote teams
+- CTO: Focus on async collaboration, not another Slack
+- Product: Core features - tasks, time tracking, reporting
+- Sales: Target SMBs, 10-50 employees, $20/user/month
+- Main problem: Teams using 5+ disconnected tools
+- MVP: Task management + time tracking + basic reporting
+- Out of scope: Video calls, chat, file storage (use integrations)
+- Risk: Competition from established players like Asana
+"
+```
+
+Claude will ask clarifying questions only for missing critical information.
 
 **Output**: `docs/prd.md` (or location you specify)
 
+**Note**: The PRD is streamlined to focus on strategic direction:
+- **Included**: Vision, scope, personas, risks
+- **NOT included**: Epics, features, technical details
+- **Deferred to features**: All detailed specifications created separately
+
+Use `/create-feature-and-stories` with a feature description or meeting transcript to create features.
+
 ---
 
-### 2. `/feature-decomposer`
+### 2. `/create-feature-and-stories`
 
-**Purpose**: Break down a PRD feature into independently deliverable user stories and create them in Linear.
+**Purpose**: Generate a detailed feature specification from a description or meeting transcript, create it as a Linear Project, AND decompose it into user stories.
 
-**When to use**: After PRD is complete, when you're ready to start planning a specific feature.
+**When to use**: After the PRD is complete, when you're ready to develop a specific feature. You provide a description or transcript, and Claude creates the full feature specification.
 
 **What it does**:
-- Reads the PRD and locates the specified feature
-- Analyzes the feature requirements
-- Breaks it down into smaller, deliverable stories
-- Creates Linear issues with:
-  - User story format: "As a [persona], I want [action] so that [benefit]"
-  - User value statement
-  - Acceptance criteria in Gherkin format
+
+**Part 1 - Feature Generation:**
+- Reads the PRD for strategic context (vision, personas, scope)
+- Asks clarifying questions about the feature
+- Generates comprehensive feature specification with:
+  - Feature overview and business value
+  - User workflows
+  - Functional and non-functional requirements
+  - Business rules and validation
+  - Dependencies and constraints
+  - Out of scope items
+- Creates a Linear Project for the feature
+- Saves feature specification document
+
+**Part 2 - User Story Decomposition:**
+- Analyzes the feature spec just created
+- Asks clarifying questions about story breakdown
+- Decomposes feature into independently deliverable user stories
+- Creates Linear Issues within the project with:
+  - User story format with value statement
+  - Detailed acceptance criteria in Gherkin format
   - Proper labels and project assignment
 
 **Example usage**:
-```
-/feature-decomposer "Feature 1.1"
-```
 
-Or with the feature name:
+With a feature description:
 ```
-/feature-decomposer "Patient Enrollment & Onboarding"
+/create-feature-and-stories "User authentication with email/password and social login (Google, GitHub)"
 ```
 
-**Output**: Multiple user stories created in Linear with complete acceptance criteria
-
-**Story Template**:
-```markdown
-## User Story
-As a [persona], I want to [action] so that I can [benefit].
-
-## User Value Statement
-[1-2 sentences explaining value to users and system]
-
-## Acceptance Criteria
-
-### AC1: [Descriptive scenario name]
-- **Given** [context]
-- **When** [action]
-- **Then** [outcome]
-- **And** [additional outcome]
-
-### AC2: [Error handling scenario]
-...
+With a meeting transcript:
 ```
+/create-feature-and-stories "
+Transcript from feature discussion:
+- Need user authentication
+- Support email/password
+- Add Google and GitHub OAuth
+- Include password reset flow
+- 2FA optional for sensitive accounts
+"
+```
+
+Or just a simple idea:
+```
+/create-feature-and-stories "Task management with assignments and due dates"
+```
+
+**Output**:
+- Linear Project (e.g., `PROJ-5`) with feature details
+- Feature spec saved to `docs/features/[feature_name].md`
+- Multiple user stories created as Linear Issues in the project
+
+**What happens next**: Review user stories, then use `/create-feature-spec` to create technical specification.
 
 ---
 
 ### 3. `/create-feature-spec`
 
-**Purpose**: Generate a detailed technical specification for a feature based on the PRD and user stories.
+**Purpose**: Generate a detailed technical specification for a Linear Project (feature) based on the feature spec and user stories.
 
-**When to use**: After user stories are created, before implementation begins.
+**When to use**: After user stories are created in Linear, before implementation begins.
 
 **What it does**:
-- Reads the PRD feature requirements
-- Queries Linear for all related user stories
+- Queries Linear for the project (feature)
+- Reads the feature specification document
+- Queries Linear for all user stories in the project
 - Analyzes acceptance criteria
+- Reviews existing codebase architecture
 - Generates comprehensive technical spec with:
   - Architecture overview (component diagrams)
   - Data models and schemas
@@ -173,10 +223,15 @@ As a [persona], I want to [action] so that I can [benefit].
 
 **Example usage**:
 ```
-/create-feature-spec "Feature 1.1"
+/create-feature-spec PROJ-5
 ```
 
-**Output**: Technical specification document (location determined by project structure)
+Or with project name:
+```
+/create-feature-spec "User Registration"
+```
+
+**Output**: Technical specification document saved to `docs/specs/[project_key]/technical_spec.md`
 
 **Spec includes**:
 - Mermaid diagrams for architecture
@@ -188,11 +243,13 @@ As a [persona], I want to [action] so that I can [benefit].
 
 ---
 
-### 4. `/plan-user-story`
+### 4. `/plan-user-story` *(Optional)*
 
 **Purpose**: Create a detailed TDD task list for implementing a specific user story.
 
-**When to use**: When you're ready to start development on a user story.
+**When to use**: When you want a structured TDD approach with Red-Green-Refactor cycles. Skip this if you prefer to implement directly with Claude using the technical spec.
+
+**Note**: This command is optional. You can implement stories using your own methodology or work directly with Claude without a structured plan.
 
 **What it does**:
 - Fetches story details from Linear
@@ -245,11 +302,13 @@ Or with full issue ID:
 
 ---
 
-### 5. `/implement-story`
+### 5. `/implement-story` *(Optional)*
 
-**Purpose**: Orchestrate the complete development workflow: implementation, review, and refinement.
+**Purpose**: Orchestrate the complete development workflow: implementation, review, and refinement using specialized agents.
 
-**When to use**: When you have a TDD task list and are ready to implement the story.
+**When to use**: When you want a fully automated TDD workflow with systematic implementation, code review, and refinement. Skip this if you prefer manual development or direct Claude interaction.
+
+**Note**: This command is optional. Many teams implement stories manually or use Claude directly with the technical spec and TDD plan as guides.
 
 **What it does**:
 - Uses specialized AI agents to:
@@ -303,7 +362,9 @@ Or with full issue ID:
 4. **Follow Project Conventions**: Match existing architecture and patterns
 5. **Include Diagrams**: Use Mermaid for architecture and flow diagrams
 
-### TDD Implementation
+### TDD Implementation *(Optional - for automated workflow)*
+
+If using the optional TDD workflow (steps 4-5):
 
 1. **Write Tests First**: Never write production code without a failing test
 2. **Simplest Test**: Write the simplest test that could possibly fail
@@ -369,12 +430,12 @@ Works with various testing strategies:
 
 1. **Issue Tracking**: Stories tracked as Linear issues
 2. **Labels**: Use consistent labels (e.g., "user-story")
-3. **Projects**: Map PRD epics to Linear projects
+3. **Projects**: Features created as Linear projects using `/create-feature-and-stories`
 4. **Workflows**: Define clear workflow states
 
 ### Linear Best Practices
 
-1. **Consistent Naming**: Use "[Feature X.X]" prefix in story titles
+1. **Consistent Naming**: Use clear, descriptive names for stories
 2. **Complete ACs**: Include all acceptance criteria in issue description
 3. **Link Stories**: Connect related stories and features
 4. **Update Status**: Keep issue status current as work progresses
@@ -387,18 +448,25 @@ Works with various testing strategies:
 ```
 project-root/
 ├── .claude/
-│   └── commands/           # Slash commands
-│       ├── generate-prd.md
-│       ├── feature-decomposer.md
-│       ├── create-feature-spec.md
-│       ├── plan-user-story.md
-│       └── implement-story.md
+│   ├── commands/           # Slash commands
+│   │   ├── generate-prd.md
+│   │   ├── create-feature-and-stories.md
+│   │   ├── create-feature-spec.md
+│   │   ├── plan-user-story.md
+│   │   └── implement-story.md
+│   └── agents/            # Specialized agents
+│       ├── story-developer.md
+│       ├── story-reviewer.md
+│       ├── refinement-developer.md
+│       └── test-fix-specialist.md
 ├── docs/
-│   ├── prd.md             # Product Requirements Document
+│   ├── prd.md             # Product Requirements Document (strategic only)
+│   ├── features/          # Feature specifications
+│   │   └── [feature_name].md
 │   ├── specs/             # Technical specifications
-│   │   └── feature_X.X/
+│   │   └── [project_key]/
 │   │       ├── technical_spec.md
-│   │       ├── story_XX_tdd_tasks.md
+│   │       ├── story_[issue_id]_tdd_tasks.md
 │   │       └── mockups/
 │   └── architecture/      # Architecture documentation
 ├── src/                   # Source code
@@ -418,45 +486,74 @@ project-root/
 
 #### Step 1: Generate PRD
 
+Option A - Interactive:
 ```bash
 /generate-prd
 ```
 
-Claude asks questions, you describe a task management system. Output: `docs/prd.md` with Feature 2.1: Task Creation & Management.
-
-#### Step 2: Decompose Feature
-
+Option B - With meeting transcript:
 ```bash
-/feature-decomposer "Feature 2.1"
+/generate-prd "
+Planning Meeting - Task Management System:
+- Vision: Simple task management for small teams
+- Problem: Existing tools too complex and expensive
+- Users: Small teams (5-15 people), project managers, freelancers
+- MVP Scope: Create/assign/track tasks, due dates, priorities
+- Out of scope: Time tracking, invoicing, advanced reporting
+- Risks: Market saturation, need clear differentiation
+"
 ```
 
-Claude analyzes Feature 2.1 and creates 5 user stories in Linear:
-- TASK-15: Create task with title and description
-- TASK-16: Assign task to team member
-- TASK-17: Set task due date
-- TASK-18: Mark task as complete
-- TASK-19: View task list with filters
+**Output**: `docs/prd.md` with strategic direction (vision, scope, personas, risks - no epics or features).
+
+#### Step 2: Create Feature & User Stories
+
+```bash
+/create-feature-and-stories "Task management feature with the ability to create, assign, and track tasks with due dates and priority levels"
+```
+
+Claude uses the PRD context, asks clarifying questions about the task management feature, then automatically creates the feature spec and decomposes it into user stories.
+
+**Output:**
+- Linear Project PROJ-8 "Task Creation & Management"
+- Feature spec: `docs/features/task_management/task_creation_and_management.md`
+- 5 User stories created:
+  - PROJ-15: Create task with title and description
+  - PROJ-16: Assign task to team member
+  - PROJ-17: Set task due date
+  - PROJ-18: Mark task as complete
+  - PROJ-19: View task list with filters
 
 #### Step 3: Create Technical Spec
 
 ```bash
-/create-feature-spec "Feature 2.1"
+/create-feature-spec PROJ-8
 ```
 
-Claude generates `docs/specs/feature_2.1/technical_spec.md` with:
+Claude generates `docs/specs/proj_8/technical_spec.md` with:
 - API endpoints: POST /tasks, GET /tasks, PATCH /tasks/:id
 - Database schema for tasks table
 - Frontend components and state management
 - Security and validation requirements
 
-#### Step 4: Plan First Story
+**At this point, you have everything needed to start implementation:**
+- PRD with strategic direction
+- Feature spec with detailed requirements
+- User stories with acceptance criteria in Linear
+- Technical spec with architecture and design
+
+**The following steps are OPTIONAL** - use them if you want a structured TDD workflow:
+
+---
+
+#### Step 4 (Optional): Plan First Story
 
 ```bash
-/plan-user-story TASK-15
+/plan-user-story PROJ-15
 ```
 
-Claude reads TASK-15 from Linear and generates:
-`docs/specs/feature_2.1/story_TASK-15_tdd_tasks.md`
+Claude reads PROJ-15 from Linear and generates:
+`docs/specs/proj_8/story_PROJ-15_tdd_tasks.md`
 
 Contains 8 tasks:
 1. Task model/entity with validation
@@ -468,10 +565,14 @@ Contains 8 tasks:
 7. Task creation form component
 8. Integration and routing
 
-#### Step 5: Implement Story
+**Alternative**: Implement directly with Claude using the technical spec as a guide, without a formal TDD plan.
+
+---
+
+#### Step 5 (Optional): Implement Story
 
 ```bash
-/implement-story docs/specs/feature_2.1/story_TASK-15_tdd_tasks.md
+/implement-story docs/specs/proj_8/story_PROJ-15_tdd_tasks.md
 ```
 
 Claude orchestrates:
@@ -479,11 +580,15 @@ Claude orchestrates:
 2. **story-reviewer** agent: Reviews code, runs tests, checks quality
 3. **refinement-developer** agent: Fixes any issues found
 
-Result: TASK-15 is complete, tested, reviewed, and ready to merge.
+Result: PROJ-15 is complete, tested, reviewed, and ready to merge.
 
-#### Repeat Steps 4-5 for remaining stories
+**Alternative**: Implement manually, or work directly with Claude in a conversational way using the specs as reference.
 
-Continue with TASK-16, TASK-17, TASK-18, TASK-19 until Feature 2.1 is complete.
+---
+
+#### Repeat Steps 4-5 for remaining stories (if using structured workflow)
+
+Continue with PROJ-16, PROJ-17, PROJ-18, PROJ-19 until the feature is complete.
 
 ---
 
@@ -585,7 +690,7 @@ To improve these commands:
 ## FAQ
 
 **Q: Do I need to use all commands?**
-A: No, use what fits your workflow. Some teams skip PRDs for small features, others might have existing technical specs.
+A: No, the workflow is modular. Steps 1-3 (PRD, Feature + Stories, Technical Spec) provide valuable documentation. Steps 4-5 (TDD planning and automated implementation) are entirely optional.
 
 **Q: Can I use this without Linear?**
 A: Yes, adapt the commands to use your issue tracker (Jira, GitHub Issues, etc.)
@@ -594,13 +699,13 @@ A: Yes, adapt the commands to use your issue tracker (Jira, GitHub Issues, etc.)
 A: Yes! Adapt frontend sections for mobile, desktop, CLI, or remove them for backend-only projects.
 
 **Q: How do I handle urgent bugs/hotfixes?**
-A: For urgent fixes, skip to `/plan-user-story` or implement directly. Document decisions for future reference.
+A: For urgent fixes, implement directly with Claude. Document decisions in the technical spec afterward for future reference.
 
 **Q: Can I use this with legacy codebases?**
-A: Absolutely. The TDD planning adapts to existing patterns. Start with new features and gradually adopt for refactoring.
+A: Absolutely. The specification workflow helps document new features clearly. Start with specs for new features and gradually expand coverage.
 
 **Q: What if my project doesn't use TDD?**
-A: Adapt the task templates to focus on implementation-first. However, adding tests incrementally is highly recommended.
+A: Simply skip steps 4-5. The core value is in the specification workflow (steps 1-3). You can implement features using any methodology you prefer with the specs as your guide.
 
 ---
 
@@ -612,7 +717,7 @@ These commands are provided as-is for use in your projects. Feel free to modify 
 
 ## Credits
 
-Developed for use with Claude Code by Anthropic. Part of a comprehensive development methodology focused on quality, testing, and AI-augmented development.
+Developed for use with Claude Code by Anthropic. Part of a comprehensive spec-driven development methodology focused on clear specifications, incremental delivery, and AI-augmented development.
 
 ---
 

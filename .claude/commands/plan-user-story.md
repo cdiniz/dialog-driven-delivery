@@ -7,13 +7,14 @@ Generate a TDD-focused implementation task list for user story $ARGUMENTS and sa
 ## Steps
 
 1. **Query Story**: Get story details from Linear (use story ID like "PROJ-42" or just "42")
-2. **Extract Context**: Get feature number from story title (e.g., "[Feature 1.1]")
-3. **Find Technical Spec**: Locate and read the technical spec for this feature
-4. **Find Mockups**: Look for relevant UI mockups or design files
-5. **Analyze Codebase**: Identify existing patterns, architecture, and integration points
-6. **Determine Save Location**: Ask user for preferred location or use consistent project structure
-7. **Generate Plan**: Create TDD task list following the template below
-8. **Save Plan**: Create necessary directories and save the plan
+2. **Get Project Context**: Get the Linear project (feature) that this story belongs to
+3. **Find Feature Spec**: Look for the feature specification document for this project
+4. **Find Technical Spec**: Locate and read the technical spec for this feature
+5. **Find Mockups**: Look for relevant UI mockups or design files
+6. **Analyze Codebase**: Identify existing patterns, architecture, and integration points
+7. **Determine Save Location**: Ask user for preferred location or use: `docs/specs/[project_key]/story_[issue_id]_tdd_tasks.md`
+8. **Generate Plan**: Create TDD task list following the template below
+9. **Save Plan**: Create necessary directories and save the plan
 
 ## TDD Task List Template
 
@@ -21,8 +22,8 @@ Generate a TDD-focused implementation task list for user story $ARGUMENTS and sa
 # TDD Implementation Tasks: [Story Title]
 
 **Story:** [ISSUE-ID] - [Story Title]
-**Feature:** [Feature Number and Name]
-**Epic:** [Epic Name]
+**Linear Project:** [PROJECT-KEY] - [Project URL]
+**Feature:** [Feature Name]
 **Date:** [Current Date]
 
 ---
@@ -43,7 +44,8 @@ Generate a TDD-focused implementation task list for user story $ARGUMENTS and sa
 - External: [Third-party APIs or services if applicable]
 
 **Related Mockups:** `[relevant mockup files or design links]`
-**Technical Spec Reference:** `[path to technical spec]` - Section [X]
+**Feature Spec:** `[path to feature spec]`
+**Technical Spec:** `[path to technical spec]` - Section [X]
 
 ---
 
@@ -334,10 +336,12 @@ For each task, follow the **Red-Green-Refactor** cycle:
 
 ## References
 
-- **Story:** [Linear story URL]
+- **Story:** [ISSUE-ID] - [Linear story URL]
+- **Linear Project:** [PROJECT-KEY] - [Linear project URL]
+- **Feature Spec:** `[path to feature spec]`
 - **Technical Spec:** `[path to technical spec]`
 - **UI Mockups/Designs:** `[path to mockups or design links]`
-- **PRD:** `[path to PRD]` - Feature [X.X]
+- **PRD:** `[path to PRD]`
 - **Architecture Docs:** `[path to architecture documentation]`
 
 </plan_template>
@@ -360,7 +364,7 @@ After generating and saving the TDD task list:
 Generated TDD task list for Story [ISSUE-ID]:
 
 **Story:** [ISSUE-ID] - [Story Title]
-**Feature:** [Feature X.X]
+**Linear Project:** [PROJECT-KEY] - [Feature Name]
 **Location:** `[path where plan was saved]`
 
 **Summary:**
@@ -382,8 +386,8 @@ Each task follows Red → Green → Refactor cycle:
 
 Next steps:
 1. Review the task list with team/stakeholders
-2. Start with Task 1 (work through tasks sequentially)
-3. Follow TDD discipline strictly
-4. Check off acceptance criteria as completed
+2. Run `/implement-story [path to plan]` to start implementation
+3. Or manually start with Task 1 and work through tasks sequentially
+4. Follow TDD discipline strictly
 5. Update story status in Linear as work progresses
 ```

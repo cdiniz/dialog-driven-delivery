@@ -268,6 +268,20 @@ Does this decomposition look good, or would you like to adjust any stories?
 
 ### Step 9: Create User Stories in Linear
 
+**IMPORTANT - Uncertainty Handling in Stories:**
+
+Before creating stories, review the feature spec and technical spec for any remaining uncertainty markers (`[OPEN QUESTION]`, `[DECISION PENDING]`, `[CLARIFICATION NEEDED]`).
+
+**If critical uncertainties still exist:**
+- Warn the user that stories may need refinement once uncertainties are resolved
+- Consider adding a note in the story description referencing the open question
+- Flag the story with a "blocked" or "needs-clarification" label
+
+**For each story, create with these guidelines:**
+- If an AC references an `[OPEN QUESTION]` from the feature spec, note it in the story
+- If implementation depends on a `[DECISION PENDING]` from the technical spec, add to Dependencies section
+- Stories with unresolved uncertainties should be marked for refinement
+
 For each approved story, create a Linear issue with complete details:
 
 ```markdown
@@ -409,6 +423,13 @@ So that I can [benefit from feature spec].
 **Dependencies:**
 - Requires: [Other stories or systems this depends on]
 - Blocks: [Other stories that depend on this]
+- Pending Decisions: [If story depends on unresolved DECISION PENDING from technical spec, list them here]
+
+**Uncertainties:**
+[If this story references any open questions or unresolved decisions from specs:]
+- **Open Question from Feature Spec:** See Feature Spec Section 7, Q[N] - [Brief description]
+- **Pending Decision from Technical Spec:** See Technical Spec Section 12, Q[N] - [Brief description]
+- **Impact:** [How the uncertainty affects this story - may need AC refinement, technical approach may change, etc.]
 
 ## Definition of Done
 

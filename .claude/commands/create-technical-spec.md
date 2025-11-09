@@ -158,6 +158,9 @@ I'll create the technical spec following these established patterns.
 
 ### Step 8: Ask Clarifying Technical Questions
 
+**IMPORTANT - Track Question Responses:**
+As you ask clarifying technical questions, keep track of which ones the user answered and which they skipped or deferred. This tracking is critical for uncertainty marking in Step 10.
+
 Based on the feature type, transcript analysis, and codebase review, ask targeted questions:
 
 **For Backend/API Features:**
@@ -309,7 +312,51 @@ Based on this feature, I'll include these sections in the technical spec:
 
 ### Step 10: Generate Technical Specification
 
-Create a comprehensive technical spec with only relevant sections:
+**CRITICAL - Uncertainty Marker Policy:**
+
+Before generating the spec, review the documentation in `docs/uncertainty-markers.md`.
+
+When generating the technical specification, you MUST follow these rules:
+
+1. **If user didn't answer a technical question** → Use uncertainty markers:
+   - `[DECISION PENDING: option A vs option B - see Open Questions QX]` - for architectural/technical choices
+   - `[CLARIFICATION NEEDED: what needs defining]` - for vague technical requirements
+
+2. **If you infer a technical approach** → Mark it explicitly:
+   - `[ASSUMPTION: statement of what you're assuming based on codebase patterns]`
+
+3. **If technology choice is uncertain** → Mark the decision:
+   - `[DECISION PENDING: PostgreSQL vs MongoDB - see Q3]`
+
+4. **NEVER make silent technical assumptions.** If you infer from codebase, mark with `[ASSUMPTION]`.
+
+5. **Link all markers** → Every inline marker must have corresponding entry in:
+   - Section 9 (Open Questions & Decisions) for `[DECISION PENDING]` and `[CLARIFICATION NEEDED]`
+   - Section 10 (Appendix > Technical Assumptions) for `[ASSUMPTION]`
+
+**Examples:**
+
+❌ BAD (silent technical decision):
+```
+Data will be stored in MongoDB with the following schema...
+```
+
+✅ GOOD (explicit decision marker):
+```
+Data will be stored in [DECISION PENDING: PostgreSQL vs MongoDB - see Q3] with the following schema...
+```
+
+❌ BAD (unmarked inference):
+```
+We'll use JWT tokens for authentication
+```
+
+✅ GOOD (explicit assumption):
+```
+We'll use [ASSUMPTION: JWT tokens based on existing auth pattern in codebase] for authentication
+```
+
+Now create a comprehensive technical spec with only relevant sections:
 
 ```markdown
 # Technical Specification: [Feature Name]
@@ -1060,25 +1107,46 @@ Content-Security-Policy: [Policy]
 
 ## 12. Open Questions & Decisions
 
-Track unresolved technical questions:
+Track unresolved technical questions and decisions.
 
-- [ ] **Q1:** [Technical question that needs resolution]
-  - **Context:** [Why this matters]
-  - **Options:** [Option A vs Option B]
-  - **Owner:** [Who decides]
-  - **Deadline:** [When needed]
+**NOTE:** Every `[DECISION PENDING]` and `[CLARIFICATION NEEDED]` marker in the spec body must have a corresponding entry here with:
+- Clear question statement
+- Context explaining why this matters
+- Options being considered (with pros/cons if applicable)
+- Owner (who will decide)
+- Deadline (when it's needed)
+
+Example format:
+
+- [ ] **Q1:** [Technical question or decision that needs resolution]
+  - **Context:** [Why this matters for the implementation]
+  - **Options:**
+    - Option A: [description] - Pros: [benefits], Cons: [tradeoffs]
+    - Option B: [description] - Pros: [benefits], Cons: [tradeoffs]
+  - **Owner:** [Tech Lead/Team/Architect]
+  - **Deadline:** [Before sprint planning/Before implementation/etc.]
+  - **Referenced in:** [Section 4.1, Data Models, etc.]
 
 - [ ] **Q2:** [Technical question that needs resolution]
   - **Context:** [Why this matters]
   - **Options:** [Option A vs Option B]
   - **Owner:** [Who decides]
   - **Deadline:** [When needed]
+  - **Referenced in:** [Where in the spec]
 
-[Continue with all open questions]
+[Continue with all open questions - ensure each inline marker has an entry here]
 
 **Decisions Made:**
+
+Document decisions that have been resolved during the planning process:
+
 - **[Decision 1]:** [What was decided and why]
+  - **Rationale:** [Why this decision was made]
+  - **Tradeoffs:** [What was given up for this choice]
+  - **Alternatives Considered:** [What else was considered and why rejected]
+
 - **[Decision 2]:** [What was decided and why]
+  - **Rationale:** [Why this decision was made]
 
 ---
 
@@ -1097,7 +1165,26 @@ Track unresolved technical questions:
 
 ---
 
-## Appendix A: Codebase Patterns
+## Appendix A: Technical Assumptions
+
+**NOTE:** Every `[ASSUMPTION]` marker in the spec body must have a corresponding entry here.
+
+List all technical assumptions made during specification with full context:
+
+Example format:
+
+1. **[Assumption Name]:** [Full statement of the technical assumption]. [Why this assumption was made - based on codebase patterns, industry standards, etc.]. [Impact if assumption is wrong]. [How to validate before implementation].
+
+Example:
+1. **JWT Authentication:** We assume JWT tokens for authentication based on existing auth pattern found in `src/auth/`. This affects session management and API design. If wrong, may need to refactor auth middleware. Validate by reviewing auth requirements with security team.
+
+2. **Database Choice:** We assume [ASSUMPTION content from spec]. [Continue with context and validation approach].
+
+[List all assumptions - ensure each inline `[ASSUMPTION]` marker has an entry here]
+
+---
+
+## Appendix B: Codebase Patterns
 
 [Document existing patterns found in codebase review]
 
@@ -1131,6 +1218,66 @@ Track unresolved technical questions:
 
 [Repeat for all stories and acceptance criteria]
 ```
+
+### Step 10.5: Uncertainty Validation (NEW)
+
+**CRITICAL STEP - Do not skip this!**
+
+Before saving the technical spec, scan the generated specification and validate uncertainty markers:
+
+1. **Count all uncertainty markers:**
+   ```
+   Uncertainty Marker Summary:
+   - [DECISION PENDING]: X occurrences
+   - [CLARIFICATION NEEDED]: Y occurrences
+   - [ASSUMPTION]: Z occurrences
+
+   Total uncertainties: [X+Y+Z]
+   ```
+
+2. **Verify each marker is tracked:**
+   - Check that each `[DECISION PENDING]` and `[CLARIFICATION NEEDED]` has a corresponding entry in Section 12 (Open Questions & Decisions)
+   - Check that each `[ASSUMPTION]` has a corresponding entry in Appendix A (Technical Assumptions)
+   - List any markers that are NOT properly tracked
+
+3. **Present summary to user:**
+   ```markdown
+   I've generated the technical specification with [N] uncertainty markers:
+
+   **Technical Decisions Pending:** [X] items requiring architectural/technology decisions
+   **Clarifications Needed:** [Y] items requiring more specific technical definitions
+   **Technical Assumptions:** [Z] items inferred from codebase patterns that need validation
+
+   [If uncertainties exist:]
+   These technical uncertainties should be resolved before story decomposition. Would you like to:
+
+   **Option A:** Resolve them now - I'll ask follow-up technical questions
+   **Option B:** Leave them marked for resolution during sprint planning
+   **Option C:** Review the spec first, then resolve
+
+   Which would you prefer?
+   ```
+
+4. **If user chooses Option A (Resolve now):**
+   - Go through each `[DECISION PENDING]` and `[CLARIFICATION NEEDED]`
+   - Ask the user for technical decisions
+   - Update the spec to replace markers with actual choices
+   - Move resolved questions to "Decisions Made" in Section 12
+
+5. **If user chooses Option B or C:**
+   - Proceed to next step
+   - Include uncertainty count in final summary
+
+**Quality Gates:**
+
+⚠️ **Warning if:**
+- More than 5 `[DECISION PENDING]` markers exist (too many unresolved technical choices)
+- Critical architecture decisions have `[DECISION PENDING]` markers (blocks decomposition)
+- Database choice or major technology decisions are still pending
+
+✅ **Acceptable:**
+- A few `[ASSUMPTION]` markers based on codebase patterns (can validate during implementation)
+- `[CLARIFICATION NEEDED]` on performance thresholds or scaling details (can refine during implementation)
 
 ### Step 11: Ask for Save Location
 
@@ -1184,6 +1331,21 @@ After completing all steps, provide a detailed summary:
 - [N] database tables with schema and migrations
 - [N] UI components with props and behavior
 - [N] open technical questions to resolve
+- [N] technical assumptions to validate
+
+**Uncertainty Status:**
+[If uncertainties exist:]
+⚠️ This specification contains [N] technical uncertainties:
+- [X] technical decisions pending (Section 12)
+- [Y] clarifications needed for technical details (Section 12)
+- [Z] technical assumptions based on codebase patterns (Appendix A)
+
+[If critical decisions pending:]
+🚨 **CRITICAL:** The following decisions must be resolved before story decomposition:
+- [List critical DECISION PENDING items]
+
+[If no uncertainties:]
+✅ No unresolved technical uncertainties - specification is ready for story decomposition.
 
 **Codebase Alignment:**
 - Follows existing [architecture pattern] pattern
@@ -1192,7 +1354,7 @@ After completing all steps, provide a detailed summary:
 - Integrates with [existing components]
 
 **Next Steps:**
-1. Review technical spec and resolve open questions (Section 12)
+1. [If uncertainties exist:] Review and resolve technical uncertainties in Section 12 and validate assumptions in Appendix A
 2. Share with development team for technical review
 3. When ready to break into stories: `/decompose-feature [PROJECT-KEY]`
 4. After stories created, start implementation: `/plan-user-story [ISSUE-ID]`

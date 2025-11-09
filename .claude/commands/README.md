@@ -13,7 +13,8 @@ This workflow is built on **pragmatic principles** for ongoing product developme
 3. **Incremental Delivery**: Break features into independently deliverable user stories
 4. **Iterative Refinement**: Story decomposition can be refined as the team learns
 5. **Quality Through Design**: Thoughtful specs prevent issues before they occur
-6. **Flexibility**: Use what adds value - TDD automation is completely optional
+6. **Explicit Over Implicit**: Uncertainties are marked, not assumed (prevents AI hallucination)
+7. **Flexibility**: Use what adds value - TDD automation is completely optional
 
 ---
 
@@ -489,6 +490,44 @@ Workflow supports **team learning**:
 - Can run refinement multiple times
 - Stories can be split, merged, added, or modified
 - Preserves history and tracks changes
+
+### Uncertainty Markers: Preventing AI Hallucination
+
+One of the most critical features of this workflow is **explicit uncertainty management**:
+
+**The Problem:** When AI generates specifications, it can "hallucinate" plausible-sounding details that were never discussed. This leads to incorrect assumptions becoming requirements.
+
+**Our Solution:** Uncertainty markers make unknowns explicit:
+
+- `[OPEN QUESTION: text]` - User decision needed, cannot proceed without answer
+- `[DECISION PENDING: options]` - Valid choices exist, decision deferred
+- `[ASSUMPTION: statement]` - Inference made from context, needs validation
+- `[CLARIFICATION NEEDED: aspect]` - Requirement is vague, needs specificity
+
+**How it works:**
+1. Commands ask clarifying questions during generation
+2. For unanswered questions → inline markers in spec body
+3. All markers tracked in dedicated sections (Open Questions, Assumptions)
+4. Quality gates prevent proceeding with too many unresolved uncertainties
+5. User can resolve uncertainties immediately or mark for later
+
+**Example:**
+```markdown
+❌ BAD (silent hallucination):
+Users authenticate via OAuth2 using Google provider
+
+✅ GOOD (explicit uncertainty):
+Users authenticate via [OPEN QUESTION: OAuth2, password, or social login?]
+```
+
+**Benefits:**
+- Prevents incorrect assumptions from becoming implementation requirements
+- Makes knowledge gaps visible to stakeholders
+- Creates clear decision points for product/tech teams
+- Provides audit trail of what was decided vs assumed
+- Enables better prioritization (can't implement stories with unresolved questions)
+
+See `docs/uncertainty-markers.md` for complete documentation and `docs/uncertainty-markers-examples.md` for real-world examples.
 
 ---
 

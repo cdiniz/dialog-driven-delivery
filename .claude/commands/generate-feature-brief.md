@@ -68,9 +68,56 @@ Let me ask some clarifying questions to complete the feature brief:
 5. Are there any compliance or security considerations? (GDPR, auth, etc.)
 6. [Any other questions based on gaps in the input]"
 
+**IMPORTANT - Track Question Responses:**
+As you ask clarifying questions, keep track of which ones the user answered and which they skipped or deferred. This tracking is critical for Step 6.5 (Uncertainty Validation).
+
 ### Step 6: Generate Feature Specification
 
-Create a comprehensive feature spec using this template:
+**CRITICAL - Uncertainty Marker Policy:**
+
+Before generating the spec, review the documentation in `docs/uncertainty-markers.md`.
+
+When generating the specification, you MUST follow these rules:
+
+1. **If user didn't answer a question** → Use uncertainty markers:
+   - `[OPEN QUESTION: specific question]` - for user decisions
+   - `[CLARIFICATION NEEDED: what needs defining]` - for vague requirements
+
+2. **If you make a reasonable inference** → Mark it explicitly:
+   - `[ASSUMPTION: statement of what you're assuming]`
+
+3. **If multiple valid approaches exist** → Mark the choice:
+   - `[DECISION PENDING: option A vs option B - see Open Questions QX]`
+
+4. **NEVER make silent assumptions.** If you infer something, mark it with `[ASSUMPTION]`.
+
+5. **Link all markers** → Every inline marker must have corresponding entry in:
+   - Section 7 (Open Questions) for `[OPEN QUESTION]` and `[CLARIFICATION NEEDED]`
+   - Section 10 (Appendix > Assumptions) for `[ASSUMPTION]`
+
+**Examples:**
+
+❌ BAD (silent assumption):
+```
+Users can authenticate via OAuth2 using Google provider
+```
+
+✅ GOOD (explicit uncertainty):
+```
+Users can authenticate via [OPEN QUESTION: OAuth2, password, or social login?]
+```
+
+❌ BAD (unmarked inference):
+```
+API response time should be fast
+```
+
+✅ GOOD (explicit clarification needed):
+```
+API response time should be [CLARIFICATION NEEDED: define threshold - <500ms, <1s, <3s?]
+```
+
+Now create a comprehensive feature spec using this template:
 
 <feature_template>
 ```markdown
@@ -252,17 +299,28 @@ Create a comprehensive feature spec using this template:
 
 ## 7. Open Questions
 
-Track unresolved questions that need answers before or during implementation:
+Track unresolved questions that need answers before or during implementation.
+
+**NOTE:** Every `[OPEN QUESTION]` and `[CLARIFICATION NEEDED]` marker in the spec body must have a corresponding entry here with:
+- Clear question statement
+- Owner (who will resolve it)
+- Deadline (when it's needed)
+- Context (where in the spec it's referenced)
+
+Example format:
 
 - [ ] **Q1:** [Question that needs resolution]
-  - **Owner:** [Who will resolve]
-  - **Deadline:** [When needed]
+  - **Owner:** [Who will resolve - Product/Engineering/Design/etc.]
+  - **Deadline:** [When needed - Before technical design/Before implementation/etc.]
+  - **Context:** [Where this appears - Referenced in FR3, Section 2.1, etc.]
+  - **Options:** [If applicable - list the choices being considered]
 
 - [ ] **Q2:** [Question that needs resolution]
   - **Owner:** [Who will resolve]
   - **Deadline:** [When needed]
+  - **Context:** [Where referenced]
 
-[Continue with all open questions]
+[Continue with all open questions - ensure each inline marker has an entry here]
 
 ---
 
@@ -296,18 +354,99 @@ Track unresolved questions that need answers before or during implementation:
 [If transcript was provided, summarize key discussion points]
 
 ### Assumptions
-[List any assumptions made during feature definition]
+
+**NOTE:** Every `[ASSUMPTION]` marker in the spec body must have a corresponding entry here.
+
+List all assumptions made during feature definition with full context:
+
+Example format:
+
+1. **[Assumption Name]:** [Full statement of the assumption]. [Why this assumption was made]. [Impact if assumption is wrong]. [How to validate].
+
+Example:
+1. **Browser Support:** We assume modern browsers (Chrome 90+, Firefox 88+, Safari 14+) based on typical SaaS user base. This affects which web APIs we can use. Needs validation with actual user analytics before implementation.
+
+2. **Authentication Method:** We assume [ASSUMPTION content from spec]. [Continue with context and validation approach].
+
+[List all assumptions - ensure each inline `[ASSUMPTION]` marker has an entry here]
 
 ### Glossary
 [Define any domain-specific terms used in this document]
 ```
 </feature_template>
 
-### Step 6: Create Linear Project
+### Step 6.5: Uncertainty Validation (NEW)
+
+**CRITICAL STEP - Do not skip this!**
+
+Before creating the Linear Project, scan the generated specification and validate uncertainty markers:
+
+1. **Count all uncertainty markers:**
+   ```
+   Uncertainty Marker Summary:
+   - [OPEN QUESTION]: X occurrences
+   - [CLARIFICATION NEEDED]: Y occurrences
+   - [ASSUMPTION]: Z occurrences
+   - [DECISION PENDING]: W occurrences
+
+   Total uncertainties: [X+Y+Z+W]
+   ```
+
+2. **Verify each marker is tracked:**
+   - Check that each `[OPEN QUESTION]` and `[CLARIFICATION NEEDED]` has a corresponding entry in Section 7 (Open Questions)
+   - Check that each `[ASSUMPTION]` has a corresponding entry in Section 10 (Appendix > Assumptions)
+   - List any markers that are NOT properly tracked
+
+3. **Present summary to user:**
+   ```markdown
+   I've generated the feature specification with [N] uncertainty markers:
+
+   **Open Questions:** [X] items requiring user decisions
+   **Clarifications Needed:** [Y] items requiring more specific definitions
+   **Assumptions:** [Z] items inferred from context that need validation
+
+   [If uncertainties exist:]
+   These uncertainties should be resolved before implementation. Would you like to:
+
+   **Option A:** Resolve them now - I'll ask follow-up questions
+   **Option B:** Leave them marked for later resolution
+   **Option C:** Review the spec first, then resolve
+
+   Which would you prefer?
+   ```
+
+4. **If user chooses Option A (Resolve now):**
+   - Go through each `[OPEN QUESTION]` and `[CLARIFICATION NEEDED]`
+   - Ask the user for answers
+   - Update the spec to replace markers with actual values
+   - Move resolved questions to a "Resolved Questions" subsection in Section 7
+
+5. **If user chooses Option B or C:**
+   - Proceed to next step
+   - Include uncertainty count in final summary
+
+**Quality Gates:**
+
+⚠️ **Warning if:**
+- More than 10 `[OPEN QUESTION]` markers exist (spec may be too incomplete)
+- Critical functional requirements have `[OPEN QUESTION]` markers (blocks implementation)
+
+✅ **Acceptable:**
+- A few `[ASSUMPTION]` markers (can validate during implementation)
+- `[CLARIFICATION NEEDED]` on non-functional requirements (can refine later)
+
+### Step 7: Create Linear Project
 
 Create a project in Linear with the feature spec.
 
-### Step 7: Save Feature Spec
+**Note:** Include uncertainty count in project description:
+```
+[Feature description]
+
+**Spec Status:** [N] open questions, [M] assumptions to validate
+```
+
+### Step 8: Save Feature Spec
 
 Save the feature spec to the file system:
 
@@ -323,7 +462,7 @@ Which would you prefer?"
 - Save the spec
 - Update the "Linear Project" field in the spec with the project URL
 
-### Step 8: Provide Summary
+### Step 9: Provide Summary
 
 After completing all steps, provide a comprehensive summary:
 
@@ -339,7 +478,18 @@ After completing all steps, provide a comprehensive summary:
 - [N] functional requirements specified
 - [N] non-functional requirements documented
 - [N] open questions to resolve
+- [N] assumptions to validate
 - [N] risks identified with mitigations
+
+**Uncertainty Status:**
+[If uncertainties exist:]
+⚠️ This specification contains [N] uncertainties that should be resolved:
+- [X] open questions requiring user decisions (Section 7)
+- [Y] clarifications needed for vague requirements (Section 7)
+- [Z] assumptions that need validation (Section 10)
+
+[If no uncertainties:]
+✅ No unresolved uncertainties - specification is complete and ready for technical design.
 
 **What's in the feature spec:**
 - Complete user workflows with actors and steps
@@ -347,9 +497,10 @@ After completing all steps, provide a comprehensive summary:
 - Clear scope boundaries (in/out of scope)
 - Business rules and validation requirements
 - Dependencies, constraints, and risks
+- Explicit uncertainty markers for incomplete areas
 
 **Next Steps:**
-1. Review feature spec and resolve open questions (Section 7)
+1. [If uncertainties exist:] Review and resolve uncertainties in Section 7 and validate assumptions in Section 10
 2. Share with stakeholders for feedback
 3. When ready for technical design: `/create-technical-spec [PROJECT-KEY]`
 4. After technical spec: `/decompose-feature [PROJECT-KEY]`

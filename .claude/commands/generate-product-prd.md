@@ -1,8 +1,10 @@
 ---
-description: Generate comprehensive PRD from description, transcript, or interactive discussion
+description: Generate product-level PRD (GREENFIELD ONLY - rarely used in ongoing organizations)
 ---
 
-You are tasked with creating a comprehensive Product Requirements Document (PRD) based on the user's input.
+⚠️ **Note:** This command is for **NEW PRODUCTS ONLY** (greenfield projects). If you're working on an existing product and want to define a new feature, use `/generate-feature-brief` instead.
+
+You are tasked with creating a comprehensive Product Requirements Document (PRD) for a new product based on the user's input.
 
 ## Instructions
 
@@ -111,7 +113,14 @@ You are tasked with creating a comprehensive Product Requirements Document (PRD)
 7. **Use Clear Language**: Write for both technical and non-technical stakeholders
 8. **Infer When Reasonable**: For transcripts, make reasonable inferences about context and fill in details logically
 
-**Note:** The PRD establishes strategic direction. Features will be created separately using `/create-feature-and-stories` with descriptions or meeting transcripts.
+**Note:** The PRD establishes strategic direction. Features will be created separately using `/generate-feature-brief` with descriptions or meeting transcripts.
+
+**When to Use This Command:**
+- ✅ Starting a completely new product
+- ✅ Major product pivot or v2.0 rewrite
+- ✅ Annual strategic planning for the entire product
+- ❌ Adding a new feature to an existing product (use `/generate-feature-brief` instead)
+- ❌ Day-to-day development work (use `/generate-feature-brief` instead)
 
 ## Output
 

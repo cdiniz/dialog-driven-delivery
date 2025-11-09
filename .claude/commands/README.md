@@ -1,728 +1,690 @@
 # Spec-Driven Product Development Workflow
 
-A comprehensive, project-agnostic methodology for building software products through documentation-first development with Product Requirements Documents (PRDs), feature specifications, and technical design. Optionally includes AI-assisted TDD implementation with Claude Code.
+A comprehensive, project-agnostic methodology for building software products through **conversational, transcript-first** documentation and development. Designed for real-world teams where features are defined through meetings, refined through discussion, and implemented incrementally.
+
+---
 
 ## Philosophy
 
-This workflow emphasizes:
+This workflow is built on **pragmatic principles** for ongoing product development:
 
-1. **Specification-First**: Start with clear product requirements and technical design before writing code
-2. **Incremental Delivery**: Break features into independently deliverable user stories
-3. **Quality Through Design**: Thoughtful architecture and specifications prevent issues before they occur
-4. **Flexibility**: Use the parts that add value - structured TDD implementation is optional
-5. **AI-Augmented Development**: Leverage Claude Code for specification generation and optional automated implementation
+1. **Feature-Centric**: Most teams work on features, not product-wide planning (PRD is optional)
+2. **Conversational & Engaging**: Commands ask for meeting transcripts and work interactively
+3. **Incremental Delivery**: Break features into independently deliverable user stories
+4. **Iterative Refinement**: Story decomposition can be refined as the team learns
+5. **Quality Through Design**: Thoughtful specs prevent issues before they occur
+6. **Flexibility**: Use what adds value - TDD automation is completely optional
+
+---
+
+## Two Workflow Modes
+
+### Ongoing Development Mode (Primary - 95% of teams)
+
+For teams working on **existing products** who define features through planning meetings:
+
+```
+Feature Planning Meeting
+        ↓
+/generate-feature-brief (paste transcript)
+        ↓
+Feature Spec + Linear Project
+        ↓
+Technical Design Meeting
+        ↓
+/create-technical-spec PROJECT-42 (paste transcript)
+        ↓
+Technical Specification
+        ↓
+Story Decomposition Meeting
+        ↓
+/decompose-feature PROJECT-42 (paste transcript)
+        ↓
+User Stories in Linear
+        ↓
+[Refinement as needed]
+        ↓
+/refine-decomposition PROJECT-42 (paste refinement notes)
+        ↓
+Updated Stories
+        ↓
+[Optional TDD Workflow]
+/plan-user-story ISSUE-42
+/implement-story docs/specs/.../tdd_tasks.md
+```
+
+### Greenfield Mode (Rare - New Products Only)
+
+For teams starting a **completely new product**:
+
+```
+Product Planning
+        ↓
+/generate-product-prd (optional - for new products only)
+        ↓
+Product Requirements Document
+        ↓
+[Then follow Ongoing Development Mode for each feature]
+```
+
+---
 
 ## Prerequisites
 
 - **Claude Code** installed and configured
-- **Linear** (or similar issue tracking) for managing user stories (optional)
+- **Linear** for managing projects and user stories
 - **Git** for version control
-- **Testing framework** (optional, required only for automated TDD workflow in steps 4-5)
+- **Testing framework** (optional, only for TDD automation)
+
+---
 
 ## Installation
 
-Copy the `.claude/commands/` directory to your project:
+Copy the commands directory to your project:
 
 ```bash
 # From this repository
 cp -r .claude/commands /path/to/your/project/.claude/
 
-# Or clone individual commands you need
-mkdir -p /path/to/your/project/.claude/commands
-cp .claude/commands/generate-prd.md /path/to/your/project/.claude/commands/
-cp .claude/commands/create-feature-and-stories.md /path/to/your/project/.claude/commands/
-cp .claude/commands/create-feature-spec.md /path/to/your/project/.claude/commands/
-cp .claude/commands/plan-user-story.md /path/to/your/project/.claude/commands/
-cp .claude/commands/implement-story.md /path/to/your/project/.claude/commands/
+# Optional: Copy agents if using TDD automation (steps 4-5)
+cp -r .claude/agents /path/to/your/project/.claude/
 ```
-
-## The Complete Workflow
-
-```
-Product Idea
-     │
-     ├─ 1. Generate PRD (/generate-prd)
-     │
-     ▼
-Product Requirements Document (Strategic Direction)
-     │
-     ├─ 2. Create Feature + User Stories (/create-feature-and-stories "feature description or transcript")
-     │
-     ▼
-Linear Project (Feature) + Feature Spec + User Stories
-     │
-     ├─ 3. Create Technical Spec (/create-feature-spec PROJECT-KEY)
-     │
-     ▼
-Technical Specification
-     │
-     ├─ 4. [OPTIONAL] Plan User Story (/plan-user-story ISSUE-ID)
-     │
-     ▼
-TDD Task List
-     │
-     ├─ 5. [OPTIONAL] Implement Story (/implement-story path/to/tdd_plan.md)
-     │
-     ▼
-Completed, Tested, Reviewed Code
-```
-
-**Note on Workflow Flexibility:**
-
-Steps 1-3 establish the documentation foundation (PRD, Feature Spec, Technical Spec) which is valuable for any project.
-
-Steps 4-5 are **optional** and provide a structured TDD approach:
-- **Use them if**: You want a systematic TDD workflow with planning, implementation, review, and refinement
-- **Skip them if**: You prefer your own development methodology or want to implement directly with Claude using the technical spec as a guide
-
-The workflow is designed to be modular - use the parts that add value to your team's process.
 
 ---
 
-## Slash Commands Reference
+## Conversational Slash Commands
 
-### 1. `/generate-prd`
+### Core Workflow (Steps 1-4)
 
-**Purpose**: Create a comprehensive Product Requirements Document from a description, meeting transcript, or interactive discussion.
+#### 1. `/generate-feature-brief`
 
-**When to use**: At the very beginning of a new product or major feature initiative.
+**Purpose**: Create feature specification from meeting transcript or conversation
 
-**What it does**:
-- Accepts optional description or meeting transcript
-- Extracts information from transcript or asks questions interactively
-- Generates a strategic PRD with:
-  - Executive summary (vision, problem, solution, metrics)
-  - Scope (MVP and out-of-scope items)
-  - User personas
-  - **Epics**: Not included - features are created on-demand from descriptions
-  - Risk assessment and mitigations
+**Workflow**:
+1. Command asks: "Do you have a meeting transcript or want to discuss?"
+2. You paste transcript (preferred) OR discuss conversationally
+3. Agent analyzes transcript and asks clarifying questions
+4. Agent generates feature spec
+5. Agent creates Linear Project
+6. Agent saves feature spec to `docs/features/[name].md`
 
-**Example usage**:
+**When to use**: When you have a feature idea or planning meeting transcript
 
-Interactive mode (Claude asks questions):
+**No arguments required** - the command asks for input
+
+**Example**:
 ```
-/generate-prd
-```
+You: /generate-feature-brief
 
-With a product description:
-```
-/generate-prd "Building a project management tool for remote teams. Need task tracking, time management, team collaboration, and reporting. Target market is small to medium businesses with distributed teams."
-```
+Agent: How would you like to provide feature information?
+       Option A: Meeting Transcript
+       Option B: Describe Conversationally
 
-With a meeting transcript:
-```
-/generate-prd "
-Product Planning Meeting Notes:
-- CEO: We need a solution for managing remote teams
-- CTO: Focus on async collaboration, not another Slack
-- Product: Core features - tasks, time tracking, reporting
-- Sales: Target SMBs, 10-50 employees, $20/user/month
-- Main problem: Teams using 5+ disconnected tools
-- MVP: Task management + time tracking + basic reporting
-- Out of scope: Video calls, chat, file storage (use integrations)
-- Risk: Competition from established players like Asana
-"
-```
+You: Option A
+     [Paste meeting transcript from your feature planning session]
 
-Claude will ask clarifying questions only for missing critical information.
+Agent: I've analyzed your transcript. Here's what I found:
+       Feature: Advanced Search with Filters
+       Target Users: Project managers
+       Key Workflows: ...
 
-**Output**: `docs/prd.md` (or location you specify)
+       Let me ask some clarifying questions:
+       1. What are the success criteria?
+       2. What's explicitly out of scope?
+       ...
 
-**Note**: The PRD is streamlined to focus on strategic direction:
-- **Included**: Vision, scope, personas, risks
-- **NOT included**: Epics, features, technical details
-- **Deferred to features**: All detailed specifications created separately
+You: [Answer questions]
 
-Use `/create-feature-and-stories` with a feature description or meeting transcript to create features.
-
----
-
-### 2. `/create-feature-and-stories`
-
-**Purpose**: Generate a detailed feature specification from a description or meeting transcript, create it as a Linear Project, AND decompose it into user stories.
-
-**When to use**: After the PRD is complete, when you're ready to develop a specific feature. You provide a description or transcript, and Claude creates the full feature specification.
-
-**What it does**:
-
-**Part 1 - Feature Generation:**
-- Reads the PRD for strategic context (vision, personas, scope)
-- Asks clarifying questions about the feature
-- Generates comprehensive feature specification with:
-  - Feature overview and business value
-  - User workflows
-  - Functional and non-functional requirements
-  - Business rules and validation
-  - Dependencies and constraints
-  - Out of scope items
-- Creates a Linear Project for the feature
-- Saves feature specification document
-
-**Part 2 - User Story Decomposition:**
-- Analyzes the feature spec just created
-- Asks clarifying questions about story breakdown
-- Decomposes feature into independently deliverable user stories
-- Creates Linear Issues within the project with:
-  - User story format with value statement
-  - Detailed acceptance criteria in Gherkin format
-  - Proper labels and project assignment
-
-**Example usage**:
-
-With a feature description:
-```
-/create-feature-and-stories "User authentication with email/password and social login (Google, GitHub)"
-```
-
-With a meeting transcript:
-```
-/create-feature-and-stories "
-Transcript from feature discussion:
-- Need user authentication
-- Support email/password
-- Add Google and GitHub OAuth
-- Include password reset flow
-- 2FA optional for sensitive accounts
-"
-```
-
-Or just a simple idea:
-```
-/create-feature-and-stories "Task management with assignments and due dates"
+Agent: [Generates feature spec and creates Linear Project]
+       ✅ Feature spec: docs/features/advanced_search.md
+       ✅ Linear Project: PROJ-42
 ```
 
 **Output**:
-- Linear Project (e.g., `PROJ-5`) with feature details
-- Feature spec saved to `docs/features/[feature_name].md`
-- Multiple user stories created as Linear Issues in the project
-
-**What happens next**: Review user stories, then use `/create-feature-spec` to create technical specification.
+- Feature specification document
+- Linear Project created
+- Clear next steps
 
 ---
 
-### 3. `/create-feature-spec`
+#### 2. `/create-technical-spec PROJECT-KEY`
 
-**Purpose**: Generate a detailed technical specification for a Linear Project (feature) based on the feature spec and user stories.
+**Purpose**: Generate technical specification from project and optional technical discussion
 
-**When to use**: After user stories are created in Linear, before implementation begins.
+**Workflow**:
+1. Fetches Linear Project and feature spec
+2. Asks: "Did you have a technical design meeting?"
+3. You paste transcript (optional) OR discuss conversationally
+4. Agent reviews your codebase patterns
+5. Agent asks clarifying technical questions
+6. Agent generates technical spec with smart section selection
+7. Agent saves to `docs/specs/[project_key]/technical_spec.md`
 
-**What it does**:
-- Queries Linear for the project (feature)
-- Reads the feature specification document
-- Queries Linear for all user stories in the project
-- Analyzes acceptance criteria
-- Reviews existing codebase architecture
-- Generates comprehensive technical spec with:
-  - Architecture overview (component diagrams)
-  - Data models and schemas
-  - API contracts
-  - Security considerations
-  - Testing strategy
-  - Monitoring and observability
-  - Open questions and decisions
+**Requires**: Linear Project ID (e.g., `PROJ-42`)
 
-**Example usage**:
+**Example**:
 ```
-/create-feature-spec PROJ-5
+You: /create-technical-spec PROJ-42
+
+Agent: I found Linear Project PROJ-42: Advanced Search
+
+       Current Documentation:
+       - Feature Spec: ✅ docs/features/advanced_search.md
+       - 5 user stories in project
+
+       Did you have a technical design meeting?
+       Option A: Yes, I have a transcript
+       Option B: No, let's discuss it now
+
+You: Option A
+     [Paste technical discussion transcript]
+
+Agent: I've analyzed your transcript:
+       Architecture: REST API with Elasticsearch
+       Frontend: React with Redux
+       ...
+
+       Let me review your codebase...
+
+       I found: You use Elasticsearch 8.x, Redux Toolkit, ...
+
+       Clarifying questions:
+       1. Which Elasticsearch index?
+       2. Should filters persist in URL?
+       ...
+
+You: [Answer questions]
+
+Agent: [Generates technical spec]
+       ✅ Technical spec: docs/specs/proj_42/technical_spec.md
+       Sections included: Data Models, API Contracts, UI Components
 ```
 
-Or with project name:
-```
-/create-feature-spec "User Registration"
-```
-
-**Output**: Technical specification document saved to `docs/specs/[project_key]/technical_spec.md`
-
-**Spec includes**:
-- Mermaid diagrams for architecture
-- Detailed API specifications
-- Database schema changes
-- Security and compliance considerations
-- Testing approach
-- Monitoring requirements
+**Output**:
+- Technical specification with relevant sections only
+- Architecture diagrams (Mermaid)
+- API contracts, data models, UI components
+- Clear implementation guidance
 
 ---
 
-### 4. `/plan-user-story` *(Optional)*
+#### 3. `/decompose-feature PROJECT-KEY`
 
-**Purpose**: Create a detailed TDD task list for implementing a specific user story.
+**Purpose**: Break feature into user stories through conversational planning
 
-**When to use**: When you want a structured TDD approach with Red-Green-Refactor cycles. Skip this if you prefer to implement directly with Claude using the technical spec.
+**Workflow**:
+1. Fetches Linear Project and documentation
+2. Asks: "Did you have a decomposition meeting?"
+3. You paste transcript (preferred) OR discuss conversationally
+4. Agent proposes decomposition strategies with pros/cons
+5. Agent asks clarifying questions about boundaries
+6. Agent shows proposed story breakdown
+7. You confirm
+8. Agent creates user stories in Linear with complete acceptance criteria
 
-**Note**: This command is optional. You can implement stories using your own methodology or work directly with Claude without a structured plan.
+**Requires**: Linear Project ID
 
-**What it does**:
-- Fetches story details from Linear
-- Reads the technical specification
-- Analyzes existing codebase patterns
-- Generates a comprehensive TDD task list with:
-  - Prerequisites
-  - Backend tasks (models, services, APIs)
-  - Frontend tasks (services, state management, UI components)
-  - Documentation tasks
-  - Each task follows Red-Green-Refactor cycle
-
-**Example usage**:
+**Example**:
 ```
-/plan-user-story 42
+You: /decompose-feature PROJ-42
+
+Agent: I found Linear Project PROJ-42: Advanced Search
+       Current stories: 0
+       ✅ Ready to decompose
+
+       Did you have a decomposition meeting?
+       Option A: Yes, I have a transcript
+       Option B: No, let's decompose it together
+
+You: Option A
+     [Paste story decomposition meeting transcript]
+
+Agent: I've analyzed your transcript:
+       Proposed stories: 5 stories
+       Approach: Hybrid (minimal first story, then enhancements)
+
+       Clarifying questions:
+       1. Should Story 1 span frontend and backend?
+       2. Where should error handling go?
+       ...
+
+You: [Answer questions]
+
+Agent: Here's the proposed breakdown:
+
+       Story 1: Basic text search (backend + frontend)
+       - Focus: End-to-end minimal search
+       - ACs: 5 scenarios
+       - Dependencies: None
+
+       Story 2: Add status filter
+       ...
+
+       Does this look good?
+
+You: Yes
+
+Agent: [Creates stories in Linear]
+       ✅ Created PROJ-42: Basic text search
+       ✅ Created PROJ-43: Add status filter
+       ...
 ```
 
-Or with full issue ID:
+**Output**:
+- User stories created in Linear
+- Complete acceptance criteria (Gherkin format)
+- Dependencies mapped
+- Implementation order suggested
+
+---
+
+#### 4. `/refine-decomposition PROJECT-KEY`
+
+**Purpose**: Refine existing story decomposition - split, merge, add, or modify stories
+
+**Workflow**:
+1. Fetches ALL existing stories and shows current state
+2. Asks: "What prompted this refinement?"
+3. You paste refinement transcript OR discuss changes
+4. Agent analyzes and proposes specific changes
+5. Agent shows before/after for each change
+6. You confirm
+7. Agent executes changes in Linear
+
+**Requires**: Linear Project ID
+
+**Use when**:
+- Stories are too large and need splitting
+- Stories are too small and should be merged
+- New stories discovered during development
+- Acceptance criteria need modification
+
+**Example**:
 ```
+You: /refine-decomposition PROJ-42
+
+Agent: I found Linear Project PROJ-42: Advanced Search
+
+       Current User Stories: 5 stories
+
+       Story 1: PROJ-42 - Basic text search
+       - Status: In Progress
+       - Brief: End-to-end search functionality
+       - ACs: 5 acceptance criteria
+
+       Story 2: PROJ-43 - Add status filter
+       ...
+
+       What prompted this refinement?
+       Option A: Refinement meeting
+       Option B: Discovered during development
+       Option C: Sprint planning feedback
+
+You: Option B
+     During development, we realized PROJ-42 is too large.
+     We need to split it into backend and frontend stories.
+
+Agent: I understand. Let me clarify:
+       - Should PROJ-42 become the backend story?
+       - Should I create a new story for frontend?
+       - How should ACs be distributed?
+
+You: [Answer questions]
+
+Agent: Here's the refinement plan:
+
+       1. Split PROJ-42: Basic text search
+          - PROJ-42: Backend API (keep original)
+            Scope: API endpoints, database
+            ACs: [Backend ACs]
+          - PROJ-50: Frontend UI (new story)
+            Scope: UI components, search input
+            ACs: [Frontend ACs]
+            Dependencies: Depends on PROJ-42
+
+       Does this look good?
+
+You: Yes
+
+Agent: [Executes changes]
+       ✅ Updated PROJ-42 (split into backend)
+       ✅ Created PROJ-50 (frontend split)
+       ✅ Updated dependencies
+```
+
+**Output**:
+- Modified/new stories in Linear
+- Clear change summary
+- Updated dependencies
+- Updated implementation order
+
+---
+
+### Optional TDD Automation (Steps 5-6)
+
+These steps are **completely optional** for teams that want structured, automated TDD workflow:
+
+#### 5. `/plan-user-story ISSUE-ID`
+
+**Purpose**: Generate detailed TDD task list for a user story
+
+**When to use**: When you want structured Red-Green-Refactor task breakdown
+
+**Skip if**: You prefer manual development or direct Claude interaction
+
+#### 6. `/implement-story path/to/tdd_tasks.md`
+
+**Purpose**: Orchestrate automated implementation with specialized agents
+
+**When to use**: When you want fully automated TDD workflow with review cycles
+
+**Skip if**: You prefer manual implementation
+
+See the original README sections for details on these optional commands.
+
+---
+
+### Greenfield Only (Rarely Used)
+
+#### `/generate-product-prd`
+
+**Purpose**: Create product-level PRD for new products (greenfield only)
+
+⚠️ **Use only when**:
+- Starting a completely new product
+- Major product pivot or v2.0 rewrite
+- Annual strategic planning
+
+❌ **Don't use for**:
+- Adding features to existing products (use `/generate-feature-brief`)
+- Day-to-day development
+
+**Most teams can skip this command entirely** and start with `/generate-feature-brief`.
+
+---
+
+## Typical Weekly Flow
+
+### Ongoing Organization (Most Common)
+
+```bash
+# Monday: Feature Planning Meeting
+/generate-feature-brief
+# [Paste meeting transcript, answer questions]
+# Output: Feature spec + Linear Project PROJ-42
+
+# Tuesday: Technical Design Session
+/create-technical-spec PROJ-42
+# [Paste technical discussion, answer questions]
+# Output: Technical spec with architecture
+
+# Wednesday: Story Decomposition Meeting
+/decompose-feature PROJ-42
+# [Paste decomposition discussion, confirm breakdown]
+# Output: 5 user stories created (PROJ-42 through PROJ-46)
+
+# Thursday: Sprint starts - Developer realizes story is too big
+/refine-decomposition PROJ-42
+# [Explain issue, confirm split]
+# Output: PROJ-42 split into PROJ-42 (backend) + PROJ-50 (frontend)
+
+# Friday: Developer starts implementation
+# Option A: Manual development using specs as guide
+# Option B: Optional TDD automation
 /plan-user-story PROJ-42
+/implement-story docs/specs/proj_42/story_PROJ-42_tdd_tasks.md
 ```
-
-**Output**: TDD task list saved to project documentation structure
-
-**Task Structure** (for each task):
-```markdown
-#### Task N: [Task Name]
-**File:** [path to file]
-
-**Tests to Write (RED):**
-- [ ] Test: Create test file
-- [ ] Test: test_specific_behavior
-- [ ] Test: test_error_handling
-
-**Implementation (GREEN):**
-- [ ] Create implementation file
-- [ ] Implement minimal code to pass tests
-- [ ] Run tests - all should pass
-
-**Refactor:**
-- [ ] Clean up code
-- [ ] Remove duplication
-- [ ] Improve naming
-```
-
-**TDD Principles Enforced**:
-1. **RED**: Write a failing test first
-2. **GREEN**: Write minimal code to make it pass
-3. **REFACTOR**: Improve code without changing behavior
 
 ---
 
-### 5. `/implement-story` *(Optional)*
+## Command Summary
 
-**Purpose**: Orchestrate the complete development workflow: implementation, review, and refinement using specialized agents.
+| Command | Purpose | Input | Output | Use Case |
+|---------|---------|-------|--------|----------|
+| `/generate-feature-brief` | Create feature spec | Transcript or conversation | Feature spec + Linear Project | Feature planning meeting |
+| `/create-technical-spec PROJECT-KEY` | Technical design | Project + optional transcript | Technical spec | Technical design session |
+| `/decompose-feature PROJECT-KEY` | Break into stories | Project + optional transcript | User stories in Linear | Story decomposition meeting |
+| `/refine-decomposition PROJECT-KEY` | Modify stories | Project + refinement notes | Updated stories | Refinement/learning |
+| `/plan-user-story ISSUE-ID` | TDD task list | Story ID | TDD task breakdown | Optional: TDD planning |
+| `/implement-story PATH` | Automated impl | TDD task file | Implemented code | Optional: TDD automation |
+| `/generate-product-prd` | Product PRD | Transcript or conversation | Product PRD | Greenfield only (rare) |
 
-**When to use**: When you want a fully automated TDD workflow with systematic implementation, code review, and refinement. Skip this if you prefer manual development or direct Claude interaction.
+---
 
-**Note**: This command is optional. Many teams implement stories manually or use Claude directly with the technical spec and TDD plan as guides.
+## Key Features
 
-**What it does**:
-- Uses specialized AI agents to:
-  1. **story-developer**: Implements all tasks following TDD
-  2. **story-reviewer**: Reviews code for quality, tests, and standards
-  3. **refinement-developer**: Addresses review feedback
+### Conversational & Engaging
 
-**Example usage**:
-```
-/implement-story docs/specs/feature_1.1/story_42_tdd_tasks.md
-```
+All commands use **conversational workflow**:
+- ✅ Ask for meeting transcripts (preferred input)
+- ✅ Work conversationally if no transcript
+- ✅ Show what was found before asking questions
+- ✅ Propose options with pros/cons
+- ✅ Confirm before creating artifacts
+- ✅ Provide clear summaries with next steps
 
-**Orchestration Flow**:
-1. Story developer implements all tasks
-2. Story reviewer performs comprehensive review
-3. Refinement developer fixes any issues
-4. Process repeats until all criteria met
+### Transcript-First
 
-**Completion Criteria**:
-- All TDD tasks completed
-- All tests passing
-- Code review approved
-- No linting errors
-- All acceptance criteria met
+Commands are designed for **real team meetings**:
+- Paste planning meeting transcripts
+- Paste technical discussion transcripts
+- Paste decomposition meeting transcripts
+- Paste refinement session notes
+- Agent extracts information and fills gaps conversationally
+
+### Smart & Adaptive
+
+Commands **adapt to your project**:
+- Review codebase patterns and follow them
+- Select only relevant technical spec sections
+- Propose decomposition strategies based on feature type
+- Reference existing documentation
+- Match your team's workflow
+
+### Iterative & Refinable
+
+Workflow supports **team learning**:
+- Initial decomposition in one meeting
+- Refinement in separate meeting (`/refine-decomposition`)
+- Can run refinement multiple times
+- Stories can be split, merged, added, or modified
+- Preserves history and tracks changes
 
 ---
 
 ## Best Practices
 
-### PRD Creation
+### For Feature Planning
 
-1. **Be Specific**: Avoid vague requirements; use concrete, measurable criteria
-2. **Think MVP**: Clearly distinguish between MVP and future features
-3. **Consider Compliance**: Include relevant regulatory/legal requirements early
-4. **Define Success**: Create measurable success metrics
-5. **Identify Risks**: Proactively identify and plan mitigations
+1. **Record your meetings**: Transcripts are the best input
+2. **Be specific**: Discuss concrete examples and scenarios
+3. **Define boundaries**: What's in scope and out of scope
+4. **Consider compliance early**: Security, privacy, accessibility
 
-### Feature Decomposition
+### For Technical Design
 
-1. **Natural Boundaries**: Break features by complete, deliverable functionality
-2. **User Value**: Each story should deliver value end-to-end
-3. **Independent Stories**: Stories should be implementable independently
-4. **Clear Acceptance Criteria**: Use Gherkin format with descriptive names
-5. **Cover All Cases**: Include happy paths, errors, edge cases, empty states
+1. **Discuss trade-offs**: Capture pros/cons of approaches
+2. **Reference patterns**: Mention existing similar features
+3. **Be concrete**: Use real names, not placeholders
+4. **Think about edge cases**: Error handling, performance, security
 
-### Technical Specifications
+### For Story Decomposition
 
-1. **Extract Exact Requirements**: Pull exact error messages and validations from ACs
-2. **Reference User Stories**: Link every requirement to a specific story
-3. **No Placeholders**: Use actual field names and concrete examples
-4. **Follow Project Conventions**: Match existing architecture and patterns
-5. **Include Diagrams**: Use Mermaid for architecture and flow diagrams
+1. **Natural boundaries**: Break at logical workflow points
+2. **Independent stories**: Minimize dependencies
+3. **Consistent size**: Aim for similar-sized stories
+4. **Complete ACs**: Cover happy path, errors, edge cases
 
-### TDD Implementation *(Optional - for automated workflow)*
+### For Refinement
 
-If using the optional TDD workflow (steps 4-5):
-
-1. **Write Tests First**: Never write production code without a failing test
-2. **Simplest Test**: Write the simplest test that could possibly fail
-3. **Simplest Code**: Write the simplest code that could possibly pass
-4. **Refactor When Green**: Only improve code when tests are passing
-5. **Follow Task Order**: Complete tasks sequentially, don't skip around
-
-### Code Quality
-
-1. **Prefer Integration Tests**: Test real behavior, not mocks
-2. **Avoid Over-Mocking**: Never mock the method you're testing
-3. **Specific Assertions**: Use exact values, not ranges or negations
-4. **Never Skip Tests**: Fix failing tests, don't disable them
-5. **Clean Commits**: Commit working code with all tests passing
+1. **Learn and adapt**: Refine based on development learnings
+2. **Split when needed**: Don't force large stories
+3. **Track reasons**: Document why stories changed
+4. **Update dependencies**: Keep dependency graph current
 
 ---
 
-## Adapting to Your Project
+## Project Structure
 
-### Backend Architecture
-
-The commands work with various architectures:
-- **Hexagonal/Ports & Adapters**: Separate domain, services, adapters
-- **Layered Architecture**: Controllers, services, repositories
-- **MVC**: Models, views, controllers
-- **Microservices**: Service-based architecture
-
-**Customize by**:
-- Adjusting file path conventions in generated plans
-- Modifying task templates for your specific layers
-- Adding project-specific testing requirements
-
-### Frontend Framework
-
-The commands support multiple frameworks:
-- **React** (with React Query, Redux, Context API)
-- **Vue** (with Pinia, Vuex, Composition API)
-- **Angular** (with RxJS, Services, NgRx)
-- **Svelte** (with Svelte stores)
-
-**Customize by**:
-- Specifying your state management approach
-- Adjusting component testing strategies
-- Modifying task templates for your framework
-
-### Testing Approach
-
-Works with various testing strategies:
-- **Unit Tests**: Jest, Vitest, pytest, JUnit
-- **Integration Tests**: Testing Library, Testcontainers, Supertest
-- **E2E Tests**: Playwright, Cypress, Selenium
-
-**Customize by**:
-- Specifying test file locations
-- Adjusting test setup/teardown patterns
-- Modifying assertion styles
-
----
-
-## Integration with Linear
-
-### Required Linear Setup
-
-1. **Issue Tracking**: Stories tracked as Linear issues
-2. **Labels**: Use consistent labels (e.g., "user-story")
-3. **Projects**: Features created as Linear projects using `/create-feature-and-stories`
-4. **Workflows**: Define clear workflow states
-
-### Linear Best Practices
-
-1. **Consistent Naming**: Use clear, descriptive names for stories
-2. **Complete ACs**: Include all acceptance criteria in issue description
-3. **Link Stories**: Connect related stories and features
-4. **Update Status**: Keep issue status current as work progresses
-5. **Document Blockers**: Note blockers and dependencies
-
----
-
-## Project Structure Recommendations
+When using this workflow, organize documentation like this:
 
 ```
-project-root/
+your-project/
 ├── .claude/
-│   ├── commands/           # Slash commands
-│   │   ├── generate-prd.md
-│   │   ├── create-feature-and-stories.md
-│   │   ├── create-feature-spec.md
+│   ├── commands/                    # These slash commands
+│   │   ├── generate-feature-brief.md
+│   │   ├── create-technical-spec.md
+│   │   ├── decompose-feature.md
+│   │   ├── refine-decomposition.md
 │   │   ├── plan-user-story.md
-│   │   └── implement-story.md
-│   └── agents/            # Specialized agents
+│   │   ├── implement-story.md
+│   │   └── generate-product-prd.md
+│   └── agents/                      # Optional: TDD agents
 │       ├── story-developer.md
 │       ├── story-reviewer.md
 │       ├── refinement-developer.md
 │       └── test-fix-specialist.md
 ├── docs/
-│   ├── prd.md             # Product Requirements Document (strategic only)
-│   ├── features/          # Feature specifications
-│   │   └── [feature_name].md
-│   ├── specs/             # Technical specifications
-│   │   └── [project_key]/
-│   │       ├── technical_spec.md
-│   │       ├── story_[issue_id]_tdd_tasks.md
-│   │       └── mockups/
-│   └── architecture/      # Architecture documentation
-├── src/                   # Source code
+│   ├── prd.md                      # Optional: Product PRD (greenfield only)
+│   ├── features/                   # Feature specs
+│   │   ├── advanced_search.md
+│   │   ├── user_auth.md
+│   │   └── reporting.md
+│   ├── specs/                      # Technical specs per project
+│   │   ├── proj_42/
+│   │   │   ├── technical_spec.md
+│   │   │   ├── story_PROJ-42_tdd_tasks.md
+│   │   │   └── mockups/
+│   │   └── proj_43/
+│   │       └── technical_spec.md
+│   └── architecture/               # Your architecture docs
+├── src/
 │   ├── backend/
 │   └── frontend/
-└── tests/                 # Tests
-    ├── unit/
-    ├── integration/
-    └── e2e/
+└── tests/
 ```
 
 ---
 
-## Example: Complete Workflow Walkthrough
+## Benefits of This Approach
 
-### Scenario: Building a Task Management Feature
+### 1. Reflects Real Workflow
 
-#### Step 1: Generate PRD
+- Features defined through meetings (not documents first)
+- Story decomposition happens separately from feature planning
+- Refinement is an expected, separate step
+- Transcripts capture context and discussion
 
-Option A - Interactive:
-```bash
-/generate-prd
-```
+### 2. Conversational & Engaging
 
-Option B - With meeting transcript:
-```bash
-/generate-prd "
-Planning Meeting - Task Management System:
-- Vision: Simple task management for small teams
-- Problem: Existing tools too complex and expensive
-- Users: Small teams (5-15 people), project managers, freelancers
-- MVP Scope: Create/assign/track tasks, due dates, priorities
-- Out of scope: Time tracking, invoicing, advanced reporting
-- Risks: Market saturation, need clear differentiation
-"
-```
+- Commands feel like collaboration, not automation
+- Agent asks questions and proposes options
+- Shows understanding before taking action
+- Confirms before creating artifacts
 
-**Output**: `docs/prd.md` with strategic direction (vision, scope, personas, risks - no epics or features).
+### 3. Flexible & Modular
 
-#### Step 2: Create Feature & User Stories
+- Use core workflow (steps 1-4) for documentation
+- Optionally add TDD automation (steps 5-6)
+- Skip product PRD for existing products
+- Refine decomposition as many times as needed
 
-```bash
-/create-feature-and-stories "Task management feature with the ability to create, assign, and track tasks with due dates and priority levels"
-```
+### 4. Quality Through Process
 
-Claude uses the PRD context, asks clarifying questions about the task management feature, then automatically creates the feature spec and decomposes it into user stories.
+- Complete acceptance criteria from the start
+- Technical specs follow codebase patterns
+- Smart section selection (only relevant sections)
+- Maps ACs to technical implementation
 
-**Output:**
-- Linear Project PROJ-8 "Task Creation & Management"
-- Feature spec: `docs/features/task_management/task_creation_and_management.md`
-- 5 User stories created:
-  - PROJ-15: Create task with title and description
-  - PROJ-16: Assign task to team member
-  - PROJ-17: Set task due date
-  - PROJ-18: Mark task as complete
-  - PROJ-19: View task list with filters
+### 5. Team-Friendly
 
-#### Step 3: Create Technical Spec
-
-```bash
-/create-feature-spec PROJ-8
-```
-
-Claude generates `docs/specs/proj_8/technical_spec.md` with:
-- API endpoints: POST /tasks, GET /tasks, PATCH /tasks/:id
-- Database schema for tasks table
-- Frontend components and state management
-- Security and validation requirements
-
-**At this point, you have everything needed to start implementation:**
-- PRD with strategic direction
-- Feature spec with detailed requirements
-- User stories with acceptance criteria in Linear
-- Technical spec with architecture and design
-
-**The following steps are OPTIONAL** - use them if you want a structured TDD workflow:
+- Async-friendly (paste recorded meeting transcripts)
+- Supports iteration and learning
+- Clear traceability (feature → technical spec → stories → tasks)
+- Preserves history of changes
 
 ---
 
-#### Step 4 (Optional): Plan First Story
+## Migration from Previous Version
 
-```bash
-/plan-user-story PROJ-15
-```
+If you used the old workflow:
 
-Claude reads PROJ-15 from Linear and generates:
-`docs/specs/proj_8/story_PROJ-15_tdd_tasks.md`
+**Old Command → New Command**
 
-Contains 8 tasks:
-1. Task model/entity with validation
-2. Database repository
-3. Task service with business logic
-4. API endpoint for task creation
-5. API service layer (frontend)
-6. React Query hook
-7. Task creation form component
-8. Integration and routing
+- `/generate-prd` → `/generate-product-prd` (rarely used now)
+- `/create-feature-and-stories "description"` → Split into:
+  - `/generate-feature-brief` (feature spec + project)
+  - `/decompose-feature PROJECT-KEY` (stories)
+- `/create-feature-spec PROJECT-KEY` → `/create-technical-spec PROJECT-KEY`
+- New: `/refine-decomposition PROJECT-KEY` (separate refinement)
 
-**Alternative**: Implement directly with Claude using the technical spec as a guide, without a formal TDD plan.
+**Key Changes**:
 
----
-
-#### Step 5 (Optional): Implement Story
-
-```bash
-/implement-story docs/specs/proj_8/story_PROJ-15_tdd_tasks.md
-```
-
-Claude orchestrates:
-1. **story-developer** agent: Implements all 8 tasks following TDD
-2. **story-reviewer** agent: Reviews code, runs tests, checks quality
-3. **refinement-developer** agent: Fixes any issues found
-
-Result: PROJ-15 is complete, tested, reviewed, and ready to merge.
-
-**Alternative**: Implement manually, or work directly with Claude in a conversational way using the specs as reference.
-
----
-
-#### Repeat Steps 4-5 for remaining stories (if using structured workflow)
-
-Continue with PROJ-16, PROJ-17, PROJ-18, PROJ-19 until the feature is complete.
+1. **No arguments for feature brief**: Command asks for transcript
+2. **Decomposition is separate**: No longer combined with feature creation
+3. **Refinement is explicit**: New command for modifying decomposition
+4. **Transcript-first**: All commands prefer meeting transcripts
+5. **Product PRD is optional**: Most teams start with feature brief
 
 ---
 
 ## Troubleshooting
 
-### "Claude can't find the PRD"
+### "I don't have meeting transcripts"
 
-- Ensure PRD is in `docs/prd.md` or specify the location
-- Check file permissions
-- Verify PRD follows the expected format
+No problem! All commands work conversationally:
+- Select "Option B: Describe conversationally"
+- Answer the agent's questions
+- Same quality output, just more interactive
 
-### "Linear issues not created"
+### "My stories need to change during development"
 
-- Verify Linear MCP integration is configured
-- Check Linear API permissions
-- Ensure team/project exists in Linear
+Perfect! That's expected:
+- Use `/refine-decomposition PROJECT-KEY`
+- Explain what changed and why
+- Agent will update stories intelligently
 
-### "Generated tests don't match project style"
+### "I want to skip the product PRD"
 
-- Update the TDD task template in `/plan-user-story` command
-- Reference existing test files as examples
-- Specify testing conventions in project documentation
+Great! Most teams should:
+- Start directly with `/generate-feature-brief`
+- Product PRD is only for greenfield projects
+- Feature specs provide everything you need
 
-### "Tasks are too large/too small"
+### "Can I use this with other issue trackers?"
 
-- Adjust the feature decomposition guidelines
-- Provide feedback to Claude about desired task size
-- Break down or combine tasks manually
-
----
-
-## Customization Guide
-
-### Modifying Templates
-
-All templates are in the slash command files. To customize:
-
-1. Open the command file (e.g., `.claude/commands/plan-user-story.md`)
-2. Locate the `<plan_template>` or similar section
-3. Modify the template structure
-4. Save and test with a sample story
-
-### Adding Project-Specific Guidelines
-
-Update the `## Guidelines` section in each command to include:
-- Project-specific naming conventions
-- Required code patterns
-- Mandatory security checks
-- Compliance requirements
-- Performance standards
-
-### Creating New Commands
-
-Follow this structure:
-
-```markdown
----
-description: Brief description of what the command does
----
-
-[Main prompt explaining the task]
-
-## Steps
-
-1. [Step 1]
-2. [Step 2]
-...
-
-## Template
-
-<template_name>
-[Template content]
-</template_name>
-
-## Guidelines
-
-- [Guideline 1]
-- [Guideline 2]
-
-## Output
-
-[Expected output format]
-```
+The workflow is Linear-focused but adaptable:
+- Core concepts work with any tracker
+- Modify commands to use your tracker's API
+- Or use specs as guides and create issues manually
 
 ---
 
-## Contributing
+## Philosophy: Why This Workflow?
 
-To improve these commands:
+This workflow is designed for **how teams actually work**:
 
-1. Test on diverse projects
-2. Document issues and edge cases
-3. Propose improvements to templates
-4. Share successful adaptations
-5. Contribute back enhancements
+1. **Features, not products**: Daily work is feature-level, not product-level
+2. **Meetings produce artifacts**: Planning meetings → transcripts → specs
+3. **Decomposition evolves**: Story breakdown improves with team learning
+4. **Conversation matters**: Nuance and context from discussions are valuable
+5. **Documentation enables quality**: Good specs prevent issues before coding
+6. **Automation is optional**: TDD workflow helps but isn't required
+
+The result is a **pragmatic, conversational methodology** that fits real development workflows while maintaining high documentation quality and traceability.
 
 ---
 
-## FAQ
+## Support
 
-**Q: Do I need to use all commands?**
-A: No, the workflow is modular. Steps 1-3 (PRD, Feature + Stories, Technical Spec) provide valuable documentation. Steps 4-5 (TDD planning and automated implementation) are entirely optional.
-
-**Q: Can I use this without Linear?**
-A: Yes, adapt the commands to use your issue tracker (Jira, GitHub Issues, etc.)
-
-**Q: Does this work for non-web projects?**
-A: Yes! Adapt frontend sections for mobile, desktop, CLI, or remove them for backend-only projects.
-
-**Q: How do I handle urgent bugs/hotfixes?**
-A: For urgent fixes, implement directly with Claude. Document decisions in the technical spec afterward for future reference.
-
-**Q: Can I use this with legacy codebases?**
-A: Absolutely. The specification workflow helps document new features clearly. Start with specs for new features and gradually expand coverage.
-
-**Q: What if my project doesn't use TDD?**
-A: Simply skip steps 4-5. The core value is in the specification workflow (steps 1-3). You can implement features using any methodology you prefer with the specs as your guide.
+For issues, questions, or contributions:
+- Review individual command files for detailed documentation
+- Each command has extensive examples and guidelines
+- Commands are designed to be self-explanatory
+- Agent prompts guide you through the process
 
 ---
 
 ## License
 
-These commands are provided as-is for use in your projects. Feel free to modify and adapt them to your needs.
-
----
-
-## Credits
-
-Developed for use with Claude Code by Anthropic. Part of a comprehensive spec-driven development methodology focused on clear specifications, incremental delivery, and AI-augmented development.
-
----
-
-**Version**: 1.0
-**Last Updated**: 2025
-**Maintained By**: Your team/organization
-
-For questions or improvements, open an issue or submit a pull request in your project repository.
+This methodology is open for use and adaptation. Modify commands to fit your team's needs.

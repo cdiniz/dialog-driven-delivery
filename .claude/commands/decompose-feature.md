@@ -37,9 +37,8 @@ I found Linear Project $ARGUMENTS:
 **Status:** [Current status]
 **Team:** [Team name]
 
-**Current Documentation:**
-- Feature Spec: [✅ path or ❌ Not found]
-- Technical Spec: [✅ path or ❌ Not found]
+**Product Spec:** [✅ In Linear project description or ❌ Not found]
+**Technical Spec:** [✅ In Linear project description or ⏳ Pending or ❌ Not found]
 
 **Current User Stories:** [N] stories
 [If stories exist, list them:]
@@ -53,11 +52,21 @@ I found Linear Project $ARGUMENTS:
 ✅ Ready to decompose into user stories.
 ```
 
-### Step 3: Read Documentation
+### Step 3: Read Both Specs from Linear Project Description
 
-Read all available documentation to understand the feature:
+Read **both Product and Technical specifications** from the Linear project description:
 
-**Feature Spec (if available):**
+The Linear project description should contain both specs (created by `/generate-feature-brief` and `/create-technical-spec`), structured as:
+
+```markdown
+## 📋 Product Specification
+[Product spec content]
+
+## 🔧 Technical Specification
+[Technical spec content]
+```
+
+**Extract from Product Specification section:**
 - Feature overview and business value
 - Target users
 - User workflows
@@ -65,13 +74,26 @@ Read all available documentation to understand the feature:
 - Non-functional requirements
 - Business rules and validation
 - Scope boundaries
+- Open questions and assumptions
 
-**Technical Spec (if available):**
-- Architecture decisions
-- Data models
-- API contracts
-- UI components
-- Technical constraints
+**Extract from Technical Specification section (if available):**
+- Technical approach and architecture
+- System changes (new components, modifications)
+- Architecture diagrams
+- Data models and database schema
+- API contracts and endpoints
+- UI components and interactions
+- Integration points
+- Testing requirements
+- Technical open questions and assumptions
+
+**If specs not found in Linear description:**
+
+If Product Spec not found:
+- Warn: "⚠️ I couldn't find a Product Specification in the Linear project description. I recommend running `/generate-feature-brief` first. I'll proceed using the project description and any user stories."
+
+If Technical Spec is placeholder or not found:
+- Note: "ℹ️ Technical Specification hasn't been created yet. I'll decompose based on Product Spec and user stories. For better technical guidance, consider running `/create-technical-spec [PROJECT-KEY]` first."
 
 ### Step 4: Request Decomposition Meeting Input
 
@@ -270,17 +292,18 @@ Does this decomposition look good, or would you like to adjust any stories?
 
 **IMPORTANT - Uncertainty Handling in Stories:**
 
-Before creating stories, review the feature spec and technical spec for any remaining uncertainty markers (`[OPEN QUESTION]`, `[DECISION PENDING]`, `[CLARIFICATION NEEDED]`).
+Before creating stories, review **both Product and Technical specs** from the Linear project description for any remaining uncertainty markers (`[OPEN QUESTION]`, `[DECISION PENDING]`, `[CLARIFICATION NEEDED]`).
 
 **If critical uncertainties still exist:**
 - Warn the user that stories may need refinement once uncertainties are resolved
-- Consider adding a note in the story description referencing the open question
+- Consider adding a note in the story description referencing the open question and linking to the Linear project
 - Flag the story with a "blocked" or "needs-clarification" label
 
 **For each story, create with these guidelines:**
-- If an AC references an `[OPEN QUESTION]` from the feature spec, note it in the story
-- If implementation depends on a `[DECISION PENDING]` from the technical spec, add to Dependencies section
+- If an AC references an `[OPEN QUESTION]` from the Product Spec, note it in the story with link to Linear project
+- If implementation depends on a `[DECISION PENDING]` from the Technical Spec, add to Dependencies section with link
 - Stories with unresolved uncertainties should be marked for refinement
+- Link back to the Linear project description for full context
 
 For each approved story, create a Linear issue with complete details:
 
@@ -498,8 +521,8 @@ Apply these labels to help categorize stories:
 
 If something goes wrong:
 
-1. **No Feature Spec**: Warn but continue using Linear project description
-2. **No Technical Spec**: Warn but continue without technical references
+1. **No Product Spec in Linear**: Warn but continue using Linear project description and user stories
+2. **No Technical Spec in Linear**: Note that it's optional, continue with Product Spec and user stories
 3. **Stories Already Exist**: Warn and ask if user wants to continue or use `/refine-decomposition`
 4. **Unclear Boundaries**: Ask specific questions about how to split
 5. **Incomplete Transcript**: Identify gaps and work conversationally to fill them
@@ -513,9 +536,8 @@ User: /decompose-feature PROJ-42
 
 Agent: I found Linear Project PROJ-42: Advanced Search with Filters
 
-       Current Documentation:
-       - Feature Spec: ✅ docs/features/advanced_search.md
-       - Technical Spec: ✅ docs/specs/proj_42/technical_spec.md
+       Product Spec: ✅ In Linear project description
+       Technical Spec: ✅ In Linear project description
 
        Current User Stories: 0 stories
        ✅ Ready to decompose into user stories.
@@ -629,12 +651,14 @@ Agent: [Creates stories and provides summary]
 ## Important Notes
 
 - **Requires $ARGUMENTS**: Must provide Linear Project ID
+- **Reads from Linear**: Fetches both Product and Technical specs from Linear project description
 - **Transcript is Optional**: Preferred but can work conversationally
 - **Proposes Options**: Always offers decomposition strategies
 - **Confirms Before Creating**: Shows proposed breakdown for approval
 - **Complete ACs**: Every story gets comprehensive acceptance criteria
-- **Maps to Specs**: References feature spec and technical spec
+- **Maps to Specs**: References both Product and Technical specs from Linear
 - **Includes Dependencies**: Makes dependencies explicit
 - **Suggests Order**: Recommends implementation order
+- **Links Back**: Stories link back to Linear project for full context
 
 This conversational approach ensures stories are well-thought-out, properly scoped, and have comprehensive acceptance criteria while being engaging and collaborative.

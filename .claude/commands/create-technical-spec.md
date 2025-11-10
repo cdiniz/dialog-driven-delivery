@@ -37,29 +37,40 @@ I found Linear Project $ARGUMENTS:
 **Status:** [Current status]
 **Team:** [Team name]
 
-**Current Documentation:**
-- Feature Spec: [✅ path or ❌ Not found]
-- Technical Spec: [✅ path or ❌ Not found]
+**Product Spec:** [✅ In Linear project description or ❌ Not found]
+**Technical Spec:** [✅ In Linear project description or ⏳ Placeholder (ready to populate) or ❌ Not found]
 
 **User Stories:** [N] stories in this project
 - [ISSUE-1]: [Title]
 - [ISSUE-2]: [Title]
 - [Continue listing all stories]
 
-[If no feature spec found, warn: "⚠️ I recommend creating a feature spec first with `/generate-feature-brief`, but I can proceed with creating a technical spec based on the Linear project description and user stories."]
+[If no feature spec found in project description, warn: "⚠️ I recommend creating a feature spec first with `/generate-feature-brief`, but I can proceed with creating a technical spec based on the Linear project description and user stories."]
 ```
 
-### Step 3: Read Feature Spec (If Available)
+### Step 3: Read Feature Spec from Linear Project
 
-If feature spec exists:
-- Read the complete feature spec
-- Extract key information:
+Read the feature specification from the Linear project description:
+
+The feature spec should be in the project description (created by `/generate-feature-brief`).
+
+Extract key information from the project description:
   - User workflows
   - Functional requirements
   - Non-functional requirements
   - Business rules and validation
   - Dependencies and constraints
   - Compliance requirements
+  - Open questions and assumptions
+
+**If the project description contains the feature spec:**
+- Parse the structured markdown sections
+- Note any uncertainty markers that may affect technical decisions
+- Extract requirements that need technical implementation
+
+**If the project description is minimal:**
+- Warn that the technical spec will be based on limited information
+- Proceed using available information from project description and user stories
 
 ### Step 4: Analyze User Stories
 
@@ -422,21 +433,40 @@ Before saving the technical spec, scan the generated specification and validate 
 - A few `[ASSUMPTION]` markers based on codebase patterns (can validate during implementation)
 - `[CLARIFICATION NEEDED]` on performance thresholds or scaling details (can refine during implementation)
 
-### Step 11: Ask for Save Location
+### Step 11: Update Linear Project with Technical Spec
 
-Ask user where to save the technical spec:
+**Update the Linear project description** to add the Technical Specification section.
+
+**Process:**
+
+1. **Fetch the current project description** from Linear
+2. **Locate the Technical Specification section** (should be the placeholder created by `/generate-feature-brief`)
+3. **Replace the placeholder** with the complete technical specification
+4. **Update the documentation status header** to mark Technical Spec as complete
+
+**Updated Project Description Structure:**
 
 ```markdown
-Where would you like to save the technical spec?
+# Feature: [Feature Name]
 
-**Option A:** `docs/specs/[project_key]/technical_spec.md` (recommended)
-**Option B:** Custom path
+## 📋 Product Specification
 
-Which would you prefer?
+[Existing product spec - DO NOT MODIFY]
+
+---
+
+## 🔧 Technical Specification
+
+[REPLACE placeholder with full technical spec from Step 10]
+
+[Include all sections from technical spec template: Technical Approach, System Changes, Architecture, Technical Specifications, Integrations, Testing Requirements, Open Questions, etc.]
 ```
 
-- Create directory structure if needed
-- Save the spec
+**IMPORTANT:**
+- Preserve the entire Product Specification section unchanged
+- Only replace the Technical Specification section
+- Update the documentation status header with completion date and uncertainty counts
+- The Linear project description is now the single source of truth for BOTH specs
 
 ### Step 12: Provide Comprehensive Summary
 
@@ -447,7 +477,8 @@ After completing all steps, provide a detailed summary:
 
 **Feature:** [Feature Name]
 **Linear Project:** [PROJECT-KEY] - [Project URL]
-**Technical Spec:** `[path to technical spec]`
+**Specs Location:** Linear project description (Product + Technical specs)
+[If local backup created:] **Local Backup:** `[path to backup file]`
 
 **Sections Included:**
 
@@ -496,16 +527,22 @@ After completing all steps, provide a detailed summary:
 - Matches [coding conventions] conventions
 - Integrates with [existing components]
 
+**Collaboration:**
+- Both Product and Technical specs are now in Linear: [Project URL]
+- Team members can comment and collaborate on both specs in one place
+- Update the Linear project description as technical decisions are made
+
 **Next Steps:**
-1. [If uncertainties exist:] Review and resolve technical uncertainties in Section 12 and validate assumptions in Appendix A
-2. Share with development team for technical review
-3. When ready to break into stories: `/decompose-feature [PROJECT-KEY]`
-4. After stories created, start implementation: `/plan-user-story [ISSUE-ID]`
+1. [If uncertainties exist:] Review and resolve technical uncertainties in the Technical Spec section (Open Questions) and validate assumptions
+2. Share Linear project with development team for technical review
+3. Team can comment directly on the Technical Spec section in Linear
+4. When ready to break into stories: `/decompose-feature [PROJECT-KEY]` (reads both specs from Linear)
+5. After stories created, start implementation: `/plan-user-story [ISSUE-ID]`
 
 **Open Technical Questions:**
-[List questions from Section 12 that need resolution]
+[List questions from Technical Spec section that need resolution - link to Linear project]
 
-This technical spec is ready for team review and provides complete implementation guidance following your project's established patterns.
+The Linear project now contains complete Product and Technical specifications, ready for team review and story decomposition.
 ```
 
 ## Guidelines
@@ -582,7 +619,7 @@ This technical spec is ready for team review and provides complete implementatio
 
 If something goes wrong:
 
-1. **No Feature Spec**: Warn but continue using Linear project description
+1. **No Feature Spec in Linear**: Warn but continue using Linear project description and user stories
 2. **No User Stories**: Warn that decomposition should happen first, but continue
 3. **Can't Determine Sections**: Ask user which sections they want
 4. **Incomplete Transcript**: Identify gaps and ask targeted questions

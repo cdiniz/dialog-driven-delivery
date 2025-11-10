@@ -29,21 +29,33 @@ Feature Planning Meeting
         ↓
 /generate-feature-brief (paste transcript)
         ↓
-Feature Spec + Linear Project
+Linear Project with Product Spec
+        ↓
+[Product Refinement as needed]
+        ↓
+/refine-feature-brief PROJECT-42 (paste feedback/changes)
+        ↓
+Updated Product Spec
         ↓
 Technical Design Meeting
         ↓
 /create-technical-spec PROJECT-42 (paste transcript)
         ↓
-Technical Specification
+Updates Linear Project (adds Technical Spec)
+        ↓
+[Technical Refinement as needed]
+        ↓
+/refine-technical-spec PROJECT-42 (paste technical refinement)
+        ↓
+Updated Technical Spec
         ↓
 Story Decomposition Meeting
         ↓
 /decompose-feature PROJECT-42 (paste transcript)
         ↓
-User Stories in Linear
+User Stories in Linear (linked to project)
         ↓
-[Refinement as needed]
+[Story Refinement as needed]
         ↓
 /refine-decomposition PROJECT-42 (paste refinement notes)
         ↓
@@ -91,9 +103,10 @@ cp -r .claude/agents /path/to/your/project/.claude/
 1. Command asks: "Do you have a meeting transcript or want to discuss?"
 2. You paste transcript (preferred) OR discuss conversationally
 3. Agent analyzes transcript and asks clarifying questions
-4. Agent generates feature spec
-5. Agent creates Linear Project
-6. Agent saves feature spec to `docs/features/[name].md`
+4. Agent generates Product Specification
+5. Agent creates Linear Project with **Product Spec in the project description**
+6. Agent adds placeholder for Technical Spec (to be filled by `/create-technical-spec`)
+7. Agent optionally saves local backup to `docs/features/[name].md`
 
 **When to use**: When you have a feature idea or planning meeting transcript
 
@@ -122,30 +135,168 @@ Agent: I've analyzed your transcript. Here's what I found:
 
 You: [Answer questions]
 
-Agent: [Generates feature spec and creates Linear Project]
-       ✅ Feature spec: docs/features/advanced_search.md
-       ✅ Linear Project: PROJ-42
+Agent: [Generates Product Spec and creates Linear Project]
+       ✅ Linear Project: PROJ-42 created
+       ✅ Product Spec: In Linear project description
+       ✅ Technical Spec: Placeholder added (ready for /create-technical-spec)
 ```
 
 **Output**:
-- Feature specification document
-- Linear Project created
+- Linear Project created with structured description
+- Product Specification stored in project description
+- Technical Spec placeholder added
+- Optional local backup file
 - Clear next steps
+
+---
+
+#### 1.5. `/refine-feature-brief PROJECT-KEY` (Optional)
+
+**Purpose**: Refine existing product specification based on feedback or changing requirements
+
+**Workflow**:
+1. Fetches Linear Project and shows current Product Spec state
+2. Asks: "What prompted this refinement? Do you have a transcript?"
+3. You paste refinement transcript OR discuss conversationally
+4. Agent analyzes what needs to change and shows current state
+5. Agent asks clarifying questions about the changes
+6. Agent shows before/after for each proposed change
+7. You confirm changes
+8. Agent **updates Product Spec section** in Linear project description
+9. Agent identifies which user stories or technical specs might be impacted
+
+**Requires**: Linear Project ID with existing Product Spec
+
+**When to use**:
+- User feedback revealed new requirements
+- Stakeholder review requested changes
+- Scope needs adjustment (add/remove features)
+- Requirements were too vague and need clarification
+- Success metrics need updating
+- Business constraints changed
+- Open questions now have answers
+
+**Example**:
+```
+You: /refine-feature-brief PROJ-42
+
+Agent: I found Linear Project PROJ-42: Advanced Search
+
+       Product Spec: ✅ In Linear project description
+       User Stories: 5 stories
+
+       **Current Product Spec Summary:**
+       - Must Have: 8 core features
+       - Success Metrics: 2 metrics defined
+       - Open Questions: 2 unresolved
+
+       What prompted this product spec refinement?
+
+       **Option A: Refinement Meeting Transcript**
+       **Option B: Describe Changes Conversationally**
+
+You: Option A
+     [Paste transcript: "After user testing, we found users need to
+      share saved filters with their team. Also, real-time search is
+      too aggressive - 1-2 second delay is fine..."]
+
+Agent: I've analyzed your refinement transcript:
+
+       **Changes Requested:**
+       1. Filter Sharing: Add team sharing capability
+          - Reason: User testing revealed collaboration need
+          - Impact: Requires new user story
+
+       2. Performance Requirements: Relax real-time → 1-2s delay OK
+          - Reason: User testing validated acceptable delay
+          - Impact: Technical spec can be simplified
+
+       Let me show you the proposed changes:
+
+       ### Change 1: Add Filter Sharing (Section 3)
+
+       **BEFORE:**
+       ```
+       * **FR5:** Users can save filter presets
+         - Presets stored per-user
+       ```
+
+       **AFTER:**
+       ```
+       * **FR5:** Users can save and share filter presets
+         - Presets can be personal or team-shared
+         - Any team member can create shared presets
+         - Shared presets visible to all team members
+       ```
+
+       **Rationale:** User testing revealed strong collaboration need
+       **Type:** Addition + Modification
+       **Impact:** Requires new user story for sharing functionality
+
+       ### Change 2: Performance Requirements (Section 3)
+
+       **BEFORE:**
+       ```
+       * **NFR2:** Real-time search results as user types (<100ms)
+       ```
+
+       **AFTER:**
+       ```
+       * **NFR2:** Search results within 1-2 seconds
+         - Show loading indicator during search
+       ```
+
+       **Rationale:** User testing showed 1-2s delay acceptable
+       **Type:** Modification + Clarification
+       **Impact:** Technical spec can use simpler architecture
+
+       Does this look correct?
+
+You: Yes, update it
+
+Agent: ✅ Product specification refined successfully!
+       ✅ 2 sections updated
+       ✅ 1 requirement added, 1 modified
+       ✅ 2 open questions resolved
+
+       **Impact on User Stories:**
+       ⚠️ These stories may need review:
+       - PROJ-44: Filter Presets (needs sharing capability)
+       - NEW STORY NEEDED: For search refinement feature
+
+       Consider running `/refine-decomposition PROJ-42` to update stories.
+
+       **Impact on Technical Specification:**
+       ⚠️ Technical spec may need review for:
+       - Sharing permissions/authorization
+       - Relaxed performance requirements
+
+       Consider running `/refine-technical-spec PROJ-42` to update.
+```
+
+**Output**:
+- Updated Product Spec section in Linear project description
+- Clear before/after comparison of changes
+- Rationale for each change documented
+- Scope changes tracked (additions/deletions/clarifications)
+- List of potentially impacted user stories and technical specs
+- Resolution of open questions if answered
 
 ---
 
 #### 2. `/create-technical-spec PROJECT-KEY`
 
-**Purpose**: Generate technical specification from project and optional technical discussion
+**Purpose**: Generate technical specification and add it to Linear project
 
 **Workflow**:
-1. Fetches Linear Project and feature spec
+1. Fetches Linear Project and reads Product Spec from description
 2. Asks: "Did you have a technical design meeting?"
 3. You paste transcript (optional) OR discuss conversationally
 4. Agent reviews your codebase patterns
 5. Agent asks clarifying technical questions
 6. Agent generates technical spec with smart section selection
-7. Agent saves to `docs/specs/[project_key]/technical_spec.md`
+7. Agent **updates Linear project description** to add Technical Spec section
+8. Agent optionally saves local backup to `docs/specs/[project_key]/technical_spec.md`
 
 **Requires**: Linear Project ID (e.g., `PROJ-42`)
 
@@ -155,9 +306,9 @@ You: /create-technical-spec PROJ-42
 
 Agent: I found Linear Project PROJ-42: Advanced Search
 
-       Current Documentation:
-       - Feature Spec: ✅ docs/features/advanced_search.md
-       - 5 user stories in project
+       Product Spec: ✅ In Linear project description
+       Technical Spec: ⏳ Placeholder (ready to populate)
+       User Stories: 5 stories in project
 
        Did you have a technical design meeting?
        Option A: Yes, I have a transcript
@@ -182,16 +333,117 @@ Agent: I've analyzed your transcript:
 
 You: [Answer questions]
 
-Agent: [Generates technical spec]
-       ✅ Technical spec: docs/specs/proj_42/technical_spec.md
+Agent: [Generates technical spec and updates Linear]
+       ✅ Linear project updated with Technical Spec
+       ✅ Both Product and Technical specs now in Linear: [URL]
        Sections included: Data Models, API Contracts, UI Components
 ```
 
 **Output**:
-- Technical specification with relevant sections only
+- Technical specification added to Linear project description
+- Complete technical spec with relevant sections only
 - Architecture diagrams (Mermaid)
 - API contracts, data models, UI components
+- Optional local backup file
 - Clear implementation guidance
+
+---
+
+#### 2.5. `/refine-technical-spec PROJECT-KEY` (Optional)
+
+**Purpose**: Refine existing technical specification based on new discussions or learnings
+
+**Workflow**:
+1. Fetches Linear Project and shows current Technical Spec state
+2. Asks: "What prompted this refinement? Do you have a transcript?"
+3. You paste refinement transcript OR discuss conversationally
+4. Agent analyzes what needs to change and shows current state
+5. Agent asks clarifying questions about the changes
+6. Agent shows before/after for each proposed change
+7. You confirm changes
+8. Agent **updates Technical Spec section** in Linear project description
+9. Agent identifies which user stories might be impacted
+
+**Requires**: Linear Project ID with existing Technical Spec
+
+**When to use**:
+- Technical decisions change during development
+- Architecture needs adjustment based on learnings
+- New integrations or dependencies discovered
+- Performance or security concerns identified
+- Implementation reveals gaps in technical spec
+
+**Example**:
+```
+You: /refine-technical-spec PROJ-42
+
+Agent: I found Linear Project PROJ-42: Advanced Search
+
+       Technical Spec: ✅ In Linear project description
+       User Stories: 5 stories
+
+       **Current Technical Decisions:**
+       - Using Elasticsearch for full-text search
+       - REST API with JWT authentication
+       - React with Redux state management
+
+       What prompted this technical spec refinement?
+
+       **Option A: Refinement Meeting Transcript**
+       **Option B: Describe Changes Conversationally**
+
+You: Option A
+     [Paste transcript: "We need to switch from Elasticsearch to PostgreSQL
+      full-text search due to infrastructure constraints..."]
+
+Agent: I've analyzed your refinement transcript:
+
+       **Changes Requested:**
+       1. Search Technology: Elasticsearch → PostgreSQL full-text search
+          - Reason: Infrastructure team doesn't want to maintain ES cluster
+          - Impact: Slightly slower search, but simpler architecture
+
+       2. Performance Requirements: <100ms → <500ms acceptable
+          - Reason: PostgreSQL FTS is sufficient for our needs
+
+       Let me show you the proposed changes:
+
+       ### Change 1: Technical Approach (Section 1)
+
+       **BEFORE:**
+       ```
+       We will use Elasticsearch for fast, full-text search...
+       ```
+
+       **AFTER:**
+       ```
+       We will use PostgreSQL native full-text search with tsvector
+       columns. This provides sufficient performance (<500ms) without
+       requiring additional infrastructure...
+       ```
+
+       Does this look correct?
+
+You: Yes, update it
+
+Agent: ✅ Technical specification refined successfully!
+       ✅ 3 sections updated
+       ✅ 1 architecture diagram updated
+       ✅ 1 open question resolved
+
+       **Impact on User Stories:**
+       ⚠️ These stories may need review:
+       - PROJ-42: Backend API (data model changes needed)
+       - PROJ-43: Search UI (updated performance expectations)
+```
+
+**Output**:
+- Updated Technical Spec section in Linear project description
+- Clear before/after comparison of changes
+- Rationale for each change documented
+- List of potentially impacted user stories
+- Updated architecture diagrams if needed
+- Resolution of open questions if answered
 
 ---
 
@@ -379,24 +631,36 @@ See the original README sections for details on these optional commands.
 # Monday: Feature Planning Meeting
 /generate-feature-brief
 # [Paste meeting transcript, answer questions]
-# Output: Feature spec + Linear Project PROJ-42
+# Output: Linear Project PROJ-42 with Product Spec in description
 
-# Tuesday: Technical Design Session
+# Tuesday (Optional): Product Spec Refinement
+# [If stakeholders provided feedback or requirements changed]
+/refine-feature-brief PROJ-42
+# [Paste feedback transcript, confirm changes]
+# Output: Product Spec updated with refined requirements, impacted areas identified
+
+# Wednesday: Technical Design Session
 /create-technical-spec PROJ-42
 # [Paste technical discussion, answer questions]
-# Output: Technical spec with architecture
+# Output: Linear Project PROJ-42 updated with Technical Spec (both specs in Linear)
 
-# Wednesday: Story Decomposition Meeting
+# Thursday (Optional): Technical Refinement
+# [If technical decisions change or new learnings emerge]
+/refine-technical-spec PROJ-42
+# [Paste refinement transcript, confirm changes]
+# Output: Technical Spec updated with new decisions, impacted stories identified
+
+# Friday: Story Decomposition Meeting
 /decompose-feature PROJ-42
 # [Paste decomposition discussion, confirm breakdown]
 # Output: 5 user stories created (PROJ-42 through PROJ-46)
 
-# Thursday: Sprint starts - Developer realizes story is too big
+# Later: Sprint starts - Developer realizes story is too big
 /refine-decomposition PROJ-42
 # [Explain issue, confirm split]
 # Output: PROJ-42 split into PROJ-42 (backend) + PROJ-50 (frontend)
 
-# Friday: Developer starts implementation
+# Later: Developer starts implementation
 # Option A: Manual development using specs as guide
 # Option B: Optional TDD automation
 /plan-user-story PROJ-42
@@ -409,8 +673,10 @@ See the original README sections for details on these optional commands.
 
 | Command | Purpose | Input | Output | Use Case |
 |---------|---------|-------|--------|----------|
-| `/generate-feature-brief` | Create feature spec | Transcript or conversation | Feature spec + Linear Project | Feature planning meeting |
-| `/create-technical-spec PROJECT-KEY` | Technical design | Project + optional transcript | Technical spec | Technical design session |
+| `/generate-feature-brief` | Create Product Spec | Transcript or conversation | Linear Project with Product Spec in description | Feature planning meeting |
+| `/refine-feature-brief PROJECT-KEY` | Update Product Spec | Project + refinement transcript | Updated Product Spec with change rationale | Product refinement/feedback |
+| `/create-technical-spec PROJECT-KEY` | Add Technical Spec | Project + optional transcript | Updates Linear project with Technical Spec | Technical design session |
+| `/refine-technical-spec PROJECT-KEY` | Update Technical Spec | Project + refinement transcript | Updated Technical Spec with change rationale | Technical refinement/changes |
 | `/decompose-feature PROJECT-KEY` | Break into stories | Project + optional transcript | User stories in Linear | Story decomposition meeting |
 | `/refine-decomposition PROJECT-KEY` | Modify stories | Project + refinement notes | Updated stories | Refinement/learning |
 | `/plan-user-story ISSUE-ID` | TDD task list | Story ID | TDD task breakdown | Optional: TDD planning |
@@ -434,6 +700,36 @@ Benefits:
 - ✅ Faster to write and review
 - ✅ Still captures all essentials
 - ✅ Can expand sections for complex features
+
+### Linear-First Documentation
+
+**Both Product and Technical specifications** are stored **directly in Linear project descriptions**:
+
+**Project Description Structure:**
+```markdown
+## 📋 Product Specification
+[Complete product/feature spec]
+
+## 🔧 Technical Specification
+[Complete technical implementation spec]
+```
+
+**Benefits:**
+- **Single Source of Truth**: The Linear project description contains BOTH specs
+- **Built-in Collaboration**: Product and engineering teams collaborate in one place
+- **No Context Switching**: View specs, stories, and progress all in Linear
+- **Always Accessible**: No need to find files or navigate folders
+- **Version Control**: Linear tracks changes to project descriptions
+- **Unified Discussions**: Comments on both specs stay together
+- **Optional Backups**: Can save local copies for reference, but Linear is authoritative
+
+**Why This Works:**
+- ✅ Product and engineering see the same information
+- ✅ Specs always linked to project and stories
+- ✅ No sync issues between docs and project management
+- ✅ Easier onboarding (one tool, one location)
+- ✅ Technical decisions visible to product team
+- ✅ Product context visible to engineers
 
 ### Conversational & Engaging
 
@@ -564,17 +860,17 @@ your-project/
 │       ├── refinement-developer.md
 │       └── test-fix-specialist.md
 ├── docs/
-│   ├── features/                   # Feature specs
-│   │   ├── advanced_search.md
+│   ├── features/                   # Optional: Local backups of Product specs
+│   │   ├── advanced_search.md      # (Product specs live in Linear project descriptions)
 │   │   ├── user_auth.md
 │   │   └── reporting.md
-│   ├── specs/                      # Technical specs per project
-│   │   ├── proj_42/
-│   │   │   ├── technical_spec.md
-│   │   │   ├── story_PROJ-42_tdd_tasks.md
-│   │   │   └── mockups/
+│   ├── specs/                      # Optional: Local backups of Technical specs
+│   │   ├── proj_42/                # (Technical specs live in Linear project descriptions)
+│   │   │   ├── technical_spec.md   # Optional backup
+│   │   │   ├── story_PROJ-42_tdd_tasks.md  # TDD task breakdowns
+│   │   │   └── mockups/            # Design assets
 │   │   └── proj_43/
-│   │       └── technical_spec.md
+│   │       └── technical_spec.md   # Optional backup
 │   └── architecture/               # Your architecture docs
 ├── src/
 │   ├── backend/

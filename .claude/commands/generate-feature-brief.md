@@ -179,34 +179,45 @@ Before creating the Linear Project, scan the generated specification and validat
 - A few `[ASSUMPTION]` markers (can validate during implementation)
 - `[CLARIFICATION NEEDED]` on non-functional requirements (can refine later)
 
-### Step 7: Create Linear Project
+### Step 7: Create Linear Project with Product Spec
 
-Create a project in Linear with the feature spec.
+Create a Linear project with the **complete feature spec as the project description**.
 
-**Note:** Include uncertainty count in project description:
+**Project Description Format:**
+
+Structure the project description to accommodate both Product and Technical specs. The Product Spec is added now, and Technical Spec will be added later by `/create-technical-spec`.
+
+```markdown
+# Feature: [Feature Name]
+
+## 📋 Product Specification
+
+[Full feature spec from template - all sections from Section 1 through Section 4...]
+
+---
+
+## 🔧 Technical Specification
+
+_Technical specification will be added by `/create-technical-spec [PROJECT-KEY]`_
+
+_This section will include: architecture, data models, API contracts, integrations, testing requirements, and implementation details._
 ```
-[Feature description]
 
-**Spec Status:** [N] open questions, [M] assumptions to validate
-```
+**Linear Project Settings:**
+- **Name:** [Feature Name] (clear, 3-7 words)
+- **Description:** Full feature spec (markdown)
+- **Team:** [Ask user to confirm team]
+- **State:** "Planned" (or ask user)
+- **Summary:** [Brief 1-2 sentence summary for the project list view]
 
-### Step 8: Save Feature Spec
+**IMPORTANT:** The Linear project description becomes the **single source of truth** for both Product and Technical specifications. Team members collaborate on specs by updating the project description directly in Linear.
 
-Save the feature spec to the file system:
+**Section Placeholders:**
+- The Technical Spec section is added as a placeholder
+- Running `/create-technical-spec [PROJECT-KEY]` will replace the placeholder with the full technical specification
+- This keeps both specs together in one location
 
-**Ask user for location preference:**
-"Where would you like to save the feature spec?
-
-**Option A:** `docs/features/[feature_name].md` (recommended)
-**Option B:** Custom path
-
-Which would you prefer?"
-
-- Create directory structure if needed
-- Save the spec
-- Update the "Linear Project" field in the spec with the project URL
-
-### Step 9: Provide Summary
+### Step 8: Provide Summary
 
 After completing all steps, provide a comprehensive summary:
 
@@ -215,7 +226,8 @@ After completing all steps, provide a comprehensive summary:
 
 **Feature:** [Feature Name]
 **Linear Project:** [PROJECT-KEY] - [Project URL]
-**Feature Spec:** `[path to feature spec]`
+**Feature Spec Location:** Linear project description (single source of truth)
+[If local backup created:] **Local Backup:** `[path to backup file]`
 
 **Summary:**
 - [N] user workflows defined
@@ -235,7 +247,7 @@ After completing all steps, provide a comprehensive summary:
 [If no uncertainties:]
 ✅ No unresolved uncertainties - specification is complete and ready for technical design.
 
-**What's in the feature spec:**
+**What's in the Linear project description:**
 - Complete user workflows with actors and steps
 - Detailed functional and non-functional requirements
 - Clear scope boundaries (in/out of scope)
@@ -243,14 +255,22 @@ After completing all steps, provide a comprehensive summary:
 - Dependencies, constraints, and risks
 - Explicit uncertainty markers for incomplete areas
 
+**Collaborating on the Specs:**
+- View/edit specs in Linear: [Project URL]
+- Team members can update the project description directly
+- Both Product and Technical specs live in the same Linear project
+- All subsequent commands will read from the Linear project description
+- Keep specs updated as decisions are made and questions are resolved
+
 **Next Steps:**
-1. [If uncertainties exist:] Review and resolve uncertainties in Section 7 and validate assumptions in Section 10
-2. Share with stakeholders for feedback
-3. When ready for technical design: `/create-technical-spec [PROJECT-KEY]`
-4. After technical spec: `/decompose-feature [PROJECT-KEY]`
+1. [If uncertainties exist:] Review and resolve uncertainties in the Linear project description (Product Spec > Section 4: Open Questions & Assumptions)
+2. Share the Linear project with stakeholders for feedback and collaboration
+3. Update the project description as decisions are made
+4. When ready for technical design: `/create-technical-spec [PROJECT-KEY]` (adds Technical Spec section to same Linear project)
+5. After technical spec: `/decompose-feature [PROJECT-KEY]` (reads both specs from Linear)
 
 **Open Questions to Resolve:**
-[List the questions from section 7 that need answers]
+[List the questions from section 4 that need answers - link to Linear project]
 ```
 
 ## Guidelines
@@ -282,11 +302,13 @@ After completing all steps, provide a comprehensive summary:
 
 ### Linear Project Creation
 
-1. **Meaningful Names**: Use clear, descriptive project names
-2. **Good Descriptions**: Include enough context that someone can understand the project from Linear alone
-3. **Link Documentation**: Always reference the feature spec in the project description
-4. **Set Appropriate State**: Use "Planned" for new projects unless user specifies otherwise
-5. **Choose Right Team**: Confirm team selection with user
+1. **Meaningful Names**: Use clear, descriptive project names (3-7 words)
+2. **Full Spec in Description**: Store the COMPLETE feature specification in the project description (markdown format)
+3. **Single Source of Truth**: The Linear project description IS the feature spec - no separate files needed
+4. **Summary Field**: Use the project summary field for a brief 1-2 sentence overview (shows in project list)
+5. **Set Appropriate State**: Use "Planned" for new projects unless user specifies otherwise
+6. **Choose Right Team**: Confirm team selection with user
+7. **Enable Collaboration**: The spec in Linear allows team members to comment, suggest changes, and update directly
 
 ## Error Handling
 

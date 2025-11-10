@@ -341,7 +341,6 @@ For each task, follow the **Red-Green-Refactor** cycle:
 - **Feature Spec:** `[path to feature spec]`
 - **Technical Spec:** `[path to technical spec]`
 - **UI Mockups/Designs:** `[path to mockups or design links]`
-- **PRD:** `[path to PRD]`
 - **Architecture Docs:** `[path to architecture documentation]`
 
 </plan_template>

@@ -75,7 +75,7 @@ As you ask clarifying questions, keep track of which ones the user answered and 
 
 **CRITICAL - Uncertainty Marker Policy:**
 
-Before generating the spec, review the documentation in `docs/uncertainty-markers.md`.
+Before generating the spec, review the documentation in `.claude/uncertainty-markers.md`.
 
 When generating the specification, you MUST follow these rules:
 
@@ -92,8 +92,7 @@ When generating the specification, you MUST follow these rules:
 4. **NEVER make silent assumptions.** If you infer something, mark it with `[ASSUMPTION]`.
 
 5. **Link all markers** → Every inline marker must have corresponding entry in:
-   - Section 7 (Open Questions) for `[OPEN QUESTION]` and `[CLARIFICATION NEEDED]`
-   - Section 10 (Appendix > Assumptions) for `[ASSUMPTION]`
+   - Section 4 (Open Questions & Assumptions) for all uncertainty markers
 
 **Examples:**
 
@@ -117,263 +116,9 @@ API response time should be fast
 API response time should be [CLARIFICATION NEEDED: define threshold - <500ms, <1s, <3s?]
 ```
 
-Now create a comprehensive feature spec using this template:
+Now create a pragmatic, streamlined feature spec using the template from @.claude/templates/feature-spec.md
 
-<feature_template>
-```markdown
-# Feature: [Feature Name]
-
-**Date:** [Current Date]
-**Status:** Planning
-**Linear Project:** [Will be filled after creation]
-
----
-
-## 1. Feature Overview
-
-### 1.1 Description
-[Detailed description of what this feature does and why it's important. Include context from PRD if available.]
-
-### 1.2 Business Value
-[Clear explanation of the business value and strategic importance. Why are we building this?]
-
-### 1.3 Target Users
-[Which user personas will use this feature. Reference PRD personas if available, or define new ones.]
-
-### 1.4 Success Criteria
-* [Measurable criterion 1 - specific metric]
-* [Measurable criterion 2 - specific metric]
-* [Measurable criterion 3 - specific metric]
-* [Continue as needed]
-
----
-
-## 2. User Workflows
-
-### Workflow 1: [Primary Workflow Name]
-**Actors:** [User persona]
-**Trigger:** [What initiates this workflow]
-
-**Steps:**
-1. User [action with specific details]
-2. System [response with specific behavior]
-3. User [action with specific details]
-4. System [response with specific behavior]
-5. [Continue with complete workflow]
-
-**Success Outcome:** [What success looks like]
-**Error Scenarios:** [What can go wrong]
-
-### Workflow 2: [Secondary Workflow Name]
-**Actors:** [User persona]
-**Trigger:** [What initiates this workflow]
-
-**Steps:**
-1. User [action]
-2. System [response]
-3. [Continue with complete workflow]
-
-**Success Outcome:** [What success looks like]
-**Error Scenarios:** [What can go wrong]
-
-[Add more workflows as needed - cover all major user journeys]
-
----
-
-## 3. Functional Requirements
-
-### 3.1 Core Functionality
-* **FR1:** [Specific requirement with acceptance criteria]
-* **FR2:** [Specific requirement with acceptance criteria]
-* **FR3:** [Specific requirement with acceptance criteria]
-* [Continue with all core requirements]
-
-### 3.2 Input Requirements
-* **Input 1:** [Name] - [Format, validation rules, constraints]
-* **Input 2:** [Name] - [Format, validation rules, constraints]
-* [All inputs users can provide]
-
-### 3.3 Output Requirements
-* **Output 1:** [Name] - [Format, content, when shown]
-* **Output 2:** [Name] - [Format, content, when shown]
-* [All outputs users will see]
-
-### 3.4 Business Rules
-* **BR1:** [Specific business rule with conditions and outcomes]
-* **BR2:** [Specific business rule with conditions and outcomes]
-* [All business logic and rules]
-
-### 3.5 Validation Rules
-* **VR1:** [Field/input] - [Validation rule and error message]
-* **VR2:** [Field/input] - [Validation rule and error message]
-* [All validation rules with exact error messages]
-
-### 3.6 Data Requirements
-* **DR1:** [What data is needed, where it comes from]
-* **DR2:** [What data is needed, where it comes from]
-* [All data requirements]
-
----
-
-## 4. Non-Functional Requirements
-
-### 4.1 Performance
-* [Specific performance requirement with measurable criteria]
-* [Example: Page load time < 2 seconds]
-* [Example: API response time < 500ms]
-
-### 4.2 Security
-* [Specific security requirement]
-* [Authentication/authorization requirements]
-* [Data protection requirements]
-
-### 4.3 Accessibility
-* [WCAG compliance level]
-* [Keyboard navigation requirements]
-* [Screen reader requirements]
-
-### 4.4 Usability
-* [User experience requirements]
-* [Error handling and feedback]
-* [Loading states and progress indicators]
-
-### 4.5 Scalability
-* [Expected load/volume]
-* [Scaling requirements]
-
-### 4.6 Internationalization (if applicable)
-* [Languages to support]
-* [Localization requirements]
-* [Date/time/currency formats]
-
----
-
-## 5. Dependencies & Constraints
-
-### 5.1 Technical Dependencies
-* [Dependency 1: what depends on what]
-* [Dependency 2: what depends on what]
-* [Example: Requires user authentication system to be implemented first]
-
-### 5.2 External Dependencies
-* [Third-party services or APIs]
-* [External data sources]
-
-### 5.3 Technical Constraints
-* [Constraint 1: limitation and impact]
-* [Constraint 2: limitation and impact]
-* [Example: Must work with existing PostgreSQL database]
-
-### 5.4 Business Constraints
-* [Timeline constraints]
-* [Budget constraints]
-* [Resource constraints]
-
-### 5.5 Compliance Requirements
-* [GDPR, HIPAA, SOC2, etc.]
-* [Data retention policies]
-* [Audit requirements]
-
----
-
-## 6. Scope Boundaries
-
-### 6.1 In Scope
-* [Capability 1 - explicitly included]
-* [Capability 2 - explicitly included]
-* [Capability 3 - explicitly included]
-* [Be specific about what IS included]
-
-### 6.2 Out of Scope
-* [Capability 1 - explicitly NOT included]
-* [Capability 2 - explicitly NOT included]
-* [Capability 3 - explicitly NOT included]
-* [Be clear about what is deferred or excluded]
-
-### 6.3 Future Considerations
-* [Enhancement 1 - possible future work]
-* [Enhancement 2 - possible future work]
-* [Ideas mentioned but not in current scope]
-
----
-
-## 7. Open Questions
-
-Track unresolved questions that need answers before or during implementation.
-
-**NOTE:** Every `[OPEN QUESTION]` and `[CLARIFICATION NEEDED]` marker in the spec body must have a corresponding entry here with:
-- Clear question statement
-- Owner (who will resolve it)
-- Deadline (when it's needed)
-- Context (where in the spec it's referenced)
-
-Example format:
-
-- [ ] **Q1:** [Question that needs resolution]
-  - **Owner:** [Who will resolve - Product/Engineering/Design/etc.]
-  - **Deadline:** [When needed - Before technical design/Before implementation/etc.]
-  - **Context:** [Where this appears - Referenced in FR3, Section 2.1, etc.]
-  - **Options:** [If applicable - list the choices being considered]
-
-- [ ] **Q2:** [Question that needs resolution]
-  - **Owner:** [Who will resolve]
-  - **Deadline:** [When needed]
-  - **Context:** [Where referenced]
-
-[Continue with all open questions - ensure each inline marker has an entry here]
-
----
-
-## 8. Risks & Mitigations
-
-### Risk 1: [Risk Name]
-**Probability:** [High/Medium/Low]
-**Impact:** [High/Medium/Low]
-**Mitigation Strategy:** [How to address this risk]
-
-### Risk 2: [Risk Name]
-**Probability:** [High/Medium/Low]
-**Impact:** [High/Medium/Low]
-**Mitigation Strategy:** [How to address this risk]
-
-[Continue with all identified risks]
-
----
-
-## 9. References
-
-- **Meeting Transcript:** [Date and participants if from meeting]
-- **Related Documentation:** [Links to any related docs]
-- **Design Mockups:** [If available]
-
----
-
-## 10. Appendix
-
-### Meeting Notes
-[If transcript was provided, summarize key discussion points]
-
-### Assumptions
-
-**NOTE:** Every `[ASSUMPTION]` marker in the spec body must have a corresponding entry here.
-
-List all assumptions made during feature definition with full context:
-
-Example format:
-
-1. **[Assumption Name]:** [Full statement of the assumption]. [Why this assumption was made]. [Impact if assumption is wrong]. [How to validate].
-
-Example:
-1. **Browser Support:** We assume modern browsers (Chrome 90+, Firefox 88+, Safari 14+) based on typical SaaS user base. This affects which web APIs we can use. Needs validation with actual user analytics before implementation.
-
-2. **Authentication Method:** We assume [ASSUMPTION content from spec]. [Continue with context and validation approach].
-
-[List all assumptions - ensure each inline `[ASSUMPTION]` marker has an entry here]
-
-### Glossary
-[Define any domain-specific terms used in this document]
-```
-</feature_template>
+Fill in all sections of the template with the information gathered, applying the uncertainty marker policy described above.
 
 ### Step 6.5: Uncertainty Validation (NEW)
 
@@ -393,8 +138,7 @@ Before creating the Linear Project, scan the generated specification and validat
    ```
 
 2. **Verify each marker is tracked:**
-   - Check that each `[OPEN QUESTION]` and `[CLARIFICATION NEEDED]` has a corresponding entry in Section 7 (Open Questions)
-   - Check that each `[ASSUMPTION]` has a corresponding entry in Section 10 (Appendix > Assumptions)
+   - Check that all uncertainty markers have corresponding entries in Section 4 (Open Questions & Assumptions)
    - List any markers that are NOT properly tracked
 
 3. **Present summary to user:**
@@ -419,7 +163,7 @@ Before creating the Linear Project, scan the generated specification and validat
    - Go through each `[OPEN QUESTION]` and `[CLARIFICATION NEEDED]`
    - Ask the user for answers
    - Update the spec to replace markers with actual values
-   - Move resolved questions to a "Resolved Questions" subsection in Section 7
+   - Mark resolved questions as checked in Section 4
 
 5. **If user chooses Option B or C:**
    - Proceed to next step
@@ -533,9 +277,8 @@ After completing all steps, provide a comprehensive summary:
 1. **Be Concrete**: Use specific examples, actual field names, exact error messages
 2. **Be Complete**: Cover happy paths, error cases, edge cases, empty states
 3. **Be Clear**: Write for both technical and non-technical stakeholders
-4. **Reference PRD**: When available, connect feature to product vision and personas
-5. **Define Boundaries**: Be explicit about what's in and out of scope
-6. **Track Unknowns**: Capture open questions rather than making assumptions
+4. **Define Boundaries**: Be explicit about what's in and out of scope
+5. **Track Unknowns**: Capture open questions rather than making assumptions
 
 ### Linear Project Creation
 
@@ -549,9 +292,8 @@ After completing all steps, provide a comprehensive summary:
 
 If something goes wrong:
 
-1. **Missing PRD**: It's optional - continue without it
-2. **Can't Create Linear Project**: Provide the spec anyway and explain the issue
-3. **Ambiguous Input**: Ask specific clarifying questions rather than making assumptions
+1. **Can't Create Linear Project**: Provide the spec anyway and explain the issue
+2. **Ambiguous Input**: Ask specific clarifying questions rather than making assumptions
 4. **Incomplete Transcript**: Identify gaps and ask targeted questions to fill them
 5. **No Team Access**: List available teams and ask user to select
 

@@ -1,6 +1,6 @@
 # Spec-Driven Product Development Workflow
 
-A comprehensive, project-agnostic methodology for building software products through **conversational, transcript-first** documentation and development. Designed for real-world teams where features are defined through meetings, refined through discussion, and implemented incrementally.
+A pragmatic, streamlined methodology for building software products through **conversational, transcript-first** documentation and development. Designed for real-world teams where features are defined through meetings, refined through discussion, and implemented incrementally.
 
 ---
 
@@ -8,13 +8,13 @@ A comprehensive, project-agnostic methodology for building software products thr
 
 This workflow is built on **pragmatic principles** for ongoing product development:
 
-1. **Feature-Centric**: Most teams work on features, not product-wide planning (PRD is optional)
+1. **Feature-Centric**: Most teams work on features
 2. **Conversational & Engaging**: Commands ask for meeting transcripts and work interactively
 3. **Incremental Delivery**: Break features into independently deliverable user stories
 4. **Iterative Refinement**: Story decomposition can be refined as the team learns
 5. **Quality Through Design**: Thoughtful specs prevent issues before they occur
 6. **Explicit Over Implicit**: Uncertainties are marked, not assumed (prevents AI hallucination)
-7. **Flexibility**: Use what adds value - TDD automation is completely optional
+7. **Flexibility**: Use what adds value, customize templates for your context
 
 ---
 
@@ -52,20 +52,6 @@ Updated Stories
 [Optional TDD Workflow]
 /plan-user-story ISSUE-42
 /implement-story docs/specs/.../tdd_tasks.md
-```
-
-### Greenfield Mode (Rare - New Products Only)
-
-For teams starting a **completely new product**:
-
-```
-Product Planning
-        ↓
-/generate-product-prd (optional - for new products only)
-        ↓
-Product Requirements Document
-        ↓
-[Then follow Ongoing Development Mode for each feature]
 ```
 
 ---
@@ -385,25 +371,6 @@ See the original README sections for details on these optional commands.
 
 ---
 
-### Greenfield Only (Rarely Used)
-
-#### `/generate-product-prd`
-
-**Purpose**: Create product-level PRD for new products (greenfield only)
-
-⚠️ **Use only when**:
-- Starting a completely new product
-- Major product pivot or v2.0 rewrite
-- Annual strategic planning
-
-❌ **Don't use for**:
-- Adding features to existing products (use `/generate-feature-brief`)
-- Day-to-day development
-
-**Most teams can skip this command entirely** and start with `/generate-feature-brief`.
-
----
-
 ## Typical Weekly Flow
 
 ### Ongoing Organization (Most Common)
@@ -448,11 +415,25 @@ See the original README sections for details on these optional commands.
 | `/refine-decomposition PROJECT-KEY` | Modify stories | Project + refinement notes | Updated stories | Refinement/learning |
 | `/plan-user-story ISSUE-ID` | TDD task list | Story ID | TDD task breakdown | Optional: TDD planning |
 | `/implement-story PATH` | Automated impl | TDD task file | Implemented code | Optional: TDD automation |
-| `/generate-product-prd` | Product PRD | Transcript or conversation | Product PRD | Greenfield only (rare) |
 
 ---
 
 ## Key Features
+
+### Simplified, Pragmatic Templates
+
+Our feature specs use a **streamlined 5-section template** (vs traditional 10+ sections):
+- **Section 1: Overview** - What, why, who, and success metrics
+- **Section 2: User Journey** - Primary workflow with edge cases
+- **Section 3: Requirements** - Must have, should have, out of scope, constraints
+- **Section 4: Open Questions & Assumptions** - All uncertainties in one place
+- **Section 5: Risks** - High/medium risks with mitigations
+
+Benefits:
+- ✅ 2-3 pages instead of 5-10 pages
+- ✅ Faster to write and review
+- ✅ Still captures all essentials
+- ✅ Can expand sections for complex features
 
 ### Conversational & Engaging
 
@@ -527,7 +508,7 @@ Users authenticate via [OPEN QUESTION: OAuth2, password, or social login?]
 - Provides audit trail of what was decided vs assumed
 - Enables better prioritization (can't implement stories with unresolved questions)
 
-See `docs/uncertainty-markers.md` for complete documentation and `docs/uncertainty-markers-examples.md` for real-world examples.
+See `.claude/uncertainty-markers.md` for complete documentation and `.claude/uncertainty-markers-examples.md` for real-world examples.
 
 ---
 
@@ -576,15 +557,13 @@ your-project/
 │   │   ├── decompose-feature.md
 │   │   ├── refine-decomposition.md
 │   │   ├── plan-user-story.md
-│   │   ├── implement-story.md
-│   │   └── generate-product-prd.md
+│   │   └── implement-story.md
 │   └── agents/                      # Optional: TDD agents
 │       ├── story-developer.md
 │       ├── story-reviewer.md
 │       ├── refinement-developer.md
 │       └── test-fix-specialist.md
 ├── docs/
-│   ├── prd.md                      # Optional: Product PRD (greenfield only)
 │   ├── features/                   # Feature specs
 │   │   ├── advanced_search.md
 │   │   ├── user_auth.md
@@ -625,7 +604,6 @@ your-project/
 
 - Use core workflow (steps 1-4) for documentation
 - Optionally add TDD automation (steps 5-6)
-- Skip product PRD for existing products
 - Refine decomposition as many times as needed
 
 ### 4. Quality Through Process
@@ -650,7 +628,6 @@ If you used the old workflow:
 
 **Old Command → New Command**
 
-- `/generate-prd` → `/generate-product-prd` (rarely used now)
 - `/create-feature-and-stories "description"` → Split into:
   - `/generate-feature-brief` (feature spec + project)
   - `/decompose-feature PROJECT-KEY` (stories)
@@ -663,7 +640,6 @@ If you used the old workflow:
 2. **Decomposition is separate**: No longer combined with feature creation
 3. **Refinement is explicit**: New command for modifying decomposition
 4. **Transcript-first**: All commands prefer meeting transcripts
-5. **Product PRD is optional**: Most teams start with feature brief
 
 ---
 
@@ -682,13 +658,6 @@ Perfect! That's expected:
 - Use `/refine-decomposition PROJECT-KEY`
 - Explain what changed and why
 - Agent will update stories intelligently
-
-### "I want to skip the product PRD"
-
-Great! Most teams should:
-- Start directly with `/generate-feature-brief`
-- Product PRD is only for greenfield projects
-- Feature specs provide everything you need
 
 ### "Can I use this with other issue trackers?"
 

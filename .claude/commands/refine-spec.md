@@ -1,8 +1,8 @@
 ---
-description: Refine existing project specifications based on new information
+description: Refine existing feature specifications based on new information
 ---
 
-You are tasked with refining an existing Linear project specification based on new information, whether product-focused, technical, or both.
+You are tasked with refining an existing Confluence page feature specification based on new information, whether product-focused, technical, or both.
 
 ## Philosophy
 
@@ -10,7 +10,7 @@ This command updates ANY part of the existing specifications based on new input.
 
 ## Conversational Workflow
 
-1. Accept Linear Project ID as argument
+1. Accept Confluence Page ID or URL as argument
 2. Fetch and analyze current specifications
 3. Request new input (transcript, document, conversation)
 4. Analyze what's new vs what exists
@@ -20,23 +20,28 @@ This command updates ANY part of the existing specifications based on new input.
 
 ## Steps
 
-### Step 1: Get Project ID from Arguments
+### Step 1: Get Page ID from Arguments
 
-The command accepts the Linear Project as `$ARGUMENTS`:
-- Project Key (e.g., `PROJ-42`)
-- Project Name (e.g., `Advanced Search`)
-- Project ID (UUID)
+The command accepts the Confluence Page as `$ARGUMENTS`:
+- Page ID (e.g., `123456789`)
+- Page URL (e.g., `https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789`)
+- Page Title (will search for it)
+
+**Use MCP Tool:** `mcp__atlassian__getConfluencePage` to fetch the page content.
+
+If user provides a URL, extract the page ID from it. If they provide a title, use `mcp__atlassian__getPagesInConfluenceSpace` or `mcp__atlassian__searchConfluenceUsingCql` to find the page.
 
 ### Step 2: Fetch and Analyze Current State
 
-Query Linear and display the current specification state:
+Query Confluence and display the current specification state:
 
 ```markdown
-I found Linear Project $ARGUMENTS:
+I found Confluence Page: [Page Title]
 
-**Project:** [PROJECT-KEY] - [Project Name]
-**URL:** [Linear Project URL]
-**Team:** [Team name]
+**Page:** [Page Title]
+**URL:** [Confluence Page URL]
+**Space:** [Space name]
+**Last Modified:** [Date]
 
 ## Current Specification Coverage
 
@@ -199,23 +204,31 @@ Here are the proposed changes to your specifications:
 - ✅ Resolved Questions: [List any [OPEN QUESTION] markers being resolved]
 - ⚠️ New Questions: [List any new uncertainties being added]
 
-Does this look correct? Should I proceed with updating the Linear project?
+Does this look correct? Should I proceed with updating the Confluence page?
 ```
 
 ### Step 8: Apply Updates
 
-Update the Linear project description with the refined specifications:
+Update the Confluence page with the refined specifications:
+
+**Use MCP Tool:** `mcp__atlassian__updateConfluencePage`
+
+**Update Parameters:**
+- **cloudId:** [From page or site URL]
+- **pageId:** [Page ID]
+- **body:** Updated full specification content in Markdown
+- **versionMessage:** Brief description of changes made
 
 ```markdown
-Updating specifications in Linear Project [PROJECT-KEY]...
+Updating specifications in Confluence Page [Page Title]...
 
-✅ Linear project description updated
+✅ Confluence page updated
 ✅ [X] Product Specification sections modified
 ✅ [Y] Technical Specification sections modified
 ✅ [Z] Open questions resolved
 ✅ [W] New questions/uncertainties added
 
-**Linear Project URL:** [URL to view updated specs]
+**Confluence Page URL:** [URL to view updated specs]
 ```
 
 ### Step 9: Provide Comprehensive Summary
@@ -223,8 +236,8 @@ Updating specifications in Linear Project [PROJECT-KEY]...
 ```markdown
 ✅ Specifications refined successfully!
 
-**Linear Project:** [PROJECT-KEY] - [Project Name]
-**URL:** [Project URL]
+**Confluence Page:** [Page Title]
+**URL:** [Page URL]
 
 ## What Was Updated
 
@@ -274,18 +287,18 @@ Updating specifications in Linear Project [PROJECT-KEY]...
 
 [If applicable:]
 **These changes may impact:**
-- User stories (if created): [List stories that might need review]
+- Jira stories (if created): [List stories that might need review]
 - Timeline: [If scope changed significantly]
 - Technical complexity: [If architecture changed]
 
 ## Next Steps
 
-1. Review the updated specifications in Linear: [URL]
+1. Review the updated specifications in Confluence: [URL]
 2. [If gaps remain] Schedule sessions to discuss:
    - [Remaining product gaps]
    - [Remaining technical gaps]
-3. [If ready] Create user stories: `/decompose-feature [PROJECT-KEY]`
-4. Continue refinement as needed: `/refine-spec [PROJECT-KEY]`
+3. [If ready] Create Jira stories: `/decompose-feature [PAGE-ID]`
+4. Continue refinement as needed: `/refine-spec [PAGE-ID]`
 
 The specifications have been successfully updated with the new information.
 ```
@@ -363,16 +376,17 @@ Before finalizing updates:
 2. **Conflicting with existing**: Show conflict, ask how to resolve
 3. **Ambiguous updates**: Ask which section should be updated
 4. **Major scope change**: Warn about impact, confirm before proceeding
-5. **Linear update fails**: Provide full updated text for manual update
+5. **Confluence update fails**: Provide full updated text for manual update
+6. **Page not found**: Verify page ID/URL and suggest searching for the page
 
 ## Examples
 
 ### Example 1: Product Refinement
 
 ```
-User: /refine-spec PROJ-42
+User: /refine-spec 123456789
 
-Agent: I found Linear Project PROJ-42: Advanced Search
+Agent: I found Confluence Page: Advanced Search
 
        **Current Coverage:**
        📋 Product Spec: ~70% complete (missing success metrics)
@@ -408,7 +422,7 @@ Agent: ✅ Specifications refined successfully!
 ### Example 2: Technical Refinement
 
 ```
-User: /refine-spec PROJ-42
+User: /refine-spec https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789
 
 Agent: [Shows current state]
 
@@ -434,9 +448,10 @@ Agent: ✅ Technical Spec updated: 30% → 75% complete
 ### Example 3: Combined Refinement
 
 ```
-User: /refine-spec PROJ-42
+User: /refine-spec Advanced Search
 
-Agent: [Shows current state]
+Agent: [Searches and finds page]
+       [Shows current state]
 
 User: Option A
       [Pastes comprehensive review meeting covering both aspects]
@@ -467,6 +482,7 @@ Agent: ✅ Both specifications updated successfully!
 - **Progressive enhancement**: Specs grow with each refinement
 - **No forced structure**: Natural information flow
 - **Uncertainty tracking**: Resolves old questions, adds new ones
-- **Single source of truth**: Everything stays in Linear
+- **Single source of truth**: Everything stays in Confluence
+- **Version tracking**: Uses Confluence's version history with meaningful messages
 
 This unified refinement approach allows natural evolution of specifications without artificial boundaries between product and technical information.

@@ -7,39 +7,37 @@ Refine an existing feature decomposition by splitting large stories, merging sma
 ## Conversational Workflow
 
 This command uses an **engaging, conversational approach**:
-1. Accept Linear Project ID as argument
-2. Fetch project and display ALL existing stories
+1. Accept Jira Project Key as argument
+2. Fetch all existing stories for the project
 3. Ask if there's a refinement meeting transcript
 4. Analyze transcript or work conversationally
 5. Propose specific changes (split/merge/add/modify)
 6. Confirm changes before executing
-7. Execute changes in Linear
+7. Execute changes in Jira
 8. Provide clear summary of what changed
 
 ## Steps
 
-### Step 1: Get Project ID from Arguments
+### Step 1: Get Project Key from Arguments
 
-The command accepts the Linear Project as `$ARGUMENTS`:
-- Project Key (e.g., `PROJ-42`)
-- Project Name (e.g., `Advanced Search`)
-- Project ID (UUID)
+The command accepts the Jira Project Key as `$ARGUMENTS`:
+- Project Key (e.g., `PROJ`, `ENG`, `PRODUCT`)
+
+**Use MCP Tool:** `mcp__atlassian__searchJiraIssuesUsingJql` with JQL like `project = PROJ AND type = Story` to fetch all stories.
 
 ### Step 2: Fetch and Display Current State
 
-Query Linear for the project and display complete current state:
+Query Jira for all stories in the project and display complete current state:
 
 ```markdown
-I found Linear Project $ARGUMENTS:
+I found Jira Project: [PROJECT-KEY]
 
-**Project:** [PROJECT-KEY] - [Project Name]
-**URL:** [Linear Project URL]
-**Status:** [Current status]
-**Team:** [Team name]
+**Project:** [PROJECT-KEY]
+**Total Stories:** [N] stories
 
 **Current User Stories:** [N] stories
 
-### Story 1: [ISSUE-XX] - [Story Title]
+### Story 1: [ISSUE-KEY] - [Story Title]
 **Status:** [Status]
 **URL:** [URL]
 **Labels:** [Labels]
@@ -48,7 +46,7 @@ I found Linear Project $ARGUMENTS:
 **Acceptance Criteria:** [N] ACs
 **Dependencies:** [Lists other stories this depends on or blocks]
 
-### Story 2: [ISSUE-YY] - [Story Title]
+### Story 2: [ISSUE-KEY] - [Story Title]
 **Status:** [Status]
 **URL:** [URL]
 **Labels:** [Labels]
@@ -63,10 +61,9 @@ I found Linear Project $ARGUMENTS:
 
 **Story Status Summary:**
 - Backlog: [N] stories
-- Todo: [N] stories
+- Todo/Selected for Development: [N] stories
 - In Progress: [N] stories
 - Done: [N] stories
-- Cancelled: [N] stories
 
 [If there are In Progress or Done stories, show warning:]
 ⚠️ Note: [N] stories are already in progress or completed. I can still refine the decomposition, but be aware that changes may affect ongoing work.
@@ -74,13 +71,15 @@ I found Linear Project $ARGUMENTS:
 
 ### Step 3: Read Story Details
 
-For each story, read the complete Linear issue:
+For each story, read the complete Jira issue:
+
+**Use MCP Tool:** `mcp__atlassian__getJiraIssue` for each story to get:
 - Full description with user story format
 - All acceptance criteria
 - Comments and discussion
 - Current status and assignee
 - Labels and metadata
-- Links to other stories or docs
+- Links to other stories or Confluence pages
 
 ### Step 4: Request Refinement Meeting Input
 
@@ -117,12 +116,12 @@ I've analyzed your refinement meeting transcript. Here's what I found:
 **Changes Needed:**
 
 **Split Stories:**
-- **[ISSUE-XX]: [Title]** → Split into [N] smaller stories
+- **[ISSUE-KEY]: [Title]** → Split into [N] smaller stories
   - Reason: [Why it's too large - from transcript]
   - Proposed split: [How to split it]
 
 **Merge Stories:**
-- **[ISSUE-YY]** + **[ISSUE-ZZ]** → Merge into one story
+- **[ISSUE-KEY]** + **[ISSUE-KEY]** → Merge into one story
   - Reason: [Why they should be merged - from transcript]
 
 **Add New Stories:**
@@ -131,17 +130,17 @@ I've analyzed your refinement meeting transcript. Here's what I found:
   - Scope: [What it covers]
 
 **Modify Stories:**
-- **[ISSUE-AA]: [Title]**
+- **[ISSUE-KEY]: [Title]**
   - Change: [What needs to change - from transcript]
   - Reason: [Why]
 
 **Cancel Stories:**
-- **[ISSUE-BB]: [Title]**
+- **[ISSUE-KEY]: [Title]**
   - Reason: [Why no longer needed - from transcript]
 
 **Priority Changes:**
-- [ISSUE-XX] should move up in priority
-- [ISSUE-YY] can be deprioritized
+- [ISSUE-KEY] should move up in priority
+- [ISSUE-KEY] can be deprioritized
 
 **Concerns from Meeting:**
 - [Concern 1]
@@ -160,7 +159,7 @@ Based on the refinement input, ask specific questions:
 Let me clarify the refinement approach:
 
 [If splitting stories:]
-**Story Split: [ISSUE-XX] - [Title]**
+**Story Split: [ISSUE-KEY] - [Title]**
 
 I see this story is being split. How should we split it?
 
@@ -172,16 +171,16 @@ I see this story is being split. How should we split it?
 Which approach makes sense?
 
 [After user selects, ask:]
-- Should the original story [ISSUE-XX] become one of the new stories, or should I create all new stories and cancel the original?
+- Should the original story [ISSUE-KEY] become one of the new stories, or should I create all new stories and transition the original to Done/Cancelled?
 - How should acceptance criteria be distributed across the new stories?
 - Do the new stories have dependencies on each other?
 
 [If merging stories:]
-**Story Merge: [ISSUE-YY] + [ISSUE-ZZ]**
+**Story Merge: [ISSUE-KEY] + [ISSUE-KEY]**
 
 I see these stories should be merged. Questions:
 
-- Which story should be kept ([ISSUE-YY] or [ISSUE-ZZ])?
+- Which story should be kept ([ISSUE-KEY] or [ISSUE-KEY])?
 - Should I combine all acceptance criteria from both stories?
 - What should be the title of the merged story?
 
@@ -190,14 +189,14 @@ I see these stories should be merged. Questions:
 
 For this new story, I need to understand:
 
-- What user persona is this for? (from feature spec)
+- What user persona is this for?
 - What user value does it deliver?
-- What are the acceptance criteria? (or should I draft them based on the feature spec?)
+- What are the acceptance criteria? (or should I draft them based on specs?)
 - Does it depend on any existing stories?
 - What's the priority relative to existing stories?
 
 [If modifying stories:]
-**Modify Story: [ISSUE-AA] - [Title]**
+**Modify Story: [ISSUE-KEY] - [Title]**
 
 What needs to change?
 
@@ -209,7 +208,7 @@ What needs to change?
 [Continue with targeted questions based on selection]
 
 [If cancelling stories:]
-**Cancel Story: [ISSUE-BB] - [Title]**
+**Cancel Story: [ISSUE-KEY] - [Title]**
 
 Before I cancel this story, let me confirm:
 
@@ -233,7 +232,7 @@ Perfect! Based on our discussion, here are the changes I'll make to the story de
 
 ---
 
-### 1. Split [ISSUE-XX]: [Original Title]
+### 1. Split [ISSUE-KEY]: [Original Title]
 
 **Reason:** [Why it's being split]
 
@@ -244,7 +243,7 @@ Perfect! Based on our discussion, here are the changes I'll make to the story de
 
 **New Stories:**
 
-**[ISSUE-XX-A]: [New Title 1]** (keeping original issue number)
+**[ISSUE-KEY-A]: [New Title 1]** (update original issue)
 - **Scope:** [What this covers]
 - **Acceptance Criteria:** [N] ACs including:
   - [AC1 summary]
@@ -252,33 +251,33 @@ Perfect! Based on our discussion, here are the changes I'll make to the story de
 - **Dependencies:** [Dependencies]
 - **Labels:** [Labels to apply]
 
-**[NEW-ISSUE]: [New Title 2]** (new issue)
+**[NEW-ISSUE-KEY]: [New Title 2]** (new issue)
 - **Scope:** [What this covers]
 - **Acceptance Criteria:** [N] ACs including:
   - [AC1 summary]
   - [AC2 summary]
-- **Dependencies:** Depends on [ISSUE-XX-A]
+- **Dependencies:** Depends on [ISSUE-KEY-A]
 - **Labels:** [Labels to apply]
 
 ---
 
-### 2. Merge [ISSUE-YY] + [ISSUE-ZZ]
+### 2. Merge [ISSUE-KEY] + [ISSUE-KEY]
 
 **Reason:** [Why they're being merged]
 
-**Keeping:** [ISSUE-YY] (updating title and description)
-**Cancelling:** [ISSUE-ZZ] (with comment explaining merge)
+**Keeping:** [ISSUE-KEY] (updating title and description)
+**Cancelling:** [ISSUE-KEY] (with comment explaining merge)
 
-**Merged Story: [ISSUE-YY]: [New Title]**
+**Merged Story: [ISSUE-KEY]: [New Title]**
 - **Scope:** [Combined scope]
 - **Acceptance Criteria:** [N] ACs from both stories:
-  - [ACs from ISSUE-YY]
-  - [ACs from ISSUE-ZZ]
+  - [ACs from first story]
+  - [ACs from second story]
 - **Labels:** [Combined labels]
 
 ---
 
-### 3. Add New Story: [NEW-ISSUE]: [Title]
+### 3. Add New Story: [NEW-ISSUE-KEY]: [Title]
 
 **Reason:** [Why it's needed]
 
@@ -294,7 +293,7 @@ Perfect! Based on our discussion, here are the changes I'll make to the story de
 
 ---
 
-### 4. Modify [ISSUE-AA]: [Title]
+### 4. Modify [ISSUE-KEY]: [Title]
 
 **Reason:** [Why it's being modified]
 
@@ -310,11 +309,11 @@ Perfect! Based on our discussion, here are the changes I'll make to the story de
 
 ---
 
-### 5. Cancel [ISSUE-BB]: [Title]
+### 5. Cancel [ISSUE-KEY]: [Title]
 
 **Reason:** [Why it's no longer needed]
 
-**Action:** Mark as Cancelled with comment: "[Reason for cancellation]"
+**Action:** Transition to Cancelled/Done with comment: "[Reason for cancellation]"
 
 ---
 
@@ -328,9 +327,9 @@ Perfect! Based on our discussion, here are the changes I'll make to the story de
 - [Change 2: e.g., ISSUE-CC no longer blocked]
 
 **Priority Order (Recommended):**
-1. [ISSUE-XX-A]: [Title] (was #1, still #1)
-2. [NEW-ISSUE]: [Title] (new, inserted at #2)
-3. [ISSUE-YY]: [Title] (was #2, now #3 but merged with ISSUE-ZZ)
+1. [ISSUE-KEY]: [Title] (was #1, still #1)
+2. [NEW-ISSUE-KEY]: [Title] (new, inserted at #2)
+3. [ISSUE-KEY]: [Title] (was #2, now #3 but merged)
 4. [Continue with updated order]
 
 ---
@@ -342,31 +341,37 @@ Does this refinement plan look good, or would you like to adjust anything?
 
 ### Step 8: Execute Changes
 
-Once confirmed, execute changes in Linear with progress updates:
+Once confirmed, execute changes in Jira with progress updates:
+
+**Use MCP Tools:**
+- `mcp__atlassian__editJiraIssue` - Update existing issues
+- `mcp__atlassian__createJiraIssue` - Create new issues
+- `mcp__atlassian__transitionJiraIssue` - Change status (e.g., to Cancelled)
+- `mcp__atlassian__addCommentToJiraIssue` - Add explanatory comments
 
 ```markdown
 Executing refinement changes...
 
 [For each change, show progress:]
 
-✅ Split [ISSUE-XX]: [Original Title]
-   - Updated [ISSUE-XX] to: [New Title 1]
-   - Created [NEW-ISSUE-1]: [New Title 2]
+✅ Split [ISSUE-KEY]: [Original Title]
+   - Updated [ISSUE-KEY] to: [New Title 1]
+   - Created [NEW-ISSUE-KEY]: [New Title 2]
    - Updated dependencies
 
-✅ Merged [ISSUE-YY] + [ISSUE-ZZ]
-   - Updated [ISSUE-YY] with merged content
-   - Cancelled [ISSUE-ZZ] with comment
+✅ Merged [ISSUE-KEY] + [ISSUE-KEY]
+   - Updated [ISSUE-KEY] with merged content
+   - Transitioned [ISSUE-KEY] to Cancelled with comment
 
-✅ Added [NEW-ISSUE-2]: [Title]
+✅ Added [NEW-ISSUE-KEY]: [Title]
    - Created with complete ACs and labels
 
-✅ Modified [ISSUE-AA]: [Title]
+✅ Modified [ISSUE-KEY]: [Title]
    - Added [N] acceptance criteria
    - Updated description
 
-✅ Cancelled [ISSUE-BB]: [Title]
-   - Marked as Cancelled with reason
+✅ Cancelled [ISSUE-KEY]: [Title]
+   - Transitioned to Cancelled with reason
 
 All changes completed successfully!
 ```
@@ -378,28 +383,27 @@ After executing all changes, provide a detailed summary:
 ```markdown
 ✅ Story decomposition refined successfully!
 
-**Linear Project:** [PROJECT-KEY] - [Project Name]
-**URL:** [Project URL]
+**Jira Project:** [PROJECT-KEY]
 
 ---
 
 ## Changes Applied
 
 **Split Stories:** [N]
-- [ISSUE-XX] → [ISSUE-XX-A] + [NEW-ISSUE-1]
+- [ISSUE-KEY] → [ISSUE-KEY-A] + [NEW-ISSUE-KEY]
 
 **Merged Stories:** [N]
-- [ISSUE-YY] + [ISSUE-ZZ] → [ISSUE-YY]
+- [ISSUE-KEY] + [ISSUE-KEY] → [ISSUE-KEY]
 
 **New Stories:** [N]
-- [NEW-ISSUE-2]: [Title]
-- [NEW-ISSUE-3]: [Title]
+- [NEW-ISSUE-KEY]: [Title]
+- [NEW-ISSUE-KEY]: [Title]
 
 **Modified Stories:** [N]
-- [ISSUE-AA]: [Title] (updated ACs)
+- [ISSUE-KEY]: [Title] (updated ACs)
 
 **Cancelled Stories:** [N]
-- [ISSUE-BB]: [Title] (reason: [reason])
+- [ISSUE-KEY]: [Title] (reason: [reason])
 
 ---
 
@@ -407,32 +411,32 @@ After executing all changes, provide a detailed summary:
 
 **Total Stories:** [M] stories (was [N], change: [+/-X])
 
-### Story 1: [ISSUE-XX-A] - [Title]
+### Story 1: [ISSUE-KEY] - [Title]
 **Status:** [Status]
 **URL:** [URL]
 **Brief:** [1-line description]
 **ACs:** [N] acceptance criteria
 **Dependencies:** [None or list]
 **Labels:** [Labels]
-**Note:** Split from original [ISSUE-XX]
+**Note:** Split from original [OLD-ISSUE-KEY]
 
-### Story 2: [NEW-ISSUE-1] - [Title]
+### Story 2: [NEW-ISSUE-KEY] - [Title]
 **Status:** Backlog
 **URL:** [URL]
 **Brief:** [1-line description]
 **ACs:** [N] acceptance criteria
-**Dependencies:** Depends on [ISSUE-XX-A]
+**Dependencies:** Depends on [ISSUE-KEY]
 **Labels:** [Labels]
-**Note:** Split from original [ISSUE-XX]
+**Note:** Split from original [OLD-ISSUE-KEY]
 
-### Story 3: [ISSUE-YY] - [Title]
+### Story 3: [ISSUE-KEY] - [Title]
 **Status:** [Status]
 **URL:** [URL]
 **Brief:** [1-line description]
-**ACs:** [N] acceptance criteria (merged from [ISSUE-ZZ])
+**ACs:** [N] acceptance criteria (merged from [OLD-ISSUE-KEY])
 **Dependencies:** [None or list]
 **Labels:** [Labels]
-**Note:** Merged with [ISSUE-ZZ]
+**Note:** Merged with [OLD-ISSUE-KEY]
 
 [Continue with all remaining stories]
 
@@ -442,18 +446,18 @@ After executing all changes, provide a detailed summary:
 
 Based on dependencies and refinements:
 
-1. **[ISSUE-XX-A]: [Title]** (Priority: High)
+1. **[ISSUE-KEY]: [Title]** (Priority: High)
    - Foundation story
    - No dependencies
    - Should be implemented first
 
-2. **[NEW-ISSUE-1]: [Title]** (Priority: High)
-   - Depends on: [ISSUE-XX-A]
-   - Blocked until [ISSUE-XX-A] is done
+2. **[NEW-ISSUE-KEY]: [Title]** (Priority: High)
+   - Depends on: [ISSUE-KEY]
+   - Blocked until [ISSUE-KEY] is done
 
-3. **[ISSUE-YY]: [Title]** (Priority: Medium)
+3. **[ISSUE-KEY]: [Title]** (Priority: Medium)
    - Merged story with expanded scope
-   - Can start in parallel with [NEW-ISSUE-1]
+   - Can start in parallel with [NEW-ISSUE-KEY]
 
 [Continue with recommended order]
 
@@ -472,15 +476,15 @@ Based on dependencies and refinements:
 ## Next Steps
 
 **Immediate:**
-1. Review updated stories in Linear and verify changes
+1. Review updated stories in Jira and verify changes
 2. Update sprint planning based on new story breakdown
 3. Communicate changes to team (especially for in-progress work)
 4. Re-estimate stories if using estimation
 
 **For Implementation:**
-- Next story to start: [ISSUE-XX-A] - [Title]
-- Create TDD plan: `/plan-user-story [ISSUE-XX-A]`
-- Implement: `/implement-story docs/specs/.../story_[ISSUE-XX-A]_tdd_tasks.md`
+- Next story to start: [ISSUE-KEY] - [Title]
+- Create TDD plan: `/plan-user-story [ISSUE-KEY]`
+- Implement: `/implement-story docs/specs/.../story_[ISSUE-KEY]_tdd_tasks.md`
 
 **Future Refinements:**
 - If further refinement needed: `/refine-decomposition [PROJECT-KEY]`
@@ -496,7 +500,7 @@ The story decomposition has been successfully refined based on team learnings! �
 1. **Show Complete State**: Display ALL current stories before proposing changes
 2. **Be Specific**: Propose exact changes with before/after details
 3. **Explain Impact**: Show how changes affect dependencies and order
-4. **Confirm Before Acting**: Always get approval before making changes in Linear
+4. **Confirm Before Acting**: Always get approval before making changes in Jira
 5. **Track Changes**: Clearly mark what changed and why
 6. **Update Dependencies**: Ensure dependencies are updated when stories are split/merged
 7. **Preserve History**: Add comments to cancelled or significantly modified stories
@@ -512,7 +516,7 @@ The story decomposition has been successfully refined based on team learnings! �
 ### Refinement Operations
 
 **Split Story:**
-- Keep original issue for one part (preserves history)
+- Update original issue for one part (preserves history)
 - Create new issues for other parts
 - Distribute acceptance criteria logically
 - Update dependencies (new stories may depend on each other)
@@ -522,11 +526,11 @@ The story decomposition has been successfully refined based on team learnings! �
 - Keep one issue (usually lower number)
 - Combine all acceptance criteria
 - Update title to reflect merged scope
-- Cancel other issue(s) with comment explaining merge
+- Transition other issue(s) to Cancelled with comment explaining merge
 - Update any stories that depended on cancelled story
 
 **Add Story:**
-- Create complete Linear issue with all details
+- Create complete Jira issue with all details
 - Follow same format as original decomposition
 - Insert in priority order
 - Update dependencies if it blocks/depends on existing stories
@@ -535,10 +539,10 @@ The story decomposition has been successfully refined based on team learnings! �
 - Add/remove/update acceptance criteria
 - Update description or scope
 - Add comment explaining modification
-- Don't change issue number or URL
+- Don't change issue key or URL
 
 **Cancel Story:**
-- Mark as Cancelled (don't delete)
+- Transition to Cancelled state (don't delete)
 - Add comment explaining why (out of scope, merged, no longer needed, etc.)
 - Update any stories that depended on it
 
@@ -566,12 +570,12 @@ Before executing changes, analyze impact:
 
 **Stories In Progress:**
 ```markdown
-⚠️ Warning: [ISSUE-XX] is currently "In Progress"
+⚠️ Warning: [ISSUE-KEY] is currently "In Progress"
 
 Splitting/modifying this story will affect ongoing work. Options:
 
 **Option A:** Proceed with refinement and update current work
-**Option B:** Wait until [ISSUE-XX] is completed
+**Option B:** Wait until [ISSUE-KEY] is completed
 **Option C:** Only refine future stories
 
 Which approach works for your team?
@@ -579,12 +583,12 @@ Which approach works for your team?
 
 **Stories with Dependencies:**
 ```markdown
-⚠️ Note: [ISSUE-XX] is depended on by:
-- [ISSUE-YY]: [Title]
-- [ISSUE-ZZ]: [Title]
+⚠️ Note: [ISSUE-KEY] is depended on by:
+- [ISSUE-KEY]: [Title]
+- [ISSUE-KEY]: [Title]
 
-If I split [ISSUE-XX], I need to know:
-- Which new story should [ISSUE-YY] and [ISSUE-ZZ] depend on?
+If I split [ISSUE-KEY], I need to know:
+- Which new story should dependent stories reference?
 - Or should they depend on BOTH new stories?
 ```
 
@@ -593,11 +597,11 @@ If I split [ISSUE-XX], I need to know:
 ⚠️ Conflict detected:
 
 You want to:
-- Split [ISSUE-AA] into [ISSUE-AA-1] and [ISSUE-AA-2]
-- Merge [ISSUE-AA] with [ISSUE-BB]
+- Split [ISSUE-KEY] into [ISSUE-KEY-1] and [ISSUE-KEY-2]
+- Merge [ISSUE-KEY] with [ISSUE-KEY]
 
 These changes conflict. Should I:
-- First split, then merge one of the split stories with [ISSUE-BB]?
+- First split, then merge one of the split stories?
 - First merge, then split the merged story?
 - Skip one of these changes?
 ```
@@ -608,7 +612,7 @@ If something goes wrong:
 
 1. **No Stories Exist**: Error - use `/decompose-feature` first
 2. **Story Not Found**: Verify story exists and is in this project
-3. **Can't Update Linear**: Explain error and provide manual steps
+3. **Can't Update Jira**: Explain error and provide manual steps
 4. **Invalid Split**: Ask for clarification on how to split
 5. **Circular Dependencies**: Warn and ask user to resolve
 
@@ -617,9 +621,9 @@ If something goes wrong:
 ### Example: Split Large Story
 
 ```
-User: /refine-decomposition PROJ-42
+User: /refine-decomposition PROJ
 
-Agent: I found Linear Project PROJ-42: Advanced Search with Filters
+Agent: I found Jira Project: PROJ
 
        Current User Stories: 5 stories
 
@@ -661,13 +665,19 @@ Agent: Perfect! Here's the refinement plan:
 
 User: Yes
 
-Agent: [Executes changes and provides summary]
+Agent: Executing refinement changes...
+
+       ✅ Updated PROJ-42: Basic text search - Backend API
+       ✅ Created PROJ-50: Basic text search - Frontend UI
+       ✅ Updated dependencies
+
+       [Provides comprehensive summary]
 ```
 
 ### Example: Add New Story
 
 ```
-User: /refine-decomposition PROJ-42
+User: /refine-decomposition PROJ
 
 Agent: [Shows current state with 5 stories]
 
@@ -703,15 +713,19 @@ Agent: Perfect! Here's the new story:
 
 User: Yes
 
-Agent: [Creates story and provides summary]
+Agent: Creating story in Jira...
+
+       ✅ Created PROJ-51: Clear all filters button
+
+       [Provides summary]
 ```
 
 ## Important Notes
 
-- **Requires $ARGUMENTS**: Must provide Linear Project ID
+- **Requires $ARGUMENTS**: Must provide Jira Project Key
 - **Shows Complete State**: Displays ALL stories before proposing changes
 - **Change Tracking**: Clearly documents what changed and why
-- **Preserves History**: Doesn't delete stories, marks as cancelled
+- **Preserves History**: Doesn't delete stories, transitions to Cancelled
 - **Updates Dependencies**: Ensures dependencies are correct after changes
 - **Impact Analysis**: Analyzes impact on in-progress work and dependencies
 - **Repeatable**: Can be run multiple times as team learns

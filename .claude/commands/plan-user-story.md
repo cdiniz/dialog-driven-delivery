@@ -6,10 +6,10 @@ Generate a TDD-focused implementation task list for user story $ARGUMENTS and sa
 
 ## Steps
 
-1. **Query Story**: Get story details from Linear (use story ID like "PROJ-42" or just "42")
-2. **Get Project Context**: Get the Linear project (feature) that this story belongs to
-3. **Find Feature Spec**: Look for the feature specification document for this project
-4. **Find Technical Spec**: Locate and read the technical spec for this feature
+1. **Query Story**: Get story details from Jira (use story key like "PROJ-42")
+2. **Get Confluence Spec**: Get the Confluence page URL from the story description (feature specs are stored in Confluence)
+3. **Find Feature Spec**: Read the feature specification from Confluence page
+4. **Find Technical Spec**: Read the technical spec from the same Confluence page
 5. **Find Mockups**: Look for relevant UI mockups or design files
 6. **Analyze Codebase**: Identify existing patterns, architecture, and integration points
 7. **Determine Save Location**: Ask user for preferred location or use: `docs/specs/[project_key]/story_[issue_id]_tdd_tasks.md`
@@ -21,8 +21,9 @@ Generate a TDD-focused implementation task list for user story $ARGUMENTS and sa
 <plan_template>
 # TDD Implementation Tasks: [Story Title]
 
-**Story:** [ISSUE-ID] - [Story Title]
-**Linear Project:** [PROJECT-KEY] - [Project URL]
+**Story:** [ISSUE-KEY] - [Story Title]
+**Jira Issue:** [ISSUE-KEY] - [Jira Issue URL]
+**Confluence Spec:** [Confluence Page Title] - [Page URL]
 **Feature:** [Feature Name]
 **Date:** [Current Date]
 
@@ -31,12 +32,12 @@ Generate a TDD-focused implementation task list for user story $ARGUMENTS and sa
 ## Story Overview
 
 **Description:**
-[Story description from Linear]
+[Story description from Jira]
 
 **Acceptance Criteria:**
-- [ ] [AC 1 from Linear]
-- [ ] [AC 2 from Linear]
-- [ ] [AC 3 from Linear]
+- [ ] [AC 1 from Jira]
+- [ ] [AC 2 from Jira]
+- [ ] [AC 3 from Jira]
 
 **Integration Points:**
 - Backend: [Existing services/modules this story will touch]
@@ -336,10 +337,11 @@ For each task, follow the **Red-Green-Refactor** cycle:
 
 ## References
 
-- **Story:** [ISSUE-ID] - [Linear story URL]
-- **Linear Project:** [PROJECT-KEY] - [Linear project URL]
-- **Feature Spec:** `[path to feature spec]`
-- **Technical Spec:** `[path to technical spec]`
+- **Story:** [ISSUE-KEY] - [Jira issue URL]
+- **Jira Project:** [PROJECT-KEY]
+- **Confluence Spec:** [Confluence Page URL]
+- **Feature Spec:** Confluence page (Product Specification section)
+- **Technical Spec:** Confluence page (Technical Specification section)
 - **UI Mockups/Designs:** `[path to mockups or design links]`
 - **Architecture Docs:** `[path to architecture documentation]`
 
@@ -360,10 +362,11 @@ For each task, follow the **Red-Green-Refactor** cycle:
 After generating and saving the TDD task list:
 
 ```markdown
-Generated TDD task list for Story [ISSUE-ID]:
+Generated TDD task list for Story [ISSUE-KEY]:
 
-**Story:** [ISSUE-ID] - [Story Title]
-**Linear Project:** [PROJECT-KEY] - [Feature Name]
+**Story:** [ISSUE-KEY] - [Story Title]
+**Jira Project:** [PROJECT-KEY]
+**Confluence Spec:** [Page Title] - [Page URL]
 **Location:** `[path where plan was saved]`
 
 **Summary:**
@@ -388,5 +391,5 @@ Next steps:
 2. Run `/implement-story [path to plan]` to start implementation
 3. Or manually start with Task 1 and work through tasks sequentially
 4. Follow TDD discipline strictly
-5. Update story status in Linear as work progresses
+5. Update story status in Jira as work progresses
 ```

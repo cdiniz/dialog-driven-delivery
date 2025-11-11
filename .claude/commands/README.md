@@ -2,6 +2,8 @@
 
 A pragmatic, streamlined methodology for building software products through **conversational, transcript-first** documentation and development. Designed for real-world teams where features are defined through meetings, refined through discussion, and implemented incrementally.
 
+**Now with Atlassian Integration:** Specifications in Confluence, Stories in Jira.
+
 ---
 
 ## Philosophy
@@ -16,10 +18,11 @@ This workflow is built on **pragmatic principles** for ongoing product developme
 6. **Explicit Over Implicit**: Uncertainties are marked, not assumed (prevents AI hallucination)
 7. **Flexibility**: Use what adds value, customize templates for your context
 8. **Unified Approach**: Single commands handle both product and technical aspects naturally
+9. **Atlassian Native**: Confluence for specs, Jira for stories - industry standard tools
 
 ---
 
-## Simplified Workflow (v2.0)
+## Simplified Workflow (v2.0 - Atlassian Edition)
 
 ### Core Development Flow
 
@@ -30,29 +33,29 @@ Any Initial Meeting/Discussion
         ↓
 /create-spec (paste transcript/document/description)
         ↓
-Linear Project with BOTH Product & Technical Specs
+Confluence Page with BOTH Product & Technical Specs
 (fills what's known, leaves rest empty)
         ↓
 [Progressive Refinement as information becomes available]
         ↓
-/refine-spec PROJECT-42 (paste any new information)
+/refine-spec PAGE-ID (paste any new information)
         ↓
-Updated Specs (product, technical, or both)
+Updated Confluence Page (product, technical, or both)
         ↓
 [Continue refining until ready]
         ↓
-/decompose-feature PROJECT-42 (paste transcript or discuss)
+/decompose-feature PAGE-ID (specify Jira project, paste transcript or discuss)
         ↓
-User Stories in Linear (linked to project)
+Jira Stories (linked to Confluence page)
         ↓
 [Story Refinement as needed]
         ↓
-/refine-decomposition PROJECT-42 (paste refinement notes)
+/refine-decomposition PROJECT-KEY (paste refinement notes)
         ↓
-Updated Stories
+Updated Jira Stories
         ↓
 [Optional DEV Workflow]
-/plan-user-story ISSUE-42
+/plan-user-story ISSUE-KEY
 /implement-story docs/specs/.../tasks.md
 ```
 
@@ -61,7 +64,9 @@ Updated Stories
 ## Prerequisites
 
 - **Claude Code** installed and configured
-- **Linear** for managing projects and user stories
+- **Confluence** for feature specifications
+- **Jira** for user stories and tracking
+- **Atlassian MCP Server** configured for Claude Code
 - **Git** for version control
 
 ---
@@ -74,7 +79,7 @@ Copy the commands directory to your project:
 # From this repository
 cp -r .claude/commands /path/to/your/project/.claude/
 
-# Optional: Copy agents if using this dev workflow
+# Optional: Copy agents if using TDD workflow
 cp -r .claude/agents /path/to/your/project/.claude/
 ```
 
@@ -82,21 +87,22 @@ cp -r .claude/agents /path/to/your/project/.claude/
 
 ## Conversational Slash Commands
 
-### Core Workflow Commands (v2.0 - Simplified)
+### Core Workflow Commands (v2.0 - Simplified for Atlassian)
 
 #### 1. `/create-spec`
 
-**Purpose**: Create a comprehensive project specification from any input
+**Purpose**: Create a comprehensive feature specification in Confluence from any input
 
 **Workflow**:
-1. Command asks: "How would you like to provide the project information?"
+1. Command asks: "How would you like to provide the feature information?"
 2. You provide: transcript, document, or conversational description
-3. Agent proposes a project name
-4. Agent creates Linear Project with **BOTH Product & Technical Spec sections**
-5. Agent fills what's available from input, leaves rest empty (no hallucination)
-6. Shows clear summary of what was filled vs what remains empty
+3. Command asks: "Which Confluence space should I create this in?"
+4. Agent proposes a page title
+5. Agent creates Confluence page with **BOTH Product & Technical Spec sections**
+6. Agent fills what's available from input, leaves rest empty (no hallucination)
+7. Shows clear summary of what was filled vs what remains empty
 
-**When to use**: Starting any new feature or project
+**When to use**: Starting any new feature
 
 **No arguments required** - the command asks for input
 
@@ -104,7 +110,7 @@ cp -r .claude/agents /path/to/your/project/.claude/
 ```
 You: /create-spec
 
-Agent: How would you like to provide the project information?
+Agent: How would you like to provide the feature information?
        Option A: Meeting Transcript
        Option B: Document
        Option C: Describe Conversationally
@@ -112,23 +118,28 @@ Agent: How would you like to provide the project information?
 You: Option A
      [Paste any meeting transcript - product, technical, or both]
 
+Agent: Where would you like to create this in Confluence?
+       Confluence Space: ?
+
+You: PROJ
+
 Agent: Based on your input, I found information about [summary].
 
-       I propose creating a Linear project named: "Advanced Search with Filters"
-       Should I create this Linear project?
+       I propose creating a Confluence page named: "Advanced Search with Filters"
+       Should I create this page in PROJ space?
 
 You: Yes
 
-Agent: ✅ Project specification created successfully!
+Agent: ✅ Feature specification created successfully!
 
        📋 Product Spec: 70% complete (requirements clear, metrics missing)
        🔧 Technical Spec: 10% complete (only basic approach mentioned)
 
-       Missing information can be added later using /refine-spec PROJ-42
+       Missing information can be added later using /refine-spec [PAGE-ID]
 ```
 
 **Output**:
-- Linear Project with both Product AND Technical spec sections
+- Confluence page with both Product AND Technical spec sections
 - Fills only what's available from input
 - Empty sections clearly marked
 - Shows coverage percentage
@@ -136,21 +147,21 @@ Agent: ✅ Project specification created successfully!
 
 ---
 
-#### 2. `/refine-spec PROJECT-KEY`
+#### 2. `/refine-spec PAGE-ID`
 
 **Purpose**: Refine any part of existing specifications based on new information
 
 **Workflow**:
-1. Fetches Linear Project and shows current specification coverage
+1. Fetches Confluence page and shows current specification coverage
 2. Asks: "How would you like to provide the new information?"
 3. You provide: transcript, document, feedback, or description
 4. Agent detects which sections need updating (product, technical, or both)
 5. Agent shows before/after for each proposed change
 6. You confirm changes
-7. Agent updates relevant sections in Linear project description
+7. Agent updates relevant sections in Confluence page
 8. Shows comprehensive summary of what changed
 
-**Requires**: Linear Project ID
+**Requires**: Confluence Page ID or URL
 
 **When to use**:
 - Any new information becomes available
@@ -162,9 +173,9 @@ Agent: ✅ Project specification created successfully!
 
 **Example**:
 ```
-You: /refine-spec PROJ-42
+You: /refine-spec 123456789
 
-Agent: I found Linear Project PROJ-42: Advanced Search
+Agent: I found Confluence Page: Advanced Search
 
        **Current Coverage:**
        📋 Product Spec: ~70% complete
@@ -204,21 +215,22 @@ Agent: ✅ Specifications refined successfully!
 
 ---
 
-#### 3. `/decompose-feature PROJECT-KEY`
+#### 3. `/decompose-feature PAGE-ID`
 
-**Purpose**: Break feature into user stories through conversational planning
+**Purpose**: Break feature into user stories in Jira through conversational planning
 
 **Workflow**:
-1. Fetches Linear Project and both specs
-2. Asks: "Did you have a decomposition meeting?"
-3. You paste transcript (preferred) OR discuss conversationally
-4. Agent proposes decomposition strategies with pros/cons
-5. Agent asks clarifying questions about boundaries
-6. Agent shows proposed story breakdown
-7. You confirm
-8. Agent creates user stories in Linear with complete acceptance criteria
+1. Fetches Confluence page and both specs
+2. Asks: "Which Jira project should I create stories in?"
+3. Asks: "Did you have a decomposition meeting?"
+4. You paste transcript (preferred) OR discuss conversationally
+5. Agent proposes decomposition strategies with pros/cons
+6. Agent asks clarifying questions about boundaries
+7. Agent shows proposed story breakdown
+8. You confirm
+9. Agent creates user stories in Jira with complete acceptance criteria, linked to Confluence
 
-**Requires**: Linear Project ID
+**Requires**: Confluence Page ID/URL
 
 **When to use**:
 - Specs are sufficiently complete
@@ -227,12 +239,17 @@ Agent: ✅ Specifications refined successfully!
 
 **Example**:
 ```
-You: /decompose-feature PROJ-42
+You: /decompose-feature 123456789
 
-Agent: I found Linear Project PROJ-42: Advanced Search
+Agent: I found Confluence Page: Advanced Search
        Product Spec: ✅ 85% complete
        Technical Spec: ✅ 75% complete
-       Current stories: 0
+
+       Which Jira project should I create the user stories in?
+
+You: PROJ
+
+Agent: Great! I'll create stories in Jira project PROJ.
 
        Did you have a decomposition meeting?
        Option A: Yes, I have a transcript
@@ -266,14 +283,15 @@ Agent: Here's the proposed breakdown:
 
 You: Yes
 
-Agent: [Creates stories in Linear]
+Agent: Creating user stories in Jira Project PROJ...
+
        ✅ Created PROJ-42: Basic text search
        ✅ Created PROJ-43: Add status filter
        ...
 ```
 
 **Output**:
-- User stories created in Linear
+- Jira stories created with links to Confluence page
 - Complete acceptance criteria (Gherkin format)
 - Dependencies mapped
 - Implementation order suggested
@@ -285,15 +303,15 @@ Agent: [Creates stories in Linear]
 **Purpose**: Refine existing story decomposition - split, merge, add, or modify stories
 
 **Workflow**:
-1. Fetches ALL existing stories and shows current state
+1. Fetches ALL existing stories from Jira project and shows current state
 2. Asks: "What prompted this refinement?"
 3. You paste refinement transcript OR discuss changes
 4. Agent analyzes and proposes specific changes
 5. Agent shows before/after for each change
 6. You confirm
-7. Agent executes changes in Linear
+7. Agent executes changes in Jira
 
-**Requires**: Linear Project ID
+**Requires**: Jira Project Key
 
 **Use when**:
 - Stories are too large and need splitting
@@ -303,9 +321,9 @@ Agent: [Creates stories in Linear]
 
 **Example**:
 ```
-You: /refine-decomposition PROJ-42
+You: /refine-decomposition PROJ
 
-Agent: I found Linear Project PROJ-42: Advanced Search
+Agent: I found Jira Project: PROJ
 
        Current User Stories: 5 stories
 
@@ -348,14 +366,15 @@ Agent: Here's the refinement plan:
 
 You: Yes
 
-Agent: [Executes changes]
+Agent: Executing refinement changes...
+
        ✅ Updated PROJ-42 (split into backend)
        ✅ Created PROJ-50 (frontend split)
        ✅ Updated dependencies
 ```
 
 **Output**:
-- Modified/new stories in Linear
+- Modified/new Jira stories
 - Clear change summary
 - Updated dependencies
 - Updated implementation order
@@ -366,9 +385,9 @@ Agent: [Executes changes]
 
 These steps are **completely optional** for teams that want structured, automated TDD workflow:
 
-#### 5. `/plan-user-story ISSUE-ID`
+#### 5. `/plan-user-story ISSUE-KEY`
 
-**Purpose**: Generate detailed TDD task list for a user story
+**Purpose**: Generate detailed TDD task list for a Jira story
 
 **When to use**: When you want structured Red-Green-Refactor task breakdown
 
@@ -382,7 +401,7 @@ These steps are **completely optional** for teams that want structured, automate
 
 **Skip if**: You prefer manual implementation
 
-See the original README sections for details on these optional commands.
+See the original command documentation for details on these optional commands.
 
 ---
 
@@ -392,34 +411,35 @@ See the original README sections for details on these optional commands.
 
 ```bash
 # Monday: Feature Planning Meeting
-/generate-feature-brief
+/create-spec
 # [Paste meeting transcript, answer questions]
-# Output: Linear Project PROJ-42 with Product Spec in description
+# Output: Confluence Page with Product Spec in page content
 
 # Tuesday (Optional): Product Spec Refinement
 # [If stakeholders provided feedback or requirements changed]
-/refine-feature-brief PROJ-42
+/refine-spec 123456789
 # [Paste feedback transcript, confirm changes]
-# Output: Product Spec updated with refined requirements, impacted areas identified
+# Output: Product Spec updated with refined requirements
 
 # Wednesday: Technical Design Session
-/create-technical-spec PROJ-42
+/refine-spec 123456789
 # [Paste technical discussion, answer questions]
-# Output: Linear Project PROJ-42 updated with Technical Spec (both specs in Linear)
+# Output: Confluence Page updated with Technical Spec (both specs in one page)
 
 # Thursday (Optional): Technical Refinement
 # [If technical decisions change or new learnings emerge]
-/refine-technical-spec PROJ-42
+/refine-spec 123456789
 # [Paste refinement transcript, confirm changes]
-# Output: Technical Spec updated with new decisions, impacted stories identified
+# Output: Technical Spec updated with new decisions
 
 # Friday: Story Decomposition Meeting
-/decompose-feature PROJ-42
+/decompose-feature 123456789
+# [Specify Jira project: PROJ]
 # [Paste decomposition discussion, confirm breakdown]
-# Output: 5 user stories created (PROJ-42 through PROJ-46)
+# Output: 5 Jira stories created (PROJ-42 through PROJ-46)
 
 # Later: Sprint starts - Developer realizes story is too big
-/refine-decomposition PROJ-42
+/refine-decomposition PROJ
 # [Explain issue, confirm split]
 # Output: PROJ-42 split into PROJ-42 (backend) + PROJ-50 (frontend)
 
@@ -432,15 +452,15 @@ See the original README sections for details on these optional commands.
 
 ---
 
-## Command Summary (v2.0)
+## Command Summary (v2.0 - Atlassian)
 
 | Command | Purpose | Input | Output | Use Case |
 |---------|---------|-------|--------|----------|
-| `/create-spec` | Create both Product & Technical specs | Any context (transcript/doc/description) | Linear Project with both specs (fills what's known) | Starting any feature |
-| `/refine-spec PROJECT-KEY` | Update any part of specs | Project + new information | Updated specs (auto-detects what to update) | Any new information available |
-| `/decompose-feature PROJECT-KEY` | Break into stories | Project + optional transcript | User stories in Linear | Ready for sprint planning |
-| `/refine-decomposition PROJECT-KEY` | Modify stories | Project + refinement notes | Updated stories | Story refinement/learning |
-| `/plan-user-story ISSUE-ID` | TDD task list | Story ID | TDD task breakdown | Optional: TDD planning |
+| `/create-spec` | Create both Product & Technical specs | Any context (transcript/doc/description) + Confluence space | Confluence page with both specs (fills what's known) | Starting any feature |
+| `/refine-spec PAGE-ID` | Update any part of specs | Page ID + new information | Updated Confluence page (auto-detects what to update) | Any new information available |
+| `/decompose-feature PAGE-ID` | Break into stories | Page ID + Jira project + optional transcript | Jira stories linked to Confluence | Ready for sprint planning |
+| `/refine-decomposition PROJECT-KEY` | Modify stories | Project key + refinement notes | Updated Jira stories | Story refinement/learning |
+| `/plan-user-story ISSUE-KEY` | TDD task list | Jira story key | TDD task breakdown | Optional: TDD planning |
 | `/implement-story PATH` | Automated impl | TDD task file | Implemented code | Optional: TDD automation |
 
 ---
@@ -462,12 +482,14 @@ Benefits:
 - ✅ Still captures all essentials
 - ✅ Can expand sections for complex features
 
-### Linear-First Documentation
+### Confluence-First Documentation
 
-**Both Product and Technical specifications** are stored **directly in Linear project descriptions**:
+**Both Product and Technical specifications** are stored **directly in Confluence pages**:
 
-**Project Description Structure:**
+**Page Structure:**
 ```markdown
+# Feature: [Feature Name]
+
 ## 📋 Product Specification
 [Complete product/feature spec]
 
@@ -476,21 +498,31 @@ Benefits:
 ```
 
 **Benefits:**
-- **Single Source of Truth**: The Linear project description contains BOTH specs
+- **Single Source of Truth**: The Confluence page contains BOTH specs
 - **Built-in Collaboration**: Product and engineering teams collaborate in one place
-- **No Context Switching**: View specs, stories, and progress all in Linear
+- **No Context Switching**: View specs in Confluence, track work in Jira
 - **Always Accessible**: No need to find files or navigate folders
-- **Version Control**: Linear tracks changes to project descriptions
+- **Version Control**: Confluence tracks changes to pages
 - **Unified Discussions**: Comments on both specs stay together
-- **Optional Backups**: Can save local copies for reference, but Linear is authoritative
+- **Native Atlassian**: Confluence pages can link to Jira issues, Jira issues link back
+- **Rich Content**: Support for images, diagrams, tables, macros
 
 **Why This Works:**
 - ✅ Product and engineering see the same information
-- ✅ Specs always linked to project and stories
+- ✅ Specs always linked to Jira project
 - ✅ No sync issues between docs and project management
-- ✅ Easier onboarding (one tool, one location)
+- ✅ Easier onboarding (industry-standard tools)
 - ✅ Technical decisions visible to product team
 - ✅ Product context visible to engineers
+
+### Jira for Actionable Work
+
+User stories are created in Jira with:
+- Complete acceptance criteria (Gherkin format)
+- Links back to Confluence spec page
+- Proper labels for categorization
+- Dependencies between stories
+- Full Jira workflow support
 
 ### Conversational & Engaging
 
@@ -526,7 +558,7 @@ Workflow supports **team learning**:
 - Initial decomposition in one meeting
 - Refinement in separate meeting (`/refine-decomposition`)
 - Can run refinement multiple times
-- Stories can be split, merged, added, or modified
+- Stories can be split, merged, added, or modified in Jira
 - Preserves history and tracks changes
 
 ### Uncertainty Markers: Preventing AI Hallucination
@@ -609,10 +641,10 @@ When using this workflow, organize documentation like this:
 your-project/
 ├── .claude/
 │   ├── commands/                    # Slash commands (v2.0)
-│   │   ├── create-spec.md          # NEW: Unified spec creation
-│   │   ├── refine-spec.md          # NEW: Unified spec refinement
-│   │   ├── decompose-feature.md
-│   │   ├── refine-decomposition.md
+│   │   ├── create-spec.md          # Unified Confluence spec creation
+│   │   ├── refine-spec.md          # Unified Confluence spec refinement
+│   │   ├── decompose-feature.md    # Confluence → Jira decomposition
+│   │   ├── refine-decomposition.md # Jira story refinement
 │   │   ├── plan-user-story.md      # Optional: Dev Workflow planning
 │   │   └── implement-story.md      # Optional: Dev Workflow automation
 │   └── agents/                      # Optional: Dev Workflow agents
@@ -621,13 +653,11 @@ your-project/
 │       ├── refinement-developer.md
 │       └── test-fix-specialist.md
 ├── docs/
-│   ├── specs/                      # Optional: Local backups
-│   │   ├── proj_42/                # (All specs live in Linear project descriptions)
-│   │   │   ├── combined_spec.md    # Optional backup of Linear content
-│   │   │   ├── story_PROJ-42_tdd_tasks.md  # TDD task breakdowns
-│   │   │   └── mockups/            # Design assets
+│   ├── specs/                      # Optional: Local task breakdowns
+│   │   ├── proj_42/
+│   │   │   └── story_PROJ-42_tdd_tasks.md  # TDD task breakdowns
 │   │   └── proj_43/
-│   │       └── combined_spec.md    # Optional backup
+│   │       └── story_PROJ-43_tdd_tasks.md
 │   └── architecture/               # Your architecture docs
 ├── src/
 │   ├── backend/
@@ -635,68 +665,65 @@ your-project/
 └── tests/
 ```
 
+**Note:** Feature specs live in Confluence, not in local files. Local files are only for TDD task breakdowns.
+
 ---
 
 ## Benefits of This Approach
 
-### 1. Reflects Real Workflow
+### 1. Industry Standard Tools
+
+- Confluence and Jira are the most widely used tools in enterprise
+- Better integration ecosystem
+- Familiar to most developers and product managers
+- Better compliance and security features
+
+### 2. Clear Separation of Concerns
+
+- Confluence for long-form documentation and specs
+- Jira for actionable work items and tracking
+- Natural workflow that matches team mental models
+
+### 3. Native Integration
+
+- Confluence pages can embed Jira queries
+- Jira issues can link to Confluence pages
+- Bidirectional linking built into the platform
+- Comments and mentions work across tools
+
+### 4. Reflects Real Workflow
 
 - Features defined through meetings (not documents first)
 - Story decomposition happens separately from feature planning
 - Refinement is an expected, separate step
 - Transcripts capture context and discussion
 
-### 2. Conversational & Engaging
+### 5. Conversational & Engaging
 
 - Commands feel like collaboration, not automation
 - Agent asks questions and proposes options
 - Shows understanding before taking action
 - Confirms before creating artifacts
 
-### 3. Flexible & Modular
+### 6. Flexible & Modular
 
 - Use core workflow (steps 1-4) for documentation
-- Optionally DEV automation (steps 5-6)
+- Optionally add dev automation (steps 5-6)
 - Refine decomposition as many times as needed
 
-### 4. Quality Through Process
+### 7. Quality Through Process
 
 - Complete acceptance criteria from the start
 - Technical specs follow codebase patterns
 - Smart section selection (only relevant sections)
 - Maps ACs to technical implementation
 
-### 5. Team-Friendly
+### 8. Team-Friendly
 
 - Async-friendly (paste recorded meeting transcripts)
 - Supports iteration and learning
-- Clear traceability (feature → technical spec → stories → tasks)
+- Clear traceability (Confluence page → Jira stories → tasks)
 - Preserves history of changes
-
----
-
-## Migration from v1.0 to v2.0
-
-**Simplified Command Structure:**
-
-**Old Commands (v1.0) → New Commands (v2.0)**
-
-| Old Command | New Command | Change |
-|------------|-------------|---------|
-| `/generate-feature-brief` | `/create-spec` | Unified - creates both specs |
-| `/create-technical-spec PROJECT` | `/create-spec` or `/refine-spec PROJECT` | Merged into unified commands |
-| `/refine-feature-brief PROJECT` | `/refine-spec PROJECT` | Unified refinement |
-| `/refine-technical-spec PROJECT` | `/refine-spec PROJECT` | Unified refinement |
-| `/decompose-feature PROJECT` | `/decompose-feature PROJECT` | No change |
-| `/refine-decomposition PROJECT` | `/refine-decomposition PROJECT` | No change |
-
-**Key Improvements:**
-
-1. **Single creation command**: `/create-spec` creates both Product and Technical specs
-2. **Single refinement command**: `/refine-spec` updates whatever needs updating
-3. **Progressive filling**: Start with what you have, fill gaps over time
-4. **No forced separation**: Product and technical info can be mixed naturally
-5. **Smart detection**: System determines what to update based on content
 
 ---
 
@@ -705,7 +732,7 @@ your-project/
 ### "I don't have meeting transcripts"
 
 No problem! All commands work conversationally:
-- Select "Option B: Describe conversationally"
+- Select "Option B: Describe conversationally" or "Option C"
 - Answer the agent's questions
 - Same quality output, just more interactive
 
@@ -714,13 +741,13 @@ No problem! All commands work conversationally:
 Perfect! That's expected:
 - Use `/refine-decomposition PROJECT-KEY`
 - Explain what changed and why
-- Agent will update stories intelligently
+- Agent will update Jira stories intelligently
 
-### "Can I use this with other issue trackers?"
+### "Can I use this with other tools?"
 
-The workflow is Linear-focused but adaptable:
-- Core concepts work with any tracker
-- Modify commands to use your tracker's API
+The workflow is Atlassian-focused but adaptable:
+- Core concepts work with any tracker/wiki
+- Modify commands to use your tool's API
 - Or use specs as guides and create issues manually
 
 ---
@@ -734,7 +761,8 @@ This workflow is designed for **how teams actually work**:
 3. **Decomposition evolves**: Story breakdown improves with team learning
 4. **Conversation matters**: Nuance and context from discussions are valuable
 5. **Documentation enables quality**: Good specs prevent issues before coding
-6. **Automation is adaptable**: Dev workflow in place but isn't required
+6. **Industry tools**: Atlassian is the standard in most organizations
+7. **Automation is adaptable**: Dev workflow in place but isn't required
 
 The result is a **pragmatic, conversational methodology** that fits real development workflows while maintaining high documentation quality and traceability.
 

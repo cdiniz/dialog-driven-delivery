@@ -1,21 +1,22 @@
 ---
-description: Create comprehensive project specification from any input context
+description: Create comprehensive feature specification from any input context
 ---
 
-You are tasked with creating a comprehensive project specification in Linear from any input context (product discussion, technical design, or both).
+You are tasked with creating a comprehensive feature specification in Confluence from any input context (product discussion, technical design, or both).
 
 ## Philosophy
 
-This command creates a **single Linear project** containing BOTH Product and Technical specifications. Fill only what you know from the context - empty sections are better than hallucinated content. The specs will grow progressively as more information becomes available through `/refine-spec`.
+This command creates a **single Confluence page** containing BOTH Product and Technical specifications. Fill only what you know from the context - empty sections are better than hallucinated content. The specs will grow progressively as more information becomes available through `/refine-spec`.
 
 ## Conversational Workflow
 
 1. Ask user for input context
-2. Analyze and extract all available information
-3. Propose project name
-4. Create Linear Project with both spec sections
-5. Fill sections based on what's actually discussed
-6. Show clear summary of what was filled vs what remains empty
+2. Ask user for Confluence space and parent page (optional)
+3. Analyze and extract all available information
+4. Propose page title
+5. Create Confluence page with both spec sections
+6. Fill sections based on what's actually discussed
+7. Show clear summary of what was filled vs what remains empty
 
 ## Steps
 
@@ -24,18 +25,33 @@ This command creates a **single Linear project** containing BOTH Product and Tec
 Start by asking the user for context:
 
 ```markdown
-I'll help you create a comprehensive project specification in Linear.
+I'll help you create a comprehensive feature specification in Confluence.
 
-How would you like to provide the project information?
+How would you like to provide the feature information?
 
 **Option A: Meeting Transcript** - Paste a transcript from any planning or design meeting
 **Option B: Document** - Paste an existing document or specification
-**Option C: Describe Conversationally** - We'll discuss the project together
+**Option C: Describe Conversationally** - We'll discuss the feature together
 
 Which would you prefer?
 ```
 
-### Step 2: Analyze Input
+### Step 2: Get Confluence Location
+
+After receiving the input, ask for Confluence location:
+
+```markdown
+Where would you like to create this specification page in Confluence?
+
+**Confluence Space:** [Ask for space key or name, e.g., "PROJ" or "Engineering"]
+**Parent Page (optional):** [Ask if they want this under a specific parent page]
+
+If you're not sure about the space, I can list available spaces for you.
+```
+
+Use the MCP tool `mcp__atlassian__getConfluenceSpaces` if the user needs to see available spaces.
+
+### Step 3: Analyze Input
 
 **For any input type:**
 - Extract all available information
@@ -49,23 +65,23 @@ Which would you prefer?
 - **General**: Project goals, constraints, dependencies, risks, timeline
 - **Uncertainties**: Questions, pending decisions, assumptions
 
-### Step 3: Propose Project Name
+### Step 4: Propose Page Title
 
 Based on the analyzed content:
 
 ```markdown
 Based on your input, I found information about [brief summary of what was discussed].
 
-I propose creating a Linear project named: **"[Proposed Name]"**
+I propose creating a Confluence page named: **"[Proposed Name]"**
 
-This project will contain both Product and Technical specifications, with sections filled based on what was discussed.
+This page will contain both Product and Technical specifications, with sections filled based on what was discussed.
 
-Should I create this Linear project?
+Should I create this Confluence page in [SPACE-KEY]?
 ```
 
 Wait for confirmation before proceeding.
 
-### Step 4: Generate Combined Specification
+### Step 5: Generate Combined Specification
 
 Create a specification using the template structure from:
 - **Product Spec Template**: @.claude/templates/feature-spec.md
@@ -94,7 +110,7 @@ Create a specification using the template structure from:
 5. **Preserve template section numbering** from the original templates
 6. **Include all template sections** but leave empty ones with placeholders
 
-### Step 5: Apply Uncertainty Markers
+### Step 6: Apply Uncertainty Markers
 
 **CRITICAL - Non-Greedy Filling Policy:**
 
@@ -117,25 +133,33 @@ Create a specification using the template structure from:
    "Users authenticate via [OPEN QUESTION: SSO, password, or social login?]"
    ```
 
-### Step 6: Create Linear Project
+### Step 7: Create Confluence Page
 
-Create the Linear project with the complete specification:
+Create the Confluence page with the complete specification:
 
-**Project Settings:**
-- **Name:** [Confirmed project name]
-- **Description:** Full combined specification (both Product and Technical sections)
-- **Team:** [Ask user to confirm team]
-- **State:** "Planned"
-- **Summary:** [Brief 1-2 sentence summary]
+**Use MCP Tool:** `mcp__atlassian__createConfluencePage`
 
-### Step 7: Provide Comprehensive Summary
+**Page Settings:**
+- **cloudId:** [From user or detected from space]
+- **spaceId:** [Numerical space ID from space key]
+- **title:** [Confirmed page title]
+- **body:** Full combined specification (both Product and Technical sections) in Markdown format
+- **parentId:** [Optional parent page ID if specified]
 
-After creating the project:
+**Important Notes:**
+- The MCP tool accepts Markdown format for the body
+- Use the cloudId parameter (can be site URL or UUID)
+- Get the numerical spaceId using `mcp__atlassian__getConfluenceSpaces` with the space key
+
+### Step 8: Provide Comprehensive Summary
+
+After creating the page:
 
 ```markdown
-✅ Project specification created successfully!
+✅ Feature specification created successfully!
 
-**Linear Project:** [PROJECT-KEY] - [Project URL]
+**Confluence Page:** [Page Title] - [Page URL]
+**Space:** [SPACE-KEY]
 
 ## What Was Created
 
@@ -167,12 +191,12 @@ After creating the project:
 
 ## Next Steps
 
-1. Review the specification in Linear: [URL]
+1. Review the specification in Confluence: [URL]
 2. [If gaps exist] Schedule sessions to discuss:
    - [Missing product aspects]
    - [Missing technical aspects]
-3. Use `/refine-spec [PROJECT-KEY]` to add information as it becomes available
-4. Once specs are complete, use `/decompose-feature [PROJECT-KEY]` to create user stories
+3. Use `/refine-spec [PAGE-ID]` to add information as it becomes available
+4. Once specs are complete, use `/decompose-feature [PAGE-ID]` to create Jira stories
 
 The specification will grow progressively as more information becomes available.
 ```
@@ -206,10 +230,11 @@ Analyze the input to understand what's available:
 
 ## Error Handling
 
-1. **Ambiguous project scope**: Ask clarifying questions about the project's purpose
+1. **Ambiguous feature scope**: Ask clarifying questions about the feature's purpose
 2. **No concrete information**: Warn that spec will be mostly empty, confirm creation
 3. **Conflicting information**: Create uncertainties and note conflicts in Open Questions
-4. **Linear creation fails**: Provide full specification text for manual creation
+4. **Confluence creation fails**: Provide full specification text for manual creation
+5. **Space not found**: List available spaces and ask user to select one
 
 ## Examples
 
@@ -218,23 +243,28 @@ Analyze the input to understand what's available:
 ```
 User: /create-spec
 
-Agent: How would you like to provide the project information?
+Agent: How would you like to provide the feature information?
 
 User: Option A
       [Pastes product planning meeting transcript]
 
+Agent: Where would you like to create this in Confluence?
+       Confluence Space: ?
+
+User: PROJ
+
 Agent: Based on your input, I found information about an advanced search feature
        with filters for project managers.
 
-       I propose creating a Linear project named: "Advanced Search with Filters"
+       I propose creating a Confluence page named: "Advanced Search with Filters"
 
-       Should I create this Linear project?
+       Should I create this Confluence page in PROJ space?
 
 User: Yes
 
-Agent: ✅ Project specification created successfully!
+Agent: ✅ Feature specification created successfully!
 
-       **Linear Project:** PROJ-42
+       **Confluence Page:** Advanced Search with Filters
 
        **📋 Product Specification:**
        - ✅ Overview: Filled (target users, success metrics defined)
@@ -248,7 +278,7 @@ Agent: ✅ Project specification created successfully!
        - ⚪ API Contracts: Empty - not discussed
        - ⚠️ Open Questions: 8 technical decisions pending
 
-       The technical aspects can be added later using `/refine-spec PROJ-42`
+       The technical aspects can be added later using `/refine-spec [PAGE-ID]`
 ```
 
 ### Example 2: Technical-Focused Input
@@ -256,27 +286,31 @@ Agent: ✅ Project specification created successfully!
 ```
 User: /create-spec
 
-Agent: How would you like to provide the project information?
+Agent: How would you like to provide the feature information?
 
 User: Option C
       We need to implement Elasticsearch for full-text search with <100ms response
 
+Agent: Where would you like to create this in Confluence?
+
+User: Engineering space, under "Technical Specs" page
+
 Agent: Based on your input, I found information about implementing full-text
        search using Elasticsearch.
 
-       I propose creating a Linear project named: "Full-Text Search Implementation"
+       I propose creating a Confluence page named: "Full-Text Search Implementation"
 
-       Should I create this Linear project?
+       Should I create this page?
 
 User: Name it "Smart Search" instead
 
-Agent: I'll create a Linear project named: "Smart Search"
+Agent: I'll create a Confluence page named: "Smart Search"
 
        Should I proceed?
 
 User: Yes
 
-Agent: ✅ Project specification created successfully!
+Agent: ✅ Feature specification created successfully!
 
        **📋 Product Specification:**
        - ⚠️ Overview: Minimal (inferred purpose only)
@@ -290,7 +324,7 @@ Agent: ✅ Project specification created successfully!
        - ✅ Technical Specifications: Search API defined
        - ✅ Integrations: Elasticsearch details documented
 
-       Product requirements can be added later using `/refine-spec PROJ-XX`
+       Product requirements can be added later using `/refine-spec [PAGE-ID]`
 ```
 
 ### Example 3: Comprehensive Input
@@ -300,16 +334,20 @@ User: /create-spec
       Option A
       [Pastes transcript covering both product and technical discussions]
 
+Agent: Where would you like to create this in Confluence?
+
+User: ANALYTICS space
+
 Agent: Based on your input, I found comprehensive information about a reporting
        dashboard feature including user needs, workflows, and technical architecture.
 
-       I propose creating a Linear project named: "Analytics Reporting Dashboard"
+       I propose creating a Confluence page named: "Analytics Reporting Dashboard"
 
-       Should I create this Linear project?
+       Should I create this Confluence page in ANALYTICS?
 
 User: Yes
 
-Agent: ✅ Project specification created successfully!
+Agent: ✅ Feature specification created successfully!
 
        **📋 Product Specification:**
        - ✅ Overview: Filled
@@ -323,16 +361,17 @@ Agent: ✅ Project specification created successfully!
        - ⚠️ Data Models: Partial (mentioned but not detailed)
 
        Both specifications have good coverage. Missing details can be added
-       using `/refine-spec PROJ-XX`
+       using `/refine-spec [PAGE-ID]`
 ```
 
 ## Important Notes
 
-- **Always creates both specs**: Every project gets Product AND Technical sections
+- **Always creates both specs**: Every page gets Product AND Technical sections
 - **Progressive filling**: Start with what you have, grow over time
 - **Honest gaps**: Empty sections clearly marked, not filled with fluff
 - **Uncertainty markers**: Prevent hallucination by marking unknowns
-- **Single source of truth**: Everything in Linear project description
+- **Single source of truth**: Everything in Confluence page
 - **Natural workflow**: Accepts any type of input without forcing structure
+- **Confluence-native**: Uses Markdown format, integrates with Confluence features
 
 This unified approach simplifies the workflow while maintaining quality and preventing AI hallucination through explicit gap acknowledgment.

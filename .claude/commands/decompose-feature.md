@@ -2,61 +2,80 @@
 description: Decompose feature into user stories through conversational planning
 ---
 
-Decompose a feature (Linear Project) into independently deliverable user stories using a conversational, engaging approach.
+Decompose a feature (Confluence Page) into independently deliverable user stories in Jira using a conversational, engaging approach.
 
 ## Conversational Workflow
 
 This command uses an **engaging, conversational approach**:
-1. Accept Linear Project ID as argument
-2. Fetch project details and analyze current state
-3. Ask if there's a decomposition meeting transcript
-4. Analyze transcript or work conversationally
-5. Discuss decomposition strategy
-6. Ask clarifying questions about boundaries
-7. Create user stories in Linear
-8. Provide clear summary
+1. Accept Confluence Page ID/URL as argument
+2. Fetch page details and analyze specifications
+3. Ask for target Jira project key
+4. Ask if there's a decomposition meeting transcript
+5. Analyze transcript or work conversationally
+6. Discuss decomposition strategy
+7. Ask clarifying questions about boundaries
+8. Create user stories in Jira
+9. Provide clear summary
 
 ## Steps
 
-### Step 1: Get Project ID from Arguments
+### Step 1: Get Page ID from Arguments
 
-The command accepts the Linear Project as `$ARGUMENTS`:
-- Project Key (e.g., `PROJ-42`)
-- Project Name (e.g., `Advanced Search`)
-- Project ID (UUID)
+The command accepts the Confluence Page as `$ARGUMENTS`:
+- Page ID (e.g., `123456789`)
+- Page URL (e.g., `https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789`)
+- Page Title (will search for it)
 
-### Step 2: Fetch and Analyze Project
+**Use MCP Tool:** `mcp__atlassian__getConfluencePage` to fetch the page content.
 
-Query Linear for the project and display current state:
+### Step 2: Fetch and Analyze Page
+
+Query Confluence for the page and display current state:
 
 ```markdown
-I found Linear Project $ARGUMENTS:
+I found Confluence Page: [Page Title]
 
-**Project:** [PROJECT-KEY] - [Project Name]
-**URL:** [Linear Project URL]
-**Status:** [Current status]
-**Team:** [Team name]
+**Page:** [Page Title]
+**URL:** [Confluence Page URL]
+**Space:** [Space name]
 
-**Product Spec:** [✅ In Linear project description or ❌ Not found]
-**Technical Spec:** [✅ In Linear project description or ⏳ Pending or ❌ Not found]
+**Product Spec:** [✅ Found in page or ❌ Not found]
+**Technical Spec:** [✅ Found in page or ⏳ Minimal or ❌ Not found]
 
-**Current User Stories:** [N] stories
-[If stories exist, list them:]
-- [ISSUE-1]: [Title] - [Status]
-- [ISSUE-2]: [Title] - [Status]
+**Existing Jira Stories:** Checking for linked stories...
+[If stories exist, list them after querying Jira]
 
-[If stories already exist, show warning:]
-⚠️ This project already has [N] user stories. This command will ADD NEW stories to the project. If you want to modify existing stories, use `/refine-decomposition [PROJECT-KEY]` instead.
+[If no specs found, show warning:]
+⚠️ I couldn't find Product and Technical Specifications in this Confluence page.
+I recommend ensuring the page contains both specs created by `/create-spec` before decomposing.
 
-[If no stories, show:]
+[If specs found:]
 ✅ Ready to decompose into user stories.
 ```
 
-### Step 3: Read Both Specs from Linear Project Description
+### Step 3: Ask for Jira Project
 
-Read **both Product and Technical specifications** from the Linear project description:
+Ask which Jira project to create stories in:
 
-The Linear project description should contain both specs (created by `/generate-feature-brief` and `/create-technical-spec`), structured as:
+```markdown
+Which Jira project should I create the user stories in?
+
+**Jira Project Key:** [Ask for project key, e.g., "PROJ", "ENG", "PROD"]
+
+If you're not sure, I can list available Jira projects for you.
+```
+
+**Use MCP Tool:** `mcp__atlassian__getVisibleJiraProjects` if user needs to see available projects.
+
+Once project key is provided, verify it and get issue types:
+
+**Use MCP Tool:** `mcp__atlassian__getJiraProjectIssueTypesMetadata` to get available issue types and ensure "Story" type exists.
+
+### Step 4: Read Both Specs from Confluence Page
+
+Read **both Product and Technical specifications** from the Confluence page content:
+
+The Confluence page should contain both specs, structured as:
 
 ```markdown
 ## 📋 Product Specification
@@ -87,15 +106,15 @@ The Linear project description should contain both specs (created by `/generate-
 - Testing requirements
 - Technical open questions and assumptions
 
-**If specs not found in Linear description:**
+**If specs not found in Confluence page:**
 
 If Product Spec not found:
-- Warn: "⚠️ I couldn't find a Product Specification in the Linear project description. I recommend running `/generate-feature-brief` first. I'll proceed using the project description and any user stories."
+- Warn: "⚠️ I couldn't find a Product Specification in the Confluence page. I recommend running `/create-spec` first. I'll proceed using the page content."
 
 If Technical Spec is placeholder or not found:
-- Note: "ℹ️ Technical Specification hasn't been created yet. I'll decompose based on Product Spec and user stories. For better technical guidance, consider running `/create-technical-spec [PROJECT-KEY]` first."
+- Note: "ℹ️ Technical Specification hasn't been created yet. I'll decompose based on Product Spec. For better technical guidance, consider running `/refine-spec [PAGE-ID]` first."
 
-### Step 4: Request Decomposition Meeting Input
+### Step 5: Request Decomposition Meeting Input
 
 Ask user if they have a decomposition meeting:
 
@@ -108,7 +127,7 @@ Before I decompose this feature into user stories, did you have a story decompos
 Which would you prefer?
 ```
 
-### Step 5: Analyze Decomposition Input
+### Step 6: Analyze Decomposition Input
 
 **If transcript provided (Option A):**
 
@@ -147,9 +166,9 @@ I've analyzed your decomposition meeting transcript. Here's what I found:
 
 **If conversational (Option B):**
 
-Work through decomposition conversationally - see Step 6.
+Work through decomposition conversationally - see Step 7.
 
-### Step 6: Discuss Decomposition Strategy
+### Step 7: Discuss Decomposition Strategy
 
 Based on the feature spec, technical spec, and transcript (if available), propose a decomposition approach:
 
@@ -205,7 +224,7 @@ Which decomposition approach makes sense for this feature, or do you have a diff
 
 [If user selects an approach or suggests their own, proceed with that strategy]
 
-### Step 7: Ask Clarifying Questions
+### Step 8: Ask Clarifying Questions
 
 Based on the chosen decomposition strategy, ask targeted questions:
 
@@ -246,7 +265,7 @@ Let me clarify the story boundaries:
 
 [Adjust questions based on the specific feature and decomposition approach]
 
-### Step 8: Propose Story Breakdown
+### Step 9: Propose Story Breakdown
 
 Based on all gathered information, propose the final story breakdown:
 
@@ -288,75 +307,112 @@ Does this decomposition look good, or would you like to adjust any stories?
 
 [Wait for user confirmation or adjustments]
 
-### Step 9: Create User Stories in Linear
+### Step 10: Create User Stories in Jira
 
 **IMPORTANT - Uncertainty Handling in Stories:**
 
-Before creating stories, review **both Product and Technical specs** from the Linear project description for any remaining uncertainty markers (`[OPEN QUESTION]`, `[DECISION PENDING]`, `[CLARIFICATION NEEDED]`).
+Before creating stories, review **both Product and Technical specs** from the Confluence page for any remaining uncertainty markers (`[OPEN QUESTION]`, `[DECISION PENDING]`, `[CLARIFICATION NEEDED]`).
 
 **If critical uncertainties still exist:**
 - Warn the user that stories may need refinement once uncertainties are resolved
-- Consider adding a note in the story description referencing the open question and linking to the Linear project
+- Consider adding a note in the story description referencing the open question and linking to the Confluence page
 - Flag the story with a "blocked" or "needs-clarification" label
 
 **For each story, create with these guidelines:**
-- If an AC references an `[OPEN QUESTION]` from the Product Spec, note it in the story with link to Linear project
-- If implementation depends on a `[DECISION PENDING]` from the Technical Spec, add to Dependencies section with link
+- If an AC references an `[OPEN QUESTION]` from the Product Spec, note it in the story with link to Confluence page
+- If implementation depends on a `[DECISION PENDING]` from the Technical Spec, add to description with link
 - Stories with unresolved uncertainties should be marked for refinement
-- Link back to the Linear project description for full context
+- Link back to the Confluence page for full context
 
-For each approved story, create a Linear issue with complete details:
+For each approved story, create a Jira issue with complete details:
 
 ```markdown
-Creating user stories in Linear Project [PROJECT-KEY]...
+Creating user stories in Jira Project [PROJECT-KEY]...
 
 [For each story, show progress:]
-✅ Created [ISSUE-XX]: [Story Title]
-✅ Created [ISSUE-YY]: [Story Title]
+✅ Created [ISSUE-KEY]: [Story Title]
+✅ Created [ISSUE-KEY]: [Story Title]
 [Continue for all stories]
 ```
 
-**Linear Issue Format:**
+**Use MCP Tool:** `mcp__atlassian__createJiraIssue`
 
-**Title:** [Clear, action-oriented title, 3-7 words]
+**Jira Issue Format:**
+
+**Summary (Title):** [Clear, action-oriented title, 3-7 words]
 
 **Description:**
 Create the user story description using the template from @.claude/templates/user-story.md
 
 Fill in all sections based on the story scope and information from the feature and technical specs.
 
-**Linear Issue Settings:**
-- **Project:** [PROJECT-KEY]
-- **Team:** [Team from project]
-- **Labels:**
-  - "user-story" (always)
-  - [Additional labels from feature: "frontend", "backend", "api", "ui", "integration", etc.]
-- **State:** "Backlog" (or ask user for preferred initial state)
-- **Priority:** [If priority was discussed, set it; otherwise leave default]
-- **Estimate:** [If team uses estimates and size was discussed]
+**Structure:**
+```markdown
+**User Story:** As a [persona], I want [capability], so that [benefit]
 
-### Step 10: Provide Comprehensive Summary
+**Value:** [What value this delivers to users/business]
+
+**Confluence Spec:** [Link to Confluence page]
+
+---
+
+## Acceptance Criteria
+
+**AC1: [Scenario name]**
+**Given** [context]
+**When** [action]
+**Then** [expected outcome]
+
+**AC2: [Scenario name]**
+**Given** [context]
+**When** [action]
+**Then** [expected outcome]
+
+[Continue with all ACs]
+
+---
+
+## Technical Notes
+
+[Any technical considerations from technical spec]
+
+**Dependencies:** [List other story keys if dependencies exist]
+
+**References:**
+- Confluence Spec: [Page URL]
+- Related Technical Docs: [If applicable]
+```
+
+**Jira Issue Settings:**
+- **projectKey:** [PROJECT-KEY from user]
+- **issueTypeName:** "Story"
+- **summary:** [Story title]
+- **description:** [Full description in Markdown]
+- **labels:** ["user-story", plus additional context labels like "frontend", "backend", "api", etc.]
+- **priority:** [If priority was discussed, set it using priority field]
+
+### Step 11: Provide Comprehensive Summary
 
 After creating all stories, provide a detailed summary:
 
 ```markdown
 ✅ Feature decomposed successfully!
 
-**Linear Project:** [PROJECT-KEY] - [Project Name]
-**URL:** [Project URL]
+**Confluence Page:** [Page Title] - [Page URL]
+**Jira Project:** [PROJECT-KEY]
 
 **Stories Created:** [N] user stories
 
 **Story Breakdown:**
 
-1. **[ISSUE-XX]: [Story Title]** - [URL]
+1. **[ISSUE-KEY]: [Story Title]** - [URL]
    - Scope: [Frontend/Backend/Full-stack]
    - Focus: [1-line description]
    - ACs: [N] acceptance criteria
    - Dependencies: [None or list]
    - Labels: [Labels applied]
 
-2. **[ISSUE-YY]: [Story Title]** - [URL]
+2. **[ISSUE-KEY]: [Story Title]** - [URL]
    - Scope: [Frontend/Backend/Full-stack]
    - Focus: [1-line description]
    - ACs: [N] acceptance criteria
@@ -370,9 +426,9 @@ After creating all stories, provide a detailed summary:
 
 **Implementation Order:**
 Based on dependencies and value delivery, recommended order:
-1. [ISSUE-XX]: [Title] - Foundation story, no dependencies
-2. [ISSUE-YY]: [Title] - Builds on ISSUE-XX
-3. [ISSUE-ZZ]: [Title] - Enhancement, can be done in parallel
+1. [ISSUE-KEY]: [Title] - Foundation story, no dependencies
+2. [ISSUE-KEY]: [Title] - Builds on previous story
+3. [ISSUE-KEY]: [Title] - Enhancement, can be done in parallel
 [Continue with recommended order]
 
 **Coverage:**
@@ -385,15 +441,15 @@ Based on dependencies and value delivery, recommended order:
 **Next Steps:**
 
 **Immediate:**
-1. Review all stories in Linear and verify acceptance criteria
+1. Review all stories in Jira and verify acceptance criteria
 2. Prioritize stories in your backlog
 3. Estimate stories if your team uses estimation
 4. Assign stories to upcoming sprints
 
 **For Implementation:**
-1. Start with: [ISSUE-XX] - [Title]
-2. Create TDD plan (optional): `/plan-user-story [ISSUE-XX]`
-3. Implement story (optional): `/implement-story docs/specs/.../story_[ISSUE-XX]_tdd_tasks.md`
+1. Start with: [ISSUE-KEY] - [Title]
+2. Create TDD plan (optional): `/plan-user-story [ISSUE-KEY]`
+3. Implement story (optional): `/implement-story docs/specs/.../story_[ISSUE-KEY]_tdd_tasks.md`
 
 **For Refinement:**
 If you need to adjust the decomposition (split, merge, add stories):
@@ -406,11 +462,11 @@ The feature is now fully decomposed and ready for sprint planning and implementa
 
 ### Conversational Best Practices
 
-1. **Show Current State**: Always display project state before asking questions
+1. **Show Current State**: Always display page state before asking questions
 2. **Propose Options**: Offer decomposition strategies with pros/cons
 3. **Explain Reasoning**: When suggesting story boundaries, explain why
 4. **Confirm Before Creating**: Show proposed breakdown and get approval
-5. **Reference Documentation**: Connect stories to feature spec and technical spec
+5. **Reference Documentation**: Connect stories to Confluence page
 6. **Discuss Dependencies**: Make dependencies explicit
 7. **Consider Team Workflow**: Ask about team's preferred story size and scope
 
@@ -521,26 +577,30 @@ Apply these labels to help categorize stories:
 
 If something goes wrong:
 
-1. **No Product Spec in Linear**: Warn but continue using Linear project description and user stories
-2. **No Technical Spec in Linear**: Note that it's optional, continue with Product Spec and user stories
-3. **Stories Already Exist**: Warn and ask if user wants to continue or use `/refine-decomposition`
-4. **Unclear Boundaries**: Ask specific questions about how to split
-5. **Incomplete Transcript**: Identify gaps and work conversationally to fill them
+1. **No Product Spec in Confluence**: Warn but continue using Confluence page content
+2. **No Technical Spec in Confluence**: Note that it's optional, continue with Product Spec
+3. **Jira Project Not Found**: List available projects and ask user to select
+4. **Story Issue Type Not Available**: List available issue types and ask which to use
+5. **Unclear Boundaries**: Ask specific questions about how to split
+6. **Incomplete Transcript**: Identify gaps and work conversationally to fill them
 
 ## Examples
 
 ### Example: Transcript-Based Decomposition
 
 ```
-User: /decompose-feature PROJ-42
+User: /decompose-feature 123456789
 
-Agent: I found Linear Project PROJ-42: Advanced Search with Filters
+Agent: I found Confluence Page: Advanced Search with Filters
 
-       Product Spec: ✅ In Linear project description
-       Technical Spec: ✅ In Linear project description
+       Product Spec: ✅ Found in page
+       Technical Spec: ✅ Found in page
 
-       Current User Stories: 0 stories
-       ✅ Ready to decompose into user stories.
+       Which Jira project should I create the user stories in?
+
+User: PROJ
+
+Agent: Great! I'll create stories in Jira project PROJ.
 
        Before I decompose this feature, did you have a story decomposition meeting?
 
@@ -569,7 +629,7 @@ Agent: I've analyzed your decomposition meeting transcript. Here's what I found:
           one end-to-end story instead?
 
        2. Story 3 includes both backend and frontend for status filter - should
-          stories 4 also include both layers, or split them?
+          story 4 also include both layers, or split them?
 
        3. Should error handling be included in each story's ACs, or separate
           stories?
@@ -586,19 +646,32 @@ Agent: Perfect! Here's the final decomposition:
 
 User: Yes, create them
 
-Agent: [Creates stories and provides summary]
+Agent: Creating user stories in Jira Project PROJ...
+
+       ✅ Created PROJ-42: Basic text search - Backend API
+       ✅ Created PROJ-43: Basic text search - Frontend UI
+       ✅ Created PROJ-44: Add status filter
+       ✅ Created PROJ-45: Add assignee and date filters
+       ✅ Created PROJ-46: Save filter presets
+
+       ✅ Feature decomposed successfully! [Shows summary]
 ```
 
 ### Example: Conversational Decomposition
 
 ```
-User: /decompose-feature PROJ-42
+User: /decompose-feature Advanced Search
 
-Agent: I found Linear Project PROJ-42: Advanced Search with Filters
+Agent: [Searches and finds Confluence page]
+       I found Confluence Page: Advanced Search with Filters
 
        [Shows current state]
 
-       Did you have a decomposition meeting?
+       Which Jira project should I create stories in?
+
+User: ENG
+
+Agent: Did you have a decomposition meeting?
 
        **Option A: Yes, I have a transcript**
        **Option B: No, let's decompose it together**
@@ -645,20 +718,22 @@ Agent: Absolutely! So we'll use workflow-based decomposition, but split the
 
 User: Perfect!
 
-Agent: [Creates stories and provides summary]
+Agent: Creating stories in Jira...
+       [Creates stories and provides summary]
 ```
 
 ## Important Notes
 
-- **Requires $ARGUMENTS**: Must provide Linear Project ID
-- **Reads from Linear**: Fetches both Product and Technical specs from Linear project description
+- **Requires $ARGUMENTS**: Must provide Confluence Page ID/URL
+- **Reads from Confluence**: Fetches both Product and Technical specs from Confluence page
+- **Creates in Jira**: Creates user stories as Jira issues with proper linking
 - **Transcript is Optional**: Preferred but can work conversationally
 - **Proposes Options**: Always offers decomposition strategies
 - **Confirms Before Creating**: Shows proposed breakdown for approval
 - **Complete ACs**: Every story gets comprehensive acceptance criteria
-- **Maps to Specs**: References both Product and Technical specs from Linear
-- **Includes Dependencies**: Makes dependencies explicit
+- **Maps to Specs**: References both Product and Technical specs from Confluence
+- **Includes Dependencies**: Makes dependencies explicit with Jira issue keys
 - **Suggests Order**: Recommends implementation order
-- **Links Back**: Stories link back to Linear project for full context
+- **Links Back**: Stories link back to Confluence page for full context
 
 This conversational approach ensures stories are well-thought-out, properly scoped, and have comprehensive acceptance criteria while being engaging and collaborative.

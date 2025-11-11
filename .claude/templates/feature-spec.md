@@ -1,6 +1,6 @@
 # Feature: [Feature Name]
 
-**Linear Project:** [Will be filled after creation]
+**Confluence Page:** [Will be filled after creation]
 
 ---
 

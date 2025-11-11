@@ -15,43 +15,33 @@ This workflow is built on **pragmatic principles** for ongoing product developme
 5. **Quality Through Design**: Thoughtful specs prevent issues before they occur
 6. **Explicit Over Implicit**: Uncertainties are marked, not assumed (prevents AI hallucination)
 7. **Flexibility**: Use what adds value, customize templates for your context
+8. **Unified Approach**: Single commands handle both product and technical aspects naturally
 
 ---
 
-## Two Workflow Modes
+## Simplified Workflow (v2.0)
 
-### Ongoing Development Mode (Primary - 95% of teams)
+### Core Development Flow
 
-For teams working on **existing products** who define features through planning meetings:
+For teams working on **any product** development:
 
 ```
-Feature Planning Meeting
+Any Initial Meeting/Discussion
         ↓
-/generate-feature-brief (paste transcript)
+/create-spec (paste transcript/document/description)
         ↓
-Linear Project with Product Spec
+Linear Project with BOTH Product & Technical Specs
+(fills what's known, leaves rest empty)
         ↓
-[Product Refinement as needed]
+[Progressive Refinement as information becomes available]
         ↓
-/refine-feature-brief PROJECT-42 (paste feedback/changes)
+/refine-spec PROJECT-42 (paste any new information)
         ↓
-Updated Product Spec
+Updated Specs (product, technical, or both)
         ↓
-Technical Design Meeting
+[Continue refining until ready]
         ↓
-/create-technical-spec PROJECT-42 (paste transcript)
-        ↓
-Updates Linear Project (adds Technical Spec)
-        ↓
-[Technical Refinement as needed]
-        ↓
-/refine-technical-spec PROJECT-42 (paste technical refinement)
-        ↓
-Updated Technical Spec
-        ↓
-Story Decomposition Meeting
-        ↓
-/decompose-feature PROJECT-42 (paste transcript)
+/decompose-feature PROJECT-42 (paste transcript or discuss)
         ↓
 User Stories in Linear (linked to project)
         ↓
@@ -61,9 +51,9 @@ User Stories in Linear (linked to project)
         ↓
 Updated Stories
         ↓
-[Optional TDD Workflow]
+[Optional DEV Workflow]
 /plan-user-story ISSUE-42
-/implement-story docs/specs/.../tdd_tasks.md
+/implement-story docs/specs/.../tasks.md
 ```
 
 ---
@@ -73,7 +63,6 @@ Updated Stories
 - **Claude Code** installed and configured
 - **Linear** for managing projects and user stories
 - **Git** for version control
-- **Testing framework** (optional, only for TDD automation)
 
 ---
 
@@ -85,7 +74,7 @@ Copy the commands directory to your project:
 # From this repository
 cp -r .claude/commands /path/to/your/project/.claude/
 
-# Optional: Copy agents if using TDD automation (steps 4-5)
+# Optional: Copy agents if using this dev workflow
 cp -r .claude/agents /path/to/your/project/.claude/
 ```
 
@@ -93,357 +82,125 @@ cp -r .claude/agents /path/to/your/project/.claude/
 
 ## Conversational Slash Commands
 
-### Core Workflow (Steps 1-4)
+### Core Workflow Commands (v2.0 - Simplified)
 
-#### 1. `/generate-feature-brief`
+#### 1. `/create-spec`
 
-**Purpose**: Create feature specification from meeting transcript or conversation
+**Purpose**: Create a comprehensive project specification from any input
 
 **Workflow**:
-1. Command asks: "Do you have a meeting transcript or want to discuss?"
-2. You paste transcript (preferred) OR discuss conversationally
-3. Agent analyzes transcript and asks clarifying questions
-4. Agent generates Product Specification
-5. Agent creates Linear Project with **Product Spec in the project description**
-6. Agent adds placeholder for Technical Spec (to be filled by `/create-technical-spec`)
-7. Agent optionally saves local backup to `docs/features/[name].md`
+1. Command asks: "How would you like to provide the project information?"
+2. You provide: transcript, document, or conversational description
+3. Agent proposes a project name
+4. Agent creates Linear Project with **BOTH Product & Technical Spec sections**
+5. Agent fills what's available from input, leaves rest empty (no hallucination)
+6. Shows clear summary of what was filled vs what remains empty
 
-**When to use**: When you have a feature idea or planning meeting transcript
+**When to use**: Starting any new feature or project
 
 **No arguments required** - the command asks for input
 
 **Example**:
 ```
-You: /generate-feature-brief
+You: /create-spec
 
-Agent: How would you like to provide feature information?
+Agent: How would you like to provide the project information?
        Option A: Meeting Transcript
-       Option B: Describe Conversationally
+       Option B: Document
+       Option C: Describe Conversationally
 
 You: Option A
-     [Paste meeting transcript from your feature planning session]
+     [Paste any meeting transcript - product, technical, or both]
 
-Agent: I've analyzed your transcript. Here's what I found:
-       Feature: Advanced Search with Filters
-       Target Users: Project managers
-       Key Workflows: ...
+Agent: Based on your input, I found information about [summary].
 
-       Let me ask some clarifying questions:
-       1. What are the success criteria?
-       2. What's explicitly out of scope?
-       ...
+       I propose creating a Linear project named: "Advanced Search with Filters"
+       Should I create this Linear project?
 
-You: [Answer questions]
+You: Yes
 
-Agent: [Generates Product Spec and creates Linear Project]
-       ✅ Linear Project: PROJ-42 created
-       ✅ Product Spec: In Linear project description
-       ✅ Technical Spec: Placeholder added (ready for /create-technical-spec)
+Agent: ✅ Project specification created successfully!
+
+       📋 Product Spec: 70% complete (requirements clear, metrics missing)
+       🔧 Technical Spec: 10% complete (only basic approach mentioned)
+
+       Missing information can be added later using /refine-spec PROJ-42
 ```
 
 **Output**:
-- Linear Project created with structured description
-- Product Specification stored in project description
-- Technical Spec placeholder added
-- Optional local backup file
+- Linear Project with both Product AND Technical spec sections
+- Fills only what's available from input
+- Empty sections clearly marked
+- Shows coverage percentage
 - Clear next steps
 
 ---
 
-#### 1.5. `/refine-feature-brief PROJECT-KEY` (Optional)
+#### 2. `/refine-spec PROJECT-KEY`
 
-**Purpose**: Refine existing product specification based on feedback or changing requirements
+**Purpose**: Refine any part of existing specifications based on new information
 
 **Workflow**:
-1. Fetches Linear Project and shows current Product Spec state
-2. Asks: "What prompted this refinement? Do you have a transcript?"
-3. You paste refinement transcript OR discuss conversationally
-4. Agent analyzes what needs to change and shows current state
-5. Agent asks clarifying questions about the changes
-6. Agent shows before/after for each proposed change
-7. You confirm changes
-8. Agent **updates Product Spec section** in Linear project description
-9. Agent identifies which user stories or technical specs might be impacted
+1. Fetches Linear Project and shows current specification coverage
+2. Asks: "How would you like to provide the new information?"
+3. You provide: transcript, document, feedback, or description
+4. Agent detects which sections need updating (product, technical, or both)
+5. Agent shows before/after for each proposed change
+6. You confirm changes
+7. Agent updates relevant sections in Linear project description
+8. Shows comprehensive summary of what changed
 
-**Requires**: Linear Project ID with existing Product Spec
+**Requires**: Linear Project ID
 
 **When to use**:
-- User feedback revealed new requirements
-- Stakeholder review requested changes
-- Scope needs adjustment (add/remove features)
-- Requirements were too vague and need clarification
-- Success metrics need updating
-- Business constraints changed
-- Open questions now have answers
+- Any new information becomes available
+- Product requirements change or get clarified
+- Technical decisions are made or revised
+- Stakeholder feedback needs incorporation
+- Open questions get answered
+- Gaps in specs need filling
 
 **Example**:
 ```
-You: /refine-feature-brief PROJ-42
+You: /refine-spec PROJ-42
 
 Agent: I found Linear Project PROJ-42: Advanced Search
 
-       Product Spec: ✅ In Linear project description
-       User Stories: 5 stories
+       **Current Coverage:**
+       📋 Product Spec: ~70% complete
+       🔧 Technical Spec: ~30% complete
 
-       **Current Product Spec Summary:**
-       - Must Have: 8 core features
-       - Success Metrics: 2 metrics defined
-       - Open Questions: 2 unresolved
-
-       What prompted this product spec refinement?
-
-       **Option A: Refinement Meeting Transcript**
-       **Option B: Describe Changes Conversationally**
+       How would you like to provide the new information?
 
 You: Option A
-     [Paste transcript: "After user testing, we found users need to
-      share saved filters with their team. Also, real-time search is
-      too aggressive - 1-2 second delay is fine..."]
+     [Paste any transcript - automatically detects what to update]
 
-Agent: I've analyzed your refinement transcript:
+Agent: I've analyzed your input and found information affecting:
 
-       **Changes Requested:**
-       1. Filter Sharing: Add team sharing capability
-          - Reason: User testing revealed collaboration need
-          - Impact: Requires new user story
+       📋 Product Specification Updates:
+       - Requirements: Adding 2 new requirements
+       - Open Questions: Resolving 1 question
 
-       2. Performance Requirements: Relax real-time → 1-2s delay OK
-          - Reason: User testing validated acceptable delay
-          - Impact: Technical spec can be simplified
+       🔧 Technical Specification Updates:
+       - Architecture: Adding 2 diagrams
+       - API Contracts: Adding 3 endpoints
 
-       Let me show you the proposed changes:
+       [Shows before/after for each change]
 
-       ### Change 1: Add Filter Sharing (Section 3)
+       Should I proceed?
 
-       **BEFORE:**
-       ```
-       * **FR5:** Users can save filter presets
-         - Presets stored per-user
-       ```
+You: Yes
 
-       **AFTER:**
-       ```
-       * **FR5:** Users can save and share filter presets
-         - Presets can be personal or team-shared
-         - Any team member can create shared presets
-         - Shared presets visible to all team members
-       ```
-
-       **Rationale:** User testing revealed strong collaboration need
-       **Type:** Addition + Modification
-       **Impact:** Requires new user story for sharing functionality
-
-       ### Change 2: Performance Requirements (Section 3)
-
-       **BEFORE:**
-       ```
-       * **NFR2:** Real-time search results as user types (<100ms)
-       ```
-
-       **AFTER:**
-       ```
-       * **NFR2:** Search results within 1-2 seconds
-         - Show loading indicator during search
-       ```
-
-       **Rationale:** User testing showed 1-2s delay acceptable
-       **Type:** Modification + Clarification
-       **Impact:** Technical spec can use simpler architecture
-
-       Does this look correct?
-
-You: Yes, update it
-
-Agent: ✅ Product specification refined successfully!
-       ✅ 2 sections updated
-       ✅ 1 requirement added, 1 modified
-       ✅ 2 open questions resolved
-
-       **Impact on User Stories:**
-       ⚠️ These stories may need review:
-       - PROJ-44: Filter Presets (needs sharing capability)
-       - NEW STORY NEEDED: For search refinement feature
-
-       Consider running `/refine-decomposition PROJ-42` to update stories.
-
-       **Impact on Technical Specification:**
-       ⚠️ Technical spec may need review for:
-       - Sharing permissions/authorization
-       - Relaxed performance requirements
-
-       Consider running `/refine-technical-spec PROJ-42` to update.
+Agent: ✅ Specifications refined successfully!
+       Product Spec: 70% → 85% complete
+       Technical Spec: 30% → 75% complete
 ```
 
 **Output**:
-- Updated Product Spec section in Linear project description
-- Clear before/after comparison of changes
-- Rationale for each change documented
-- Scope changes tracked (additions/deletions/clarifications)
-- List of potentially impacted user stories and technical specs
-- Resolution of open questions if answered
-
----
-
-#### 2. `/create-technical-spec PROJECT-KEY`
-
-**Purpose**: Generate technical specification and add it to Linear project
-
-**Workflow**:
-1. Fetches Linear Project and reads Product Spec from description
-2. Asks: "Did you have a technical design meeting?"
-3. You paste transcript (optional) OR discuss conversationally
-4. Agent reviews your codebase patterns
-5. Agent asks clarifying technical questions
-6. Agent generates technical spec with smart section selection
-7. Agent **updates Linear project description** to add Technical Spec section
-8. Agent optionally saves local backup to `docs/specs/[project_key]/technical_spec.md`
-
-**Requires**: Linear Project ID (e.g., `PROJ-42`)
-
-**Example**:
-```
-You: /create-technical-spec PROJ-42
-
-Agent: I found Linear Project PROJ-42: Advanced Search
-
-       Product Spec: ✅ In Linear project description
-       Technical Spec: ⏳ Placeholder (ready to populate)
-       User Stories: 5 stories in project
-
-       Did you have a technical design meeting?
-       Option A: Yes, I have a transcript
-       Option B: No, let's discuss it now
-
-You: Option A
-     [Paste technical discussion transcript]
-
-Agent: I've analyzed your transcript:
-       Architecture: REST API with Elasticsearch
-       Frontend: React with Redux
-       ...
-
-       Let me review your codebase...
-
-       I found: You use Elasticsearch 8.x, Redux Toolkit, ...
-
-       Clarifying questions:
-       1. Which Elasticsearch index?
-       2. Should filters persist in URL?
-       ...
-
-You: [Answer questions]
-
-Agent: [Generates technical spec and updates Linear]
-       ✅ Linear project updated with Technical Spec
-       ✅ Both Product and Technical specs now in Linear: [URL]
-       Sections included: Data Models, API Contracts, UI Components
-```
-
-**Output**:
-- Technical specification added to Linear project description
-- Complete technical spec with relevant sections only
-- Architecture diagrams (Mermaid)
-- API contracts, data models, UI components
-- Optional local backup file
-- Clear implementation guidance
-
----
-
-#### 2.5. `/refine-technical-spec PROJECT-KEY` (Optional)
-
-**Purpose**: Refine existing technical specification based on new discussions or learnings
-
-**Workflow**:
-1. Fetches Linear Project and shows current Technical Spec state
-2. Asks: "What prompted this refinement? Do you have a transcript?"
-3. You paste refinement transcript OR discuss conversationally
-4. Agent analyzes what needs to change and shows current state
-5. Agent asks clarifying questions about the changes
-6. Agent shows before/after for each proposed change
-7. You confirm changes
-8. Agent **updates Technical Spec section** in Linear project description
-9. Agent identifies which user stories might be impacted
-
-**Requires**: Linear Project ID with existing Technical Spec
-
-**When to use**:
-- Technical decisions change during development
-- Architecture needs adjustment based on learnings
-- New integrations or dependencies discovered
-- Performance or security concerns identified
-- Implementation reveals gaps in technical spec
-
-**Example**:
-```
-You: /refine-technical-spec PROJ-42
-
-Agent: I found Linear Project PROJ-42: Advanced Search
-
-       Technical Spec: ✅ In Linear project description
-       User Stories: 5 stories
-
-       **Current Technical Decisions:**
-       - Using Elasticsearch for full-text search
-       - REST API with JWT authentication
-       - React with Redux state management
-
-       What prompted this technical spec refinement?
-
-       **Option A: Refinement Meeting Transcript**
-       **Option B: Describe Changes Conversationally**
-
-You: Option A
-     [Paste transcript: "We need to switch from Elasticsearch to PostgreSQL
-      full-text search due to infrastructure constraints..."]
-
-Agent: I've analyzed your refinement transcript:
-
-       **Changes Requested:**
-       1. Search Technology: Elasticsearch → PostgreSQL full-text search
-          - Reason: Infrastructure team doesn't want to maintain ES cluster
-          - Impact: Slightly slower search, but simpler architecture
-
-       2. Performance Requirements: <100ms → <500ms acceptable
-          - Reason: PostgreSQL FTS is sufficient for our needs
-
-       Let me show you the proposed changes:
-
-       ### Change 1: Technical Approach (Section 1)
-
-       **BEFORE:**
-       ```
-       We will use Elasticsearch for fast, full-text search...
-       ```
-
-       **AFTER:**
-       ```
-       We will use PostgreSQL native full-text search with tsvector
-       columns. This provides sufficient performance (<500ms) without
-       requiring additional infrastructure...
-       ```
-
-       Does this look correct?
-
-You: Yes, update it
-
-Agent: ✅ Technical specification refined successfully!
-       ✅ 3 sections updated
-       ✅ 1 architecture diagram updated
-       ✅ 1 open question resolved
-
-       **Impact on User Stories:**
-       ⚠️ These stories may need review:
-       - PROJ-42: Backend API (data model changes needed)
-       - PROJ-43: Search UI (updated performance expectations)
-```
-
-**Output**:
-- Updated Technical Spec section in Linear project description
-- Clear before/after comparison of changes
-- Rationale for each change documented
-- List of potentially impacted user stories
-- Updated architecture diagrams if needed
-- Resolution of open questions if answered
+- Updates to Product Spec, Technical Spec, or both
+- Clear before/after comparison
+- Shows coverage improvement
+- Resolution tracking for open questions
 
 ---
 
@@ -452,7 +209,7 @@ Agent: ✅ Technical specification refined successfully!
 **Purpose**: Break feature into user stories through conversational planning
 
 **Workflow**:
-1. Fetches Linear Project and documentation
+1. Fetches Linear Project and both specs
 2. Asks: "Did you have a decomposition meeting?"
 3. You paste transcript (preferred) OR discuss conversationally
 4. Agent proposes decomposition strategies with pros/cons
@@ -463,13 +220,19 @@ Agent: ✅ Technical specification refined successfully!
 
 **Requires**: Linear Project ID
 
+**When to use**:
+- Specs are sufficiently complete
+- Ready for sprint planning
+- Need to break work into implementable chunks
+
 **Example**:
 ```
 You: /decompose-feature PROJ-42
 
 Agent: I found Linear Project PROJ-42: Advanced Search
+       Product Spec: ✅ 85% complete
+       Technical Spec: ✅ 75% complete
        Current stories: 0
-       ✅ Ready to decompose
 
        Did you have a decomposition meeting?
        Option A: Yes, I have a transcript
@@ -599,7 +362,7 @@ Agent: [Executes changes]
 
 ---
 
-### Optional TDD Automation (Steps 5-6)
+### Optional Dev Workflow (Steps 5-6)
 
 These steps are **completely optional** for teams that want structured, automated TDD workflow:
 
@@ -669,16 +432,14 @@ See the original README sections for details on these optional commands.
 
 ---
 
-## Command Summary
+## Command Summary (v2.0)
 
 | Command | Purpose | Input | Output | Use Case |
 |---------|---------|-------|--------|----------|
-| `/generate-feature-brief` | Create Product Spec | Transcript or conversation | Linear Project with Product Spec in description | Feature planning meeting |
-| `/refine-feature-brief PROJECT-KEY` | Update Product Spec | Project + refinement transcript | Updated Product Spec with change rationale | Product refinement/feedback |
-| `/create-technical-spec PROJECT-KEY` | Add Technical Spec | Project + optional transcript | Updates Linear project with Technical Spec | Technical design session |
-| `/refine-technical-spec PROJECT-KEY` | Update Technical Spec | Project + refinement transcript | Updated Technical Spec with change rationale | Technical refinement/changes |
-| `/decompose-feature PROJECT-KEY` | Break into stories | Project + optional transcript | User stories in Linear | Story decomposition meeting |
-| `/refine-decomposition PROJECT-KEY` | Modify stories | Project + refinement notes | Updated stories | Refinement/learning |
+| `/create-spec` | Create both Product & Technical specs | Any context (transcript/doc/description) | Linear Project with both specs (fills what's known) | Starting any feature |
+| `/refine-spec PROJECT-KEY` | Update any part of specs | Project + new information | Updated specs (auto-detects what to update) | Any new information available |
+| `/decompose-feature PROJECT-KEY` | Break into stories | Project + optional transcript | User stories in Linear | Ready for sprint planning |
+| `/refine-decomposition PROJECT-KEY` | Modify stories | Project + refinement notes | Updated stories | Story refinement/learning |
 | `/plan-user-story ISSUE-ID` | TDD task list | Story ID | TDD task breakdown | Optional: TDD planning |
 | `/implement-story PATH` | Automated impl | TDD task file | Implemented code | Optional: TDD automation |
 
@@ -847,30 +608,26 @@ When using this workflow, organize documentation like this:
 ```
 your-project/
 ├── .claude/
-│   ├── commands/                    # These slash commands
-│   │   ├── generate-feature-brief.md
-│   │   ├── create-technical-spec.md
+│   ├── commands/                    # Slash commands (v2.0)
+│   │   ├── create-spec.md          # NEW: Unified spec creation
+│   │   ├── refine-spec.md          # NEW: Unified spec refinement
 │   │   ├── decompose-feature.md
 │   │   ├── refine-decomposition.md
-│   │   ├── plan-user-story.md
-│   │   └── implement-story.md
-│   └── agents/                      # Optional: TDD agents
+│   │   ├── plan-user-story.md      # Optional: Dev Workflow planning
+│   │   └── implement-story.md      # Optional: Dev Workflow automation
+│   └── agents/                      # Optional: Dev Workflow agents
 │       ├── story-developer.md
 │       ├── story-reviewer.md
 │       ├── refinement-developer.md
 │       └── test-fix-specialist.md
 ├── docs/
-│   ├── features/                   # Optional: Local backups of Product specs
-│   │   ├── advanced_search.md      # (Product specs live in Linear project descriptions)
-│   │   ├── user_auth.md
-│   │   └── reporting.md
-│   ├── specs/                      # Optional: Local backups of Technical specs
-│   │   ├── proj_42/                # (Technical specs live in Linear project descriptions)
-│   │   │   ├── technical_spec.md   # Optional backup
+│   ├── specs/                      # Optional: Local backups
+│   │   ├── proj_42/                # (All specs live in Linear project descriptions)
+│   │   │   ├── combined_spec.md    # Optional backup of Linear content
 │   │   │   ├── story_PROJ-42_tdd_tasks.md  # TDD task breakdowns
 │   │   │   └── mockups/            # Design assets
 │   │   └── proj_43/
-│   │       └── technical_spec.md   # Optional backup
+│   │       └── combined_spec.md    # Optional backup
 │   └── architecture/               # Your architecture docs
 ├── src/
 │   ├── backend/
@@ -899,7 +656,7 @@ your-project/
 ### 3. Flexible & Modular
 
 - Use core workflow (steps 1-4) for documentation
-- Optionally add TDD automation (steps 5-6)
+- Optionally DEV automation (steps 5-6)
 - Refine decomposition as many times as needed
 
 ### 4. Quality Through Process
@@ -918,24 +675,28 @@ your-project/
 
 ---
 
-## Migration from Previous Version
+## Migration from v1.0 to v2.0
 
-If you used the old workflow:
+**Simplified Command Structure:**
 
-**Old Command → New Command**
+**Old Commands (v1.0) → New Commands (v2.0)**
 
-- `/create-feature-and-stories "description"` → Split into:
-  - `/generate-feature-brief` (feature spec + project)
-  - `/decompose-feature PROJECT-KEY` (stories)
-- `/create-feature-spec PROJECT-KEY` → `/create-technical-spec PROJECT-KEY`
-- New: `/refine-decomposition PROJECT-KEY` (separate refinement)
+| Old Command | New Command | Change |
+|------------|-------------|---------|
+| `/generate-feature-brief` | `/create-spec` | Unified - creates both specs |
+| `/create-technical-spec PROJECT` | `/create-spec` or `/refine-spec PROJECT` | Merged into unified commands |
+| `/refine-feature-brief PROJECT` | `/refine-spec PROJECT` | Unified refinement |
+| `/refine-technical-spec PROJECT` | `/refine-spec PROJECT` | Unified refinement |
+| `/decompose-feature PROJECT` | `/decompose-feature PROJECT` | No change |
+| `/refine-decomposition PROJECT` | `/refine-decomposition PROJECT` | No change |
 
-**Key Changes**:
+**Key Improvements:**
 
-1. **No arguments for feature brief**: Command asks for transcript
-2. **Decomposition is separate**: No longer combined with feature creation
-3. **Refinement is explicit**: New command for modifying decomposition
-4. **Transcript-first**: All commands prefer meeting transcripts
+1. **Single creation command**: `/create-spec` creates both Product and Technical specs
+2. **Single refinement command**: `/refine-spec` updates whatever needs updating
+3. **Progressive filling**: Start with what you have, fill gaps over time
+4. **No forced separation**: Product and technical info can be mixed naturally
+5. **Smart detection**: System determines what to update based on content
 
 ---
 
@@ -973,7 +734,7 @@ This workflow is designed for **how teams actually work**:
 3. **Decomposition evolves**: Story breakdown improves with team learning
 4. **Conversation matters**: Nuance and context from discussions are valuable
 5. **Documentation enables quality**: Good specs prevent issues before coding
-6. **Automation is optional**: TDD workflow helps but isn't required
+6. **Automation is adaptable**: Dev workflow in place but isn't required
 
 The result is a **pragmatic, conversational methodology** that fits real development workflows while maintaining high documentation quality and traceability.
 

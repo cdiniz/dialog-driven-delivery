@@ -110,28 +110,111 @@ Create a specification using the template structure from:
 5. **Preserve template section numbering** from the original templates
 6. **Include all template sections** but leave empty ones with placeholders
 
-### Step 6: Apply Uncertainty Markers
+**CRITICAL - Uncertainty Marker Policy:**
 
-**CRITICAL - Non-Greedy Filling Policy:**
+Before generating the spec, review the documentation in `.claude/uncertainty-markers.md`.
 
-1. **Only fill what was explicitly discussed** - Leave other sections empty with placeholders
-2. **Mark all uncertainties** using the standard markers:
-   - `[OPEN QUESTION: text]` - User decision needed
-   - `[CLARIFICATION NEEDED: aspect]` - Vague requirement
-   - `[ASSUMPTION: statement]` - Inference made
-   - `[DECISION PENDING: options]` - Choice deferred
+When generating the specification, you MUST follow these rules:
 
-3. **Empty sections get explicit placeholders:**
-   ```markdown
-   ❌ BAD (generic filler):
-   "We will use industry best practices for authentication"
+1. **If user didn't answer a question** → Use uncertainty markers:
+   - `[OPEN QUESTION: specific question]` - for user decisions
+   - `[CLARIFICATION NEEDED: what needs defining]` - for vague requirements
 
-   ✅ GOOD (honest empty):
-   "_Authentication approach to be determined_"
+2. **If you make a reasonable inference** → Mark it explicitly:
+   - `[ASSUMPTION: statement of what you're assuming]`
 
-   ✅ GOOD (partial with uncertainty):
-   "Users authenticate via [OPEN QUESTION: SSO, password, or social login?]"
+3. **If multiple valid approaches exist** → Mark the choice:
+   - `[DECISION PENDING: option A vs option B - see Open Questions QX]`
+
+4. **NEVER make silent assumptions.** If you infer something, mark it with `[ASSUMPTION]`.
+
+5. **Link all markers** → Every inline marker must have corresponding entry in:
+   - Section (Open Questions & Assumptions) for all uncertainty markers
+
+**Examples:**
+
+❌ BAD (silent assumption):
+```
+Users can authenticate via OAuth2 using Google provider
+```
+
+✅ GOOD (explicit uncertainty):
+```
+Users can authenticate via [OPEN QUESTION: OAuth2, password, or social login?]
+```
+
+❌ BAD (unmarked inference):
+```
+API response time should be fast
+```
+
+✅ GOOD (explicit clarification needed):
+```
+API response time should be [CLARIFICATION NEEDED: define threshold - <500ms, <1s, <3s?]
+```
+
+Now create a pragmatic, streamlined feature spec using the template from @.claude/templates/feature-spec.md
+
+Fill in all sections of the template with the information gathered, applying the uncertainty marker policy described above.
+
+### Step 5.5: Uncertainty Validation 
+
+**CRITICAL STEP - Do not skip this!**
+
+Before creating the spec, scan the generated specification and validate uncertainty markers:
+
+1. **Count all uncertainty markers:**
    ```
+   Uncertainty Marker Summary:
+   - [OPEN QUESTION]: X occurrences
+   - [CLARIFICATION NEEDED]: Y occurrences
+   - [ASSUMPTION]: Z occurrences
+   - [DECISION PENDING]: W occurrences
+
+   Total uncertainties: [X+Y+Z+W]
+   ```
+
+2. **Verify each marker is tracked:**
+   - Check that all uncertainty markers have corresponding entries in (Open Questions & Assumptions)
+   - List any markers that are NOT properly tracked
+
+3. **Present summary to user:**
+   ```markdown
+   I've generated the feature specification with [N] uncertainty markers:
+
+   **Open Questions:** [X] items requiring user decisions
+   **Clarifications Needed:** [Y] items requiring more specific definitions
+   **Assumptions:** [Z] items inferred from context that need validation
+
+   [If uncertainties exist:]
+   These uncertainties should be resolved before implementation. Would you like to:
+
+   **Option A:** Resolve them now - I'll ask follow-up questions
+   **Option B:** Leave them marked for later resolution
+   **Option C:** Review the spec first, then resolve
+
+   Which would you prefer?
+   ```
+
+4. **If user chooses Option A (Resolve now):**
+   - Go through each `[OPEN QUESTION]` and `[CLARIFICATION NEEDED]`
+   - Ask the user for answers
+   - Update the spec to replace markers with actual values
+   - Mark resolved questions as checked in Section 4
+
+5. **If user chooses Option B or C:**
+   - Proceed to next step
+   - Include uncertainty count in final summary
+
+**Quality Gates:**
+
+⚠️ **Warning if:**
+- More than 10 `[OPEN QUESTION]` markers exist (spec may be too incomplete)
+- Critical functional requirements have `[OPEN QUESTION]` markers (blocks implementation)
+
+✅ **Acceptable:**
+- A few `[ASSUMPTION]` markers (can validate during implementation)
+- `[CLARIFICATION NEEDED]` on non-functional requirements (can refine later)
 
 ### Step 7: Create Confluence Page
 

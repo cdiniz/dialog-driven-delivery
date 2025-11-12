@@ -366,7 +366,7 @@ Updates: Product Spec - User Journey section
 Before finalizing updates:
 - ✓ All changes have clear rationale
 - ✓ Before/after shows enough context
-- ✓ Uncertainty markers updated appropriately
+- ✓ Uncertainty markers updated appropriately (follow @.claude/uncertainty-markers.md)
 - ✓ No hallucination - only documented changes applied
 - ✓ Both specs remain internally consistent
 

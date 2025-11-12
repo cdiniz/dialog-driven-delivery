@@ -179,12 +179,12 @@
 ## 8. Open Questions
 
 ### Needs Answer Before Implementation
-- [ ] **Q1:** [Specific question that needs resolution]?
+**Q1:** [Specific question that needs resolution]?
   - Owner: [Who will decide - Product/Engineering/Design]
   - Needed by: [When - Before design/Before dev/Before launch]
   - Context: [Where this appears in requirements]
 
-- [ ] **Q2:** [Specific question that needs resolution]?
+**Q2:** [Specific question that needs resolution]?
   - Owner: [Who will decide]
   - Needed by: [When]
 

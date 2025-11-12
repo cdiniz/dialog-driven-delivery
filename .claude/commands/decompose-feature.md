@@ -311,7 +311,7 @@ Does this decomposition look good, or would you like to adjust any stories?
 
 **IMPORTANT - Uncertainty Handling in Stories:**
 
-Before creating stories, review **both Product and Technical specs** from the Confluence page for any remaining uncertainty markers (`[OPEN QUESTION]`, `[DECISION PENDING]`, `[CLARIFICATION NEEDED]`).
+Before creating stories, review **both Product and Technical specs** from the Confluence page for any remaining uncertainty markers (`[OPEN QUESTION]`, `[DECISION PENDING]`, `[CLARIFICATION NEEDED]`). See @.claude/uncertainty-markers.md for complete marker definitions.
 
 **If critical uncertainties still exist:**
 - Warn the user that stories may need refinement once uncertainties are resolved

@@ -46,13 +46,7 @@ Updated Confluence Page (product, technical, or both)
         ↓
 /decompose-feature PAGE-ID (specify Jira project, paste transcript or discuss)
         ↓
-Jira Stories (linked to Confluence page)
-        ↓
-[Story Refinement as needed]
-        ↓
-/refine-decomposition PROJECT-KEY (paste refinement notes)
-        ↓
-Updated Jira Stories
+Epic + Jira Stories (linked to Confluence page with dependencies)
         ↓
 [Optional DEV Workflow]
 /plan-user-story ISSUE-KEY
@@ -228,7 +222,9 @@ Agent: ✅ Specifications refined successfully!
 6. Agent asks clarifying questions about boundaries
 7. Agent shows proposed story breakdown
 8. You confirm
-9. Agent creates user stories in Jira with complete acceptance criteria, linked to Confluence
+9. Agent creates Epic in Jira for the feature (with Confluence reference)
+10. Agent creates user stories under the Epic with complete acceptance criteria
+11. Agent creates Jira issue links for dependencies (blocks/is blocked by)
 
 **Requires**: Confluence Page ID/URL
 
@@ -283,109 +279,37 @@ Agent: Here's the proposed breakdown:
 
 You: Yes
 
-Agent: Creating user stories in Jira Project PROJ...
+Agent: Creating Epic for this feature in Jira Project PROJ...
 
-       ✅ Created PROJ-42: Basic text search
-       ✅ Created PROJ-43: Add status filter
+       ✅ Created Epic PROJ-41: Advanced Search with Filters
+          https://yoursite.atlassian.net/browse/PROJ-41
+
+       Now creating user stories under this Epic...
+
+       ✅ Created PROJ-42: Basic text search (under Epic PROJ-41)
+       ✅ Created PROJ-43: Add status filter (under Epic PROJ-41)
+       ...
+
+       Creating dependency links between stories...
+
+       ✅ Linked PROJ-42 blocks PROJ-43
        ...
 ```
 
 **Output**:
-- Jira stories created with links to Confluence page
+- Epic created in Jira with reference to Confluence page
+- Jira stories created under the Epic
 - Complete acceptance criteria (Gherkin format)
-- Dependencies mapped
+- Dependencies mapped using Jira issue links (blocks/is blocked by)
 - Implementation order suggested
 
 ---
 
-#### 4. `/refine-decomposition PROJECT-KEY`
-
-**Purpose**: Refine existing story decomposition - split, merge, add, or modify stories
-
-**Workflow**:
-1. Fetches ALL existing stories from Jira project and shows current state
-2. Asks: "What prompted this refinement?"
-3. You paste refinement transcript OR discuss changes
-4. Agent analyzes and proposes specific changes
-5. Agent shows before/after for each change
-6. You confirm
-7. Agent executes changes in Jira
-
-**Requires**: Jira Project Key
-
-**Use when**:
-- Stories are too large and need splitting
-- Stories are too small and should be merged
-- New stories discovered during development
-- Acceptance criteria need modification
-
-**Example**:
-```
-You: /refine-decomposition PROJ
-
-Agent: I found Jira Project: PROJ
-
-       Current User Stories: 5 stories
-
-       Story 1: PROJ-42 - Basic text search
-       - Status: In Progress
-       - Brief: End-to-end search functionality
-       - ACs: 5 acceptance criteria
-
-       Story 2: PROJ-43 - Add status filter
-       ...
-
-       What prompted this refinement?
-       Option A: Refinement meeting
-       Option B: Discovered during development
-       Option C: Sprint planning feedback
-
-You: Option B
-     During development, we realized PROJ-42 is too large.
-     We need to split it into backend and frontend stories.
-
-Agent: I understand. Let me clarify:
-       - Should PROJ-42 become the backend story?
-       - Should I create a new story for frontend?
-       - How should ACs be distributed?
-
-You: [Answer questions]
-
-Agent: Here's the refinement plan:
-
-       1. Split PROJ-42: Basic text search
-          - PROJ-42: Backend API (keep original)
-            Scope: API endpoints, database
-            ACs: [Backend ACs]
-          - PROJ-50: Frontend UI (new story)
-            Scope: UI components, search input
-            ACs: [Frontend ACs]
-            Dependencies: Depends on PROJ-42
-
-       Does this look good?
-
-You: Yes
-
-Agent: Executing refinement changes...
-
-       ✅ Updated PROJ-42 (split into backend)
-       ✅ Created PROJ-50 (frontend split)
-       ✅ Updated dependencies
-```
-
-**Output**:
-- Modified/new Jira stories
-- Clear change summary
-- Updated dependencies
-- Updated implementation order
-
----
-
-### Optional Dev Workflow (Steps 5-6)
+### Optional Dev Workflow (Steps 4-5)
 
 These steps are **completely optional** for teams that want structured, automated TDD workflow:
 
-#### 5. `/plan-user-story ISSUE-KEY`
+#### 4. `/plan-user-story ISSUE-KEY`
 
 **Purpose**: Generate detailed TDD task list for a Jira story
 
@@ -393,7 +317,7 @@ These steps are **completely optional** for teams that want structured, automate
 
 **Skip if**: You prefer manual development or direct Claude interaction
 
-#### 6. `/implement-story path/to/tdd_tasks.md`
+#### 5. `/implement-story path/to/tdd_tasks.md`
 
 **Purpose**: Orchestrate automated implementation with specialized agents
 
@@ -436,12 +360,8 @@ See the original command documentation for details on these optional commands.
 /decompose-feature 123456789
 # [Specify Jira project: PROJ]
 # [Paste decomposition discussion, confirm breakdown]
-# Output: 5 Jira stories created (PROJ-42 through PROJ-46)
-
-# Later: Sprint starts - Developer realizes story is too big
-/refine-decomposition PROJ
-# [Explain issue, confirm split]
-# Output: PROJ-42 split into PROJ-42 (backend) + PROJ-50 (frontend)
+# Output: Epic PROJ-41 created + 5 Jira stories (PROJ-42 through PROJ-46) linked to Epic
+# Output: Dependencies linked via Jira issue links
 
 # Later: Developer starts implementation
 # Option A: Manual development using specs as guide
@@ -458,8 +378,7 @@ See the original command documentation for details on these optional commands.
 |---------|---------|-------|--------|----------|
 | `/create-spec` | Create both Product & Technical specs | Any context (transcript/doc/description) + Confluence space | Confluence page with both specs (fills what's known) | Starting any feature |
 | `/refine-spec PAGE-ID` | Update any part of specs | Page ID + new information | Updated Confluence page (auto-detects what to update) | Any new information available |
-| `/decompose-feature PAGE-ID` | Break into stories | Page ID + Jira project + optional transcript | Jira stories linked to Confluence | Ready for sprint planning |
-| `/refine-decomposition PROJECT-KEY` | Modify stories | Project key + refinement notes | Updated Jira stories | Story refinement/learning |
+| `/create-user-stories-from-spec PAGE-ID` | Break into Epic + stories | Page ID + Jira project + optional transcript | Epic + Jira stories with issue links | Ready for sprint planning |
 | `/plan-user-story ISSUE-KEY` | TDD task list | Jira story key | TDD task breakdown | Optional: TDD planning |
 | `/implement-story PATH` | Automated impl | TDD task file | Implemented code | Optional: TDD automation |
 
@@ -517,12 +436,23 @@ Benefits:
 
 ### Jira for Actionable Work
 
-User stories are created in Jira with:
+Features are decomposed into a hierarchical structure in Jira:
+
+**Epic Level:**
+- One Epic per feature
+- Epic contains reference to Confluence specification
+- Epic summary matches feature name
+- All stories for the feature are linked as children
+
+**Story Level:**
+- User stories created under the Epic
 - Complete acceptance criteria (Gherkin format)
 - Links back to Confluence spec page
 - Proper labels for categorization
-- Dependencies between stories
+- Dependencies tracked via Jira issue links (blocks/is blocked by)
 - Full Jira workflow support
+
+This creates a clear hierarchy: **Epic → Stories → Tasks** (if needed)
 
 ### Conversational & Engaging
 
@@ -555,11 +485,10 @@ Commands **adapt to your project**:
 ### Iterative & Refinable
 
 Workflow supports **team learning**:
-- Initial decomposition in one meeting
-- Refinement in separate meeting (`/refine-decomposition`)
-- Can run refinement multiple times
-- Stories can be split, merged, added, or modified in Jira
-- Preserves history and tracks changes
+- Specifications can be refined as new information becomes available (`/refine-spec`)
+- Stories can be refined directly in Jira using native tools
+- Epic structure provides clear organization and traceability
+- Preserves history and tracks changes in both Confluence and Jira
 
 ### Uncertainty Markers: Preventing AI Hallucination
 
@@ -641,12 +570,11 @@ When using this workflow, organize documentation like this:
 your-project/
 ├── .claude/
 │   ├── commands/                    # Slash commands (v2.0)
-│   │   ├── create-spec.md          # Unified Confluence spec creation
-│   │   ├── refine-spec.md          # Unified Confluence spec refinement
-│   │   ├── decompose-feature.md    # Confluence → Jira decomposition
-│   │   ├── refine-decomposition.md # Jira story refinement
-│   │   ├── plan-user-story.md      # Optional: Dev Workflow planning
-│   │   └── implement-story.md      # Optional: Dev Workflow automation
+│   │   ├── create-spec.md                      # Unified Confluence spec creation
+│   │   ├── refine-spec.md                      # Unified Confluence spec refinement
+│   │   ├── create-user-stories-from-spec.md    # Confluence → Jira decomposition (Epic + Stories)
+│   │   ├── plan-user-story.md                  # Optional: Dev Workflow planning
+│   │   └── implement-story.md                  # Optional: Dev Workflow automation
 │   └── agents/                      # Optional: Dev Workflow agents
 │       ├── story-developer.md
 │       ├── story-reviewer.md
@@ -707,9 +635,9 @@ your-project/
 
 ### 6. Flexible & Modular
 
-- Use core workflow (steps 1-4) for documentation
-- Optionally add dev automation (steps 5-6)
-- Refine decomposition as many times as needed
+- Use core workflow (steps 1-3) for documentation and decomposition
+- Optionally add dev automation (steps 4-5)
+- Refine specifications and stories as needed
 
 ### 7. Quality Through Process
 
@@ -738,10 +666,12 @@ No problem! All commands work conversationally:
 
 ### "My stories need to change during development"
 
-Perfect! That's expected:
-- Use `/refine-decomposition PROJECT-KEY`
-- Explain what changed and why
-- Agent will update Jira stories intelligently
+That's expected and normal! You can:
+- Update stories directly in Jira using native editing
+- Split stories using Jira's "Split Issue" feature
+- Create new stories and link them to the Epic
+- Update dependencies using Jira's link functionality
+- Use `/refine-spec` to update the Confluence specification if requirements changed
 
 ### "Can I use this with other tools?"
 

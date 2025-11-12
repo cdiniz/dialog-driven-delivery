@@ -12,9 +12,9 @@ This command uses an **engaging, conversational approach**:
 3. Ask for target Jira project key
 4. Ask if there's a decomposition meeting transcript
 5. Analyze transcript or work conversationally
-6. Discuss decomposition strategy
+6. Propose workflow-based story breakdown
 7. Ask clarifying questions about boundaries
-8. Create user stories in Jira
+8. Create Epic and user stories in Jira
 9. Provide clear summary
 
 ## Steps
@@ -168,73 +168,48 @@ I've analyzed your decomposition meeting transcript. Here's what I found:
 
 Work through decomposition conversationally - see Step 7.
 
-### Step 7: Discuss Decomposition Strategy
+### Step 7: Propose Workflow-Based Decomposition
 
-Based on the feature spec, technical spec, and transcript (if available), propose a decomposition approach:
+Based on the feature spec, technical spec, and transcript (if available), propose a workflow-based decomposition where each story delivers one complete user workflow end-to-end.
 
 ```markdown
-Based on the feature spec and technical spec, I see several ways we could decompose this:
+Based on the feature spec and technical spec, here's how I propose to break this down by user workflow:
 
-**Option A: By User Workflow** (Recommended)
-Break into stories where each story delivers one complete user workflow end-to-end.
+**Proposed Stories ([N] stories):**
 
-Example stories:
-1. [Workflow 1 from feature spec]
-2. [Workflow 2 from feature spec]
-3. [Workflow 3 from feature spec]
+**Story 1: [Workflow 1 from feature spec]**
+- Delivers: [What user value this provides]
+- Scope: [Frontend/Backend/Full-stack]
+- Key ACs: [Main scenarios]
 
-Pros: Each story delivers user value, easy to demo
-Cons: Stories might be larger, could span frontend and backend
+**Story 2: [Workflow 2 from feature spec]**
+- Delivers: [What user value this provides]
+- Scope: [Frontend/Backend/Full-stack]
+- Key ACs: [Main scenarios]
 
-**Option B: By Technical Layer**
-Break into frontend stories, backend stories, etc.
+**Story 3: [Workflow 3 from feature spec]**
+- Delivers: [What user value this provides]
+- Scope: [Frontend/Backend/Full-stack]
+- Key ACs: [Main scenarios]
 
-Example stories:
-1. Backend API for [feature]
-2. Frontend UI for [feature]
-3. Integration with [system]
+[Continue for all workflows]
 
-Pros: Clear technical boundaries, easier to parallelize
-Cons: No story delivers complete user value alone
+Each story delivers complete user value and can be demoed independently.
 
-**Option C: By Component/Entity**
-Break into stories by major components or data entities.
-
-Example stories:
-1. [Entity A] CRUD operations
-2. [Entity B] CRUD operations
-3. [Entity C] integration
-
-Pros: Clear scope per story
-Cons: May not align with user workflows
-
-**Option D: Hybrid Approach**
-Combine approaches - e.g., first story is end-to-end minimal, then add enhancements.
-
-Example stories:
-1. Basic [feature] with minimal functionality (end-to-end)
-2. Add [enhancement 1]
-3. Add [enhancement 2]
-
-Pros: First story delivers value, subsequent stories add increments
-Cons: Requires careful scoping of "minimal"
-
-Which decomposition approach makes sense for this feature, or do you have a different approach in mind?
+Before I finalize these, I have a few questions about the boundaries...
 ```
 
-[If user selects an approach or suggests their own, proceed with that strategy]
+[Proceed directly to clarifying questions]
 
 ### Step 8: Ask Clarifying Questions
 
-Based on the chosen decomposition strategy, ask targeted questions:
+Based on the proposed workflow-based decomposition, ask targeted questions:
 
 **Questions About Story Boundaries:**
 ```markdown
 Let me clarify the story boundaries:
 
 1. **Story Scope:**
-   [If stories span layers:] Should story "[Story Name]" include both frontend and backend, or split them?
-
    [If stories are workflows:] Should "[Workflow Name]" be one story or split into multiple steps?
 
 2. **Dependencies:**
@@ -307,7 +282,55 @@ Does this decomposition look good, or would you like to adjust any stories?
 
 [Wait for user confirmation or adjustments]
 
-### Step 10: Create User Stories in Jira
+### Step 10: Create Epic in Jira
+
+Before creating the individual stories, create an Epic that will serve as the parent for all stories in this feature:
+
+```markdown
+Creating Epic for this feature in Jira Project [PROJECT-KEY]...
+```
+
+**Use MCP Tool:** `mcp__atlassian__createJiraIssue`
+
+**Epic Settings:**
+- **projectKey:** [PROJECT-KEY from user]
+- **issueTypeName:** "Epic"
+- **summary:** [Feature name from Confluence page title]
+- **description:**
+  ```markdown
+  Feature specification: [Confluence Page Title]
+
+  [Brief overview from Product Spec - 1-2 sentences]
+
+  ## Reference
+  - **Confluence Spec:** [Page URL]
+  - **Space:** [Space name]
+
+  ## User Stories
+  This Epic contains [N] user stories that deliver this feature incrementally.
+  ```
+- **labels:** ["feature", "epic", plus context labels from the feature]
+
+**Store the Epic key** for linking stories in the next step.
+
+```markdown
+✅ Created Epic [EPIC-KEY]: [Feature Name]
+   [Epic URL]
+
+Now creating [N] user stories under this Epic...
+```
+
+### Step 11: Create User Stories in Jira
+
+**CRITICAL - Jira Project Type Detection:**
+
+Before creating stories, you should detect the Jira project type to use the correct Epic linking method:
+
+1. **Ask the user**: "Is this a Team-managed (Next-Gen) or Company-managed (Classic) Jira project?"
+2. Or **detect automatically**: Try Option 2 first (additional_fields), fall back to Option 1 if needed
+3. **Default recommendation**: Use `additional_fields` approach (Option 2) as it works for most configurations
+
+This is crucial because Epic-Story relationships work differently in different Jira project types.
 
 **IMPORTANT - Uncertainty Handling in Stories:**
 
@@ -391,7 +414,71 @@ Fill in all sections based on the story scope and information from the feature a
 - **labels:** ["user-story", plus additional context labels like "frontend", "backend", "api", etc.]
 - **priority:** [If priority was discussed, set it using priority field]
 
-### Step 11: Provide Comprehensive Summary
+**CRITICAL - Epic-Story Linking:**
+
+Jira has different approaches for linking Stories to Epics depending on project type. Here's how to use the MCP tool correctly:
+
+**RECOMMENDED: Use additional_fields (works for most Jira configurations)**
+
+```javascript
+// When calling mcp__atlassian__createJiraIssue for a Story:
+{
+  cloudId: "[CLOUD-ID]",
+  projectKey: "[PROJECT-KEY]",
+  issueTypeName: "Story",
+  summary: "[Story Title]",
+  description: "[Story Description in Markdown]",
+  additional_fields: {
+    parent: {
+      key: "[EPIC-KEY from Step 10]"  // e.g., "PROJ-41"
+    }
+  },
+  labels: ["user-story", "frontend", "backend", ...]
+}
+```
+
+**ALTERNATIVE: For Team-Managed (Next-Gen) Projects Only**
+
+If the above doesn't work (very rare), try:
+```javascript
+{
+  cloudId: "[CLOUD-ID]",
+  projectKey: "[PROJECT-KEY]",
+  issueTypeName: "Story",
+  summary: "[Story Title]",
+  description: "[Story Description in Markdown]",
+  parent: "[EPIC-KEY from Step 10]",  // Direct parent field
+  labels: ["user-story", ...]
+}
+```
+
+**Implementation Strategy:**
+1. **Default**: Always try `additional_fields` approach first (works 95% of the time)
+2. **If it fails**: Create the story without parent, then inform user to link manually
+3. **Never try both**: Pick one approach and stick with it for all stories in the Epic
+
+**If Epic Linking Fails:**
+
+If neither approach works and stories are created without Epic links:
+1. Inform the user that stories were created successfully but Epic linking failed
+2. Provide manual linking instructions:
+   ```markdown
+   ⚠️ Stories created but Epic linking failed. Please link manually:
+
+   **In Jira:**
+   1. Open each story ([STORY-KEY])
+   2. Click on the "Epic" field or "Parent" field in the details
+   3. Select or search for Epic [EPIC-KEY]
+   4. Save the story
+
+   **Or use bulk operations:**
+   1. Go to Jira board or backlog
+   2. Select all stories: [STORY-1], [STORY-2], etc.
+   3. Click "Bulk Change" → "Edit Issues"
+   4. Set "Parent" or "Epic Link" to [EPIC-KEY]
+   ```
+
+### Step 12: Provide Comprehensive Summary
 
 After creating all stories, provide a detailed summary:
 
@@ -401,22 +488,28 @@ After creating all stories, provide a detailed summary:
 **Confluence Page:** [Page Title] - [Page URL]
 **Jira Project:** [PROJECT-KEY]
 
-**Stories Created:** [N] user stories
+**Epic Created:** [EPIC-KEY]: [Feature Name] - [Epic URL]
+  - All user stories are linked to this Epic
+  - Epic contains reference to Confluence specification
+
+**Stories Created:** [N] user stories under Epic [EPIC-KEY]
 
 **Story Breakdown:**
 
 1. **[ISSUE-KEY]: [Story Title]** - [URL]
+   - Parent Epic: [EPIC-KEY]
    - Scope: [Frontend/Backend/Full-stack]
    - Focus: [1-line description]
    - ACs: [N] acceptance criteria
-   - Dependencies: [None or list]
+   - Dependencies: [None or "Blocked by [ISSUE-KEY]" - documented in story description]
    - Labels: [Labels applied]
 
 2. **[ISSUE-KEY]: [Story Title]** - [URL]
+   - Parent Epic: [EPIC-KEY]
    - Scope: [Frontend/Backend/Full-stack]
    - Focus: [1-line description]
    - ACs: [N] acceptance criteria
-   - Dependencies: [None or list]
+   - Dependencies: [None or "Blocked by [ISSUE-KEY]" - documented in story description]
    - Labels: [Labels applied]
 
 [Continue for all stories]
@@ -441,10 +534,11 @@ Based on dependencies and value delivery, recommended order:
 **Next Steps:**
 
 **Immediate:**
-1. Review all stories in Jira and verify acceptance criteria
-2. Prioritize stories in your backlog
-3. Estimate stories if your team uses estimation
-4. Assign stories to upcoming sprints
+1. ✅ Review all stories in Jira and verify acceptance criteria
+2. [If dependencies exist:] Create dependency links manually (see instructions above)
+3. Prioritize stories in your backlog
+4. Estimate stories if your team uses estimation
+5. Assign stories to upcoming sprints
 
 **For Implementation:**
 1. Start with: [ISSUE-KEY] - [Title]
@@ -463,12 +557,12 @@ The feature is now fully decomposed and ready for sprint planning and implementa
 ### Conversational Best Practices
 
 1. **Show Current State**: Always display page state before asking questions
-2. **Propose Options**: Offer decomposition strategies with pros/cons
+2. **Propose Workflow-Based Breakdown**: Present stories based on user workflows from the feature spec
 3. **Explain Reasoning**: When suggesting story boundaries, explain why
-4. **Confirm Before Creating**: Show proposed breakdown and get approval
-5. **Reference Documentation**: Connect stories to Confluence page
-6. **Discuss Dependencies**: Make dependencies explicit
-7. **Consider Team Workflow**: Ask about team's preferred story size and scope
+4. **Ask Clarifying Questions**: Adapt to team structure (split by layer if needed)
+5. **Confirm Before Creating**: Show proposed breakdown and get approval
+6. **Reference Documentation**: Connect stories to Confluence page
+7. **Discuss Dependencies**: Make dependencies explicit
 
 ### Transcript Analysis Tips
 
@@ -521,57 +615,23 @@ The feature is now fully decomposed and ready for sprint planning and implementa
 - Should be split into smaller stories
 - Ask user how to split
 
-### Decomposition Strategies
+### Decomposition Strategy
 
-**By User Workflow (Recommended):**
-- Each story = one complete user journey
-- Pros: Delivers user value, easy to demo, aligns with feature spec
-- Cons: May span multiple layers, could be larger
-- Best for: Features with clear user workflows
+**This command uses "By User Workflow" decomposition:**
+- Each story = one complete user journey end-to-end
+- Each story delivers user value independently
+- Each story can be demoed to stakeholders
+- Stories align naturally with the feature spec's user workflows
 
-**By Technical Layer:**
-- Separate stories for backend, frontend, integration
-- Pros: Clear technical boundaries, easy to parallelize
-- Cons: No story delivers complete value alone
-- Best for: Large features with independent frontend/backend teams
+**Key Benefits:**
+- Clear user value in every story
+- Easy to prioritize by user impact
+- Aligns with product requirements
+- Natural mapping to feature spec workflows
 
-**By Component/Entity:**
-- Each story = one major component or entity
-- Pros: Clear scope, manageable size
-- Cons: May not align with user workflows
-- Best for: CRUD-heavy features, data modeling features
+**When workflows span multiple layers:**
+If your team has separate frontend/backend teams, you can still split individual workflows by layer during the clarifying questions phase. The decomposition will adapt to your team structure while maintaining the workflow-based foundation.
 
-**Hybrid (Recommended for Complex Features):**
-- First story: Minimal end-to-end (walking skeleton)
-- Subsequent stories: Add enhancements, edge cases, optimizations
-- Pros: First story delivers value, subsequent stories are incremental
-- Cons: Requires careful scoping of "minimal"
-- Best for: Complex features, uncertain requirements
-
-### Label Strategy
-
-Apply these labels to help categorize stories:
-
-**Always Apply:**
-- `user-story` - Marks as a user story (vs bug, task, etc.)
-
-**Technical Scope:**
-- `frontend` - Has UI components
-- `backend` - Has API/service layer
-- `database` - Has data model changes
-- `integration` - Integrates with external systems
-
-**Feature Areas:**
-- `api` - API endpoint changes
-- `ui` - User interface changes
-- `auth` - Authentication/authorization
-- `reporting` - Reports or exports
-- `search` - Search functionality
-
-**Cross-Cutting:**
-- `performance` - Performance-critical
-- `security` - Security implications
-- `accessibility` - Accessibility requirements
 
 ## Error Handling
 
@@ -580,9 +640,12 @@ If something goes wrong:
 1. **No Product Spec in Confluence**: Warn but continue using Confluence page content
 2. **No Technical Spec in Confluence**: Note that it's optional, continue with Product Spec
 3. **Jira Project Not Found**: List available projects and ask user to select
-4. **Story Issue Type Not Available**: List available issue types and ask which to use
-5. **Unclear Boundaries**: Ask specific questions about how to split
-6. **Incomplete Transcript**: Identify gaps and work conversationally to fill them
+4. **Epic Issue Type Not Available**: Check available issue types, use "Story" with label "epic" as fallback
+5. **Story Issue Type Not Available**: List available issue types and ask which to use
+6. **Epic Creation Fails**: Provide Epic details for manual creation, continue with stories (without parent link)
+7. **Epic-Story Linking Fails**: Stories created but not linked to Epic - provide manual linking instructions (see Step 11)
+8. **Unclear Boundaries**: Ask specific questions about how to split
+9. **Incomplete Transcript**: Identify gaps and work conversationally to fill them
 
 ## Examples
 
@@ -619,24 +682,25 @@ Agent: I've analyzed your decomposition meeting transcript. Here's what I found:
        4. Add assignee and date filters
        5. Save filter presets
 
-       **Decomposition Approach:**
-       Hybrid - first story is minimal end-to-end for basic search, then
-       incremental enhancements for filters.
+       **Approach:**
+       The team discussed splitting the first workflow (basic search) by layer
+       since you have separate backend/frontend teams, then keeping subsequent
+       filter workflows as full-stack stories.
 
        Let me clarify some boundaries:
 
-       1. Stories 1 and 2 are split by layer - should they be combined into
-          one end-to-end story instead?
-
-       2. Story 3 includes both backend and frontend for status filter - should
-          story 4 also include both layers, or split them?
-
-       3. Should error handling be included in each story's ACs, or separate
+       1. Should error handling be included in each story's ACs, or separate
           stories?
 
-User: 1. Keep them split - we have separate teams
-      2. Story 4 should also include both layers
-      3. Include error handling in each story
+       2. Story 4 includes assignee AND date filters - should these be split
+          into separate stories for smaller scope?
+
+       3. What's the dependency order - does story 2 (frontend) need story 1
+          (backend) completed first?
+
+User: 1. Include error handling in each story
+      2. Keep story 4 as is - both filters together is fine
+      3. Yes, story 2 depends on story 1
 
 Agent: Perfect! Here's the final decomposition:
 
@@ -646,15 +710,22 @@ Agent: Perfect! Here's the final decomposition:
 
 User: Yes, create them
 
-Agent: Creating user stories in Jira Project PROJ...
+Agent: Creating Epic for this feature in Jira Project PROJ...
 
-       ✅ Created PROJ-42: Basic text search - Backend API
-       ✅ Created PROJ-43: Basic text search - Frontend UI
-       ✅ Created PROJ-44: Add status filter
-       ✅ Created PROJ-45: Add assignee and date filters
-       ✅ Created PROJ-46: Save filter presets
+       ✅ Created Epic PROJ-41: Advanced Search with Filters
+          https://yoursite.atlassian.net/browse/PROJ-41
 
-       ✅ Feature decomposed successfully! [Shows summary]
+       Now creating 5 user stories under this Epic...
+
+       ✅ Created PROJ-42: Basic text search - Backend API (under Epic PROJ-41)
+       ✅ Created PROJ-43: Basic text search - Frontend UI (under Epic PROJ-41)
+       ✅ Created PROJ-44: Add status filter (under Epic PROJ-41)
+       ✅ Created PROJ-45: Add assignee and date filters (under Epic PROJ-41)
+       ✅ Created PROJ-46: Save filter presets (under Epic PROJ-41)
+
+       ✅ Feature decomposed successfully!
+
+       [Shows summary with Epic details and manual dependency linking instructions]
 ```
 
 ### Example: Conversational Decomposition
@@ -678,62 +749,98 @@ Agent: Did you have a decomposition meeting?
 
 User: Option B
 
-Agent: Based on the feature spec, I see several ways to decompose this:
+Agent: Based on the feature spec, here's how I propose to break this down by
+       user workflow:
 
-       **Option A: By User Workflow** (Recommended)
-       1. Basic text search (end-to-end)
-       2. Add filter by status (end-to-end)
-       3. Add filter by assignee (end-to-end)
-       4. Save filter presets (end-to-end)
+       **Proposed Stories (4 stories):**
 
-       Pros: Each delivers user value
-       Cons: Each spans frontend and backend
+       **Story 1: Basic text search**
+       - Delivers: Users can search for items using text input
+       - Scope: Full-stack (backend API + frontend UI)
+       - Key ACs: Search input, results display, empty states, error handling
 
-       **Option B: By Technical Layer**
-       1. Backend API for search and filters
-       2. Frontend UI for search
-       3. Frontend UI for filters
-       4. Filter persistence
+       **Story 2: Add filter by status**
+       - Delivers: Users can filter search results by item status
+       - Scope: Full-stack (backend filtering + frontend filter UI)
+       - Key ACs: Status dropdown, filtered results, clear filters
 
-       Pros: Clear technical boundaries
-       Cons: No story delivers complete value alone
+       **Story 3: Add filter by assignee and date**
+       - Delivers: Users can filter by assignee and date range
+       - Scope: Full-stack (backend filtering + frontend filter UI)
+       - Key ACs: Assignee selector, date pickers, multiple filters
 
-       Which approach fits your team better?
+       **Story 4: Save filter presets**
+       - Delivers: Users can save and reuse their filter combinations
+       - Scope: Full-stack (backend persistence + frontend preset UI)
+       - Key ACs: Save preset, load preset, manage presets
 
-User: Option A, but can we split the first story into backend and frontend?
-      We have separate teams.
+       Each story delivers complete user value and can be demoed independently.
 
-Agent: Absolutely! So we'll use workflow-based decomposition, but split the
-       first story by layer. Here's the updated breakdown:
+       Before I finalize these, a few questions:
+
+       1. Story 1 spans both backend and frontend - should we split it into
+          two stories (API + UI) or keep it as one end-to-end story?
+
+       2. Should error handling and edge cases be included in each story's ACs?
+
+       3. What's your preferred implementation order?
+
+User: 1. Split story 1 into backend and frontend - we have separate teams
+      2. Yes, include error handling in each story
+      3. Backend first, then frontend, then the filter stories
+
+Agent: Perfect! Here's the updated breakdown:
 
        1. Basic text search - Backend API
-       2. Basic text search - Frontend UI
+       2. Basic text search - Frontend UI (depends on story 1)
        3. Add filter by status (backend + frontend)
        4. Add filter by assignee and date (backend + frontend)
        5. Save filter presets (backend + frontend)
 
-       [Shows details for each story]
+       [Shows details for each story with dependencies]
 
        Does this work for your team structure?
 
-User: Perfect!
+User: Yes, create them!
 
-Agent: Creating stories in Jira...
-       [Creates stories and provides summary]
+Agent: Creating Epic for this feature in Jira Project ENG...
+
+       ✅ Created Epic ENG-100: Advanced Search with Filters
+          https://yoursite.atlassian.net/browse/ENG-100
+
+       Now creating 5 user stories under this Epic...
+
+       ✅ Created ENG-101: Basic text search - Backend API
+       ✅ Created ENG-102: Basic text search - Frontend UI
+       ✅ Created ENG-103: Add filter by status
+       ✅ Created ENG-104: Add filter by assignee and date
+       ✅ Created ENG-105: Save filter presets
+
+       ✅ Feature decomposed successfully!
+
+       Epic: ENG-100
+       Stories: 5 stories (ENG-101 to ENG-105)
+
+       [Shows summary with manual dependency linking instructions]
 ```
 
 ## Important Notes
 
 - **Requires $ARGUMENTS**: Must provide Confluence Page ID/URL
 - **Reads from Confluence**: Fetches both Product and Technical specs from Confluence page
-- **Creates in Jira**: Creates user stories as Jira issues with proper linking
+- **Creates Epic First**: Creates an Epic issue to organize all stories for the feature
+- **Epic-Story Hierarchy**: All stories are linked to the Epic as parent
+- **Creates in Jira**: Creates user stories as Jira issues with proper Epic linking
+- **Dependencies Documented**: Dependencies are documented in story descriptions and Technical Notes sections
+- **Manual Dependency Links**: Issue links (blocks/is blocked by) must be created manually in Jira (instructions provided in summary)
 - **Transcript is Optional**: Preferred but can work conversationally
-- **Proposes Options**: Always offers decomposition strategies
+- **Workflow-Based Decomposition**: Always decomposes by user workflow for maximum value delivery
+- **Adapts to Team Structure**: Can split workflows by layer during clarifying questions if needed
 - **Confirms Before Creating**: Shows proposed breakdown for approval
 - **Complete ACs**: Every story gets comprehensive acceptance criteria
 - **Maps to Specs**: References both Product and Technical specs from Confluence
-- **Includes Dependencies**: Makes dependencies explicit with Jira issue keys
-- **Suggests Order**: Recommends implementation order
-- **Links Back**: Stories link back to Confluence page for full context
+- **Explicit Dependencies**: Dependencies clearly documented in story descriptions with instructions for manual linking
+- **Suggests Order**: Recommends implementation order based on dependencies
+- **Links Back**: Epic and stories link back to Confluence page for full context
 
-This conversational approach ensures stories are well-thought-out, properly scoped, and have comprehensive acceptance criteria while being engaging and collaborative.
+This streamlined, opinionated approach ensures stories are well-thought-out, deliver user value, and have comprehensive acceptance criteria while being fast and collaborative.

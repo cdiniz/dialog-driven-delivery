@@ -18,3 +18,7 @@
 - **And** [additional outcome if applicable]
 
 [Add more ACs as needed covering happy path, validation, business rules, edge cases, and error handling]
+
+## Relevant docs
+Feature spec: [Confluence Link]
+[Any other relevant links]

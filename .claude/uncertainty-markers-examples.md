@@ -357,9 +357,8 @@ This story implements the core task assignment functionality from the "Task Assi
 
 ## References
 
-- **Linear Project:** PROJ-123 - Task Assignment Feature
-- **Feature Spec:** `docs/features/task_assignment.md`
-- **Technical Spec:** `docs/specs/proj_123/technical_spec.md`
+- **Confluence Feature:** Task Assignment Feature
+- **Jira Epic:** Task Assignment Feature
 - **Related Stories:**
   - PROJ-125: Task Reassignment (depends on this story)
   - PROJ-126: Assignment Notifications (notification details if complex)

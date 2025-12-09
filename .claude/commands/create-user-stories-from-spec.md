@@ -542,12 +542,15 @@ Based on dependencies and value delivery, recommended order:
 
 **For Implementation:**
 1. Start with: [ISSUE-KEY] - [Title]
-2. Create TDD plan (optional): `/plan-user-story [ISSUE-KEY]`
-3. Implement story (optional): `/implement-story docs/specs/.../story_[ISSUE-KEY]_tdd_tasks.md`
+2. Implement story (optional): `/implement-story`
+   - Provide Jira story link and Confluence spec link
+   - Agent creates implementation plan and executes
+   - See CODING_README.md for complete workflow
 
 **For Refinement:**
 If you need to adjust the decomposition (split, merge, add stories):
-- Use `/refine-decomposition [PROJECT-KEY]`
+- Use Jira's native features (Split Issue, Edit, Link Issues)
+- Update the Confluence spec if requirements changed: `/refine-spec [PAGE-ID]`
 
 The feature is now fully decomposed and ready for sprint planning and implementation! 🎉
 ```

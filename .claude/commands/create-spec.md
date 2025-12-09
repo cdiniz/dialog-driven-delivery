@@ -2,21 +2,20 @@
 description: Create comprehensive feature specification from any input context
 ---
 
-You are tasked with creating a comprehensive feature specification in Confluence from any input context (product discussion, technical design, or both).
+You are tasked with creating a comprehensive feature specification as a markdown file from any input context (product discussion, technical design, or both).
 
 ## Philosophy
 
-This command creates a **single Confluence page** containing BOTH Product and Technical specifications. Fill only what you know from the context - empty sections are better than hallucinated content. The specs will grow progressively as more information becomes available through `/refine-spec`.
+This command creates a **single markdown file** in `docs/[feature-name]/spec.md` containing BOTH Product and Technical specifications. Fill only what you know from the context - empty sections are better than hallucinated content. The specs will grow progressively as more information becomes available through `/refine-spec`.
 
 ## Conversational Workflow
 
 1. Ask user for input context
-2. Ask user for Confluence space and parent page (optional)
-3. Analyze and extract all available information
-4. Propose page title
-5. Create Confluence page with both spec sections
-6. Fill sections based on what's actually discussed
-7. Show clear summary of what was filled vs what remains empty
+2. Analyze and extract all available information
+3. Propose feature name (will be used for directory name)
+4. Create `docs/[feature-name]/spec.md` with both spec sections
+5. Fill sections based on what's actually discussed
+6. Show clear summary of what was filled vs what remains empty
 
 ## Steps
 
@@ -25,7 +24,7 @@ This command creates a **single Confluence page** containing BOTH Product and Te
 Start by asking the user for context:
 
 ```markdown
-I'll help you create a comprehensive feature specification in Confluence.
+I'll help you create a comprehensive feature specification as a markdown file.
 
 How would you like to provide the feature information?
 
@@ -36,22 +35,7 @@ How would you like to provide the feature information?
 Which would you prefer?
 ```
 
-### Step 2: Get Confluence Location
-
-After receiving the input, ask for Confluence location:
-
-```markdown
-Where would you like to create this specification page in Confluence?
-
-**Confluence Space:** [Ask for space key or name, e.g., "PROJ" or "Engineering"]
-**Parent Page (optional):** [Ask if they want this under a specific parent page]
-
-If you're not sure about the space, I can list available spaces for you.
-```
-
-Use the MCP tool `mcp__atlassian__getConfluenceSpaces` if the user needs to see available spaces.
-
-### Step 3: Analyze Input
+### Step 2: Analyze Input
 
 **For any input type:**
 - Extract all available information
@@ -65,23 +49,26 @@ Use the MCP tool `mcp__atlassian__getConfluenceSpaces` if the user needs to see 
 - **General**: Project goals, constraints, dependencies, risks, timeline
 - **Uncertainties**: Questions, pending decisions, assumptions
 
-### Step 4: Propose Page Title
+### Step 3: Propose Feature Name
 
 Based on the analyzed content:
 
 ```markdown
 Based on your input, I found information about [brief summary of what was discussed].
 
-I propose creating a Confluence page named: **"[Proposed Name]"**
+I propose creating a feature directory named: **[proposed-kebab-case-name]**
 
-This page will contain both Product and Technical specifications, with sections filled based on what was discussed.
+This will create:
+- docs/[proposed-name]/spec.md - containing both Product and Technical specifications
 
-Should I create this Confluence page in [SPACE-KEY]?
+The spec file will contain sections filled based on what was discussed.
+
+Should I create this feature spec with this name?
 ```
 
 Wait for confirmation before proceeding.
 
-### Step 5: Generate Combined Specification
+### Step 4: Generate Combined Specification
 
 Create a specification using the template structure from:
 - **Product Spec Template**: @.claude/templates/feature-spec.md
@@ -157,7 +144,7 @@ Now create a pragmatic, streamlined feature spec using the template from @.claud
 
 Fill in all sections of the template with the information gathered, applying the uncertainty marker policy described above.
 
-### Step 5.5: Uncertainty Validation 
+### Step 5: Uncertainty Validation 
 
 **CRITICAL STEP - Do not skip this!**
 
@@ -216,33 +203,46 @@ Before creating the spec, scan the generated specification and validate uncertai
 - A few `[ASSUMPTION]` markers (can validate during implementation)
 - `[CLARIFICATION NEEDED]` on non-functional requirements (can refine later)
 
-### Step 7: Create Confluence Page
+### Step 6: Create Markdown File
 
-Create the Confluence page with the complete specification:
+Create the markdown file with the complete specification:
 
-**Use MCP Tool:** `mcp__atlassian__createConfluencePage`
+**Use Write Tool:** Create the file at `docs/[feature-name]/spec.md`
 
-**Page Settings:**
-- **cloudId:** [From user or detected from space]
-- **spaceId:** [Numerical space ID from space key]
-- **title:** [Confirmed page title]
-- **body:** Full combined specification (both Product and Technical sections) in Markdown format
-- **parentId:** [Optional parent page ID if specified]
+**File Structure:**
+```markdown
+# Feature: [Feature Name]
+
+**Status:** Draft
+**Created:** [YYYY-MM-DD]
+**Last Updated:** [YYYY-MM-DD]
+
+---
+
+## 📋 Product Specification
+[Product spec content following feature-spec.md template]
+
+---
+
+## 🔧 Technical Specification
+[Technical spec content following technical-spec.md template]
+```
 
 **Important Notes:**
-- The MCP tool accepts Markdown format for the body
-- Use the cloudId parameter (can be site URL or UUID)
-- Get the numerical spaceId using `mcp__atlassian__getConfluenceSpaces` with the space key
+- Create the `docs/` directory if it doesn't exist
+- Create the `docs/[feature-name]/` subdirectory
+- Use clean kebab-case for directory names
+- The spec file is named `spec.md`
 
-### Step 8: Provide Comprehensive Summary
+### Step 7: Provide Comprehensive Summary
 
 After creating the page:
 
 ```markdown
 ✅ Feature specification created successfully!
 
-**Confluence Page:** [Page Title] - [Page URL]
-**Space:** [SPACE-KEY]
+**Feature:** [Feature Name]
+**File:** docs/[feature-name]/spec.md
 
 ## What Was Created
 
@@ -274,12 +274,12 @@ After creating the page:
 
 ## Next Steps
 
-1. Review the specification in Confluence: [URL]
+1. Review the specification: docs/[feature-name]/spec.md
 2. [If gaps exist] Schedule sessions to discuss:
    - [Missing product aspects]
    - [Missing technical aspects]
-3. Use `/refine-spec [PAGE-ID]` to add information as it becomes available
-4. Once specs are complete, use `/decompose-feature [PAGE-ID]` to create Jira stories
+3. Use `/refine-spec [feature-name]` to add information as it becomes available
+4. Once specs are complete, use `/create-user-stories-from-spec [feature-name]` to create user stories
 
 The specification will grow progressively as more information becomes available.
 ```
@@ -316,8 +316,8 @@ Analyze the input to understand what's available:
 1. **Ambiguous feature scope**: Ask clarifying questions about the feature's purpose
 2. **No concrete information**: Warn that spec will be mostly empty, confirm creation
 3. **Conflicting information**: Create uncertainties and note conflicts in Open Questions
-4. **Confluence creation fails**: Provide full specification text for manual creation
-5. **Space not found**: List available spaces and ask user to select one
+4. **File creation fails**: Provide full specification text for manual creation
+5. **Invalid feature name**: Suggest alternative valid kebab-case names
 
 ## Examples
 
@@ -331,23 +331,21 @@ Agent: How would you like to provide the feature information?
 User: Option A
       [Pastes product planning meeting transcript]
 
-Agent: Where would you like to create this in Confluence?
-       Confluence Space: ?
-
-User: PROJ
-
 Agent: Based on your input, I found information about an advanced search feature
        with filters for project managers.
 
-       I propose creating a Confluence page named: "Advanced Search with Filters"
+       I propose creating a feature directory named: **advanced-search-with-filters**
 
-       Should I create this Confluence page in PROJ space?
+       This will create: docs/advanced-search-with-filters/spec.md
+
+       Should I create this feature spec with this name?
 
 User: Yes
 
 Agent: ✅ Feature specification created successfully!
 
-       **Confluence Page:** Advanced Search with Filters
+       **Feature:** Advanced Search with Filters
+       **File:** docs/advanced-search-with-filters/spec.md
 
        **📋 Product Specification:**
        - ✅ Overview: Filled (target users, success metrics defined)
@@ -361,7 +359,7 @@ Agent: ✅ Feature specification created successfully!
        - ⚪ API Contracts: Empty - not discussed
        - ⚠️ Open Questions: 8 technical decisions pending
 
-       The technical aspects can be added later using `/refine-spec [PAGE-ID]`
+       The technical aspects can be added later using `/refine-spec advanced-search-with-filters`
 ```
 
 ### Example 2: Technical-Focused Input
@@ -374,26 +372,27 @@ Agent: How would you like to provide the feature information?
 User: Option C
       We need to implement Elasticsearch for full-text search with <100ms response
 
-Agent: Where would you like to create this in Confluence?
-
-User: Engineering space, under "Technical Specs" page
-
 Agent: Based on your input, I found information about implementing full-text
        search using Elasticsearch.
 
-       I propose creating a Confluence page named: "Full-Text Search Implementation"
+       I propose creating a feature directory named: **full-text-search-implementation**
 
-       Should I create this page?
+       This will create: docs/full-text-search-implementation/spec.md
 
-User: Name it "Smart Search" instead
+       Should I create this feature spec with this name?
 
-Agent: I'll create a Confluence page named: "Smart Search"
+User: Name it "smart-search" instead
+
+Agent: I'll create a feature directory named: **smart-search**
 
        Should I proceed?
 
 User: Yes
 
 Agent: ✅ Feature specification created successfully!
+
+       **Feature:** Smart Search
+       **File:** docs/smart-search/spec.md
 
        **📋 Product Specification:**
        - ⚠️ Overview: Minimal (inferred purpose only)
@@ -407,7 +406,7 @@ Agent: ✅ Feature specification created successfully!
        - ✅ Technical Specifications: Search API defined
        - ✅ Integrations: Elasticsearch details documented
 
-       Product requirements can be added later using `/refine-spec [PAGE-ID]`
+       Product requirements can be added later using `/refine-spec smart-search`
 ```
 
 ### Example 3: Comprehensive Input
@@ -417,20 +416,21 @@ User: /create-spec
       Option A
       [Pastes transcript covering both product and technical discussions]
 
-Agent: Where would you like to create this in Confluence?
-
-User: ANALYTICS space
-
 Agent: Based on your input, I found comprehensive information about a reporting
        dashboard feature including user needs, workflows, and technical architecture.
 
-       I propose creating a Confluence page named: "Analytics Reporting Dashboard"
+       I propose creating a feature directory named: **analytics-reporting-dashboard**
 
-       Should I create this Confluence page in ANALYTICS?
+       This will create: docs/analytics-reporting-dashboard/spec.md
+
+       Should I create this feature spec with this name?
 
 User: Yes
 
 Agent: ✅ Feature specification created successfully!
+
+       **Feature:** Analytics Reporting Dashboard
+       **File:** docs/analytics-reporting-dashboard/spec.md
 
        **📋 Product Specification:**
        - ✅ Overview: Filled
@@ -444,17 +444,18 @@ Agent: ✅ Feature specification created successfully!
        - ⚠️ Data Models: Partial (mentioned but not detailed)
 
        Both specifications have good coverage. Missing details can be added
-       using `/refine-spec [PAGE-ID]`
+       using `/refine-spec analytics-reporting-dashboard`
 ```
 
 ## Important Notes
 
-- **Always creates both specs**: Every page gets Product AND Technical sections
+- **Always creates both specs**: Every file gets Product AND Technical sections
 - **Progressive filling**: Start with what you have, grow over time
 - **Honest gaps**: Empty sections clearly marked, not filled with fluff
 - **Uncertainty markers**: Prevent hallucination by marking unknowns
-- **Single source of truth**: Everything in Confluence page
+- **Single source of truth**: Everything in markdown files under docs/[feature-name]/
 - **Natural workflow**: Accepts any type of input without forcing structure
-- **Confluence-native**: Uses Markdown format, integrates with Confluence features
+- **Git-tracked**: All specs are version controlled alongside code
+- **Portable**: Markdown files work everywhere, no platform lock-in
 
 This unified approach simplifies the workflow while maintaining quality and preventing AI hallucination through explicit gap acknowledgment.

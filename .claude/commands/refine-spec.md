@@ -2,7 +2,7 @@
 description: Refine existing feature specifications based on new information
 ---
 
-You are tasked with refining an existing Confluence page feature specification based on new information, whether product-focused, technical, or both.
+You are tasked with refining an existing feature specification markdown file based on new information, whether product-focused, technical, or both.
 
 ## Philosophy
 
@@ -10,8 +10,8 @@ This command updates ANY part of the existing specifications based on new input.
 
 ## Conversational Workflow
 
-1. Accept Confluence Page ID or URL as argument
-2. Fetch and analyze current specifications
+1. Accept feature name as argument
+2. Read and analyze current specification file
 3. Request new input (transcript, document, conversation)
 4. Analyze what's new vs what exists
 5. Show proposed changes (before/after)
@@ -20,28 +20,25 @@ This command updates ANY part of the existing specifications based on new input.
 
 ## Steps
 
-### Step 1: Get Page ID from Arguments
+### Step 1: Get Feature Name from Arguments
 
-The command accepts the Confluence Page as `$ARGUMENTS`:
-- Page ID (e.g., `123456789`)
-- Page URL (e.g., `https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789`)
-- Page Title (will search for it)
+The command accepts the feature name as `$ARGUMENTS`:
+- Feature directory name (e.g., `advanced-search-with-filters`)
+- Will read from `docs/[feature-name]/spec.md`
 
-**Use MCP Tool:** `mcp__atlassian__getConfluencePage` to fetch the page content.
+**Use Read Tool:** Read the file at `docs/$ARGUMENTS/spec.md` to fetch the current specification.
 
-If user provides a URL, extract the page ID from it. If they provide a title, use `mcp__atlassian__getPagesInConfluenceSpace` or `mcp__atlassian__searchConfluenceUsingCql` to find the page.
+### Step 2: Read and Analyze Current State
 
-### Step 2: Fetch and Analyze Current State
-
-Query Confluence and display the current specification state:
+Read the markdown file and display the current specification state:
 
 ```markdown
-I found Confluence Page: [Page Title]
+I found feature specification: [Feature Name]
 
-**Page:** [Page Title]
-**URL:** [Confluence Page URL]
-**Space:** [Space name]
-**Last Modified:** [Date]
+**Feature:** [Feature Name]
+**File:** docs/[feature-name]/spec.md
+**Status:** [Draft/In Progress/Complete]
+**Last Updated:** [Date from frontmatter]
 
 ## Current Specification Coverage
 
@@ -209,26 +206,26 @@ Does this look correct? Should I proceed with updating the Confluence page?
 
 ### Step 8: Apply Updates
 
-Update the Confluence page with the refined specifications:
+Update the markdown file with the refined specifications:
 
-**Use MCP Tool:** `mcp__atlassian__updateConfluencePage`
+**Use Edit Tool:** Update the file at `docs/[feature-name]/spec.md`
 
-**Update Parameters:**
-- **cloudId:** [From page or site URL]
-- **pageId:** [Page ID]
-- **body:** Updated full specification content in Markdown
-- **versionMessage:** Brief description of changes made
+**Update Guidelines:**
+- Update the `Last Updated` date in frontmatter to today's date
+- Update the `Status` field if appropriate (Draft → In Progress, etc.)
+- Apply all approved changes to the specification content
+- Preserve all existing content that isn't being updated
 
 ```markdown
-Updating specifications in Confluence Page [Page Title]...
+Updating specification file: docs/[feature-name]/spec.md...
 
-✅ Confluence page updated
+✅ Specification file updated
 ✅ [X] Product Specification sections modified
 ✅ [Y] Technical Specification sections modified
 ✅ [Z] Open questions resolved
 ✅ [W] New questions/uncertainties added
 
-**Confluence Page URL:** [URL to view updated specs]
+**File:** docs/[feature-name]/spec.md
 ```
 
 ### Step 9: Provide Comprehensive Summary
@@ -236,8 +233,8 @@ Updating specifications in Confluence Page [Page Title]...
 ```markdown
 ✅ Specifications refined successfully!
 
-**Confluence Page:** [Page Title]
-**URL:** [Page URL]
+**Feature:** [Feature Name]
+**File:** docs/[feature-name]/spec.md
 
 ## What Was Updated
 
@@ -293,12 +290,12 @@ Updating specifications in Confluence Page [Page Title]...
 
 ## Next Steps
 
-1. Review the updated specifications in Confluence: [URL]
+1. Review the updated specification: docs/[feature-name]/spec.md
 2. [If gaps remain] Schedule sessions to discuss:
    - [Remaining product gaps]
    - [Remaining technical gaps]
-3. [If ready] Create Jira stories: `/decompose-feature [PAGE-ID]`
-4. Continue refinement as needed: `/refine-spec [PAGE-ID]`
+3. [If ready] Create user stories: `/create-user-stories-from-spec [feature-name]`
+4. Continue refinement as needed: `/refine-spec [feature-name]`
 
 The specifications have been successfully updated with the new information.
 ```
@@ -376,17 +373,17 @@ Before finalizing updates:
 2. **Conflicting with existing**: Show conflict, ask how to resolve
 3. **Ambiguous updates**: Ask which section should be updated
 4. **Major scope change**: Warn about impact, confirm before proceeding
-5. **Confluence update fails**: Provide full updated text for manual update
-6. **Page not found**: Verify page ID/URL and suggest searching for the page
+5. **File update fails**: Provide full updated text for manual update
+6. **File not found**: Verify feature name and check if spec file exists at expected path
 
 ## Examples
 
 ### Example 1: Product Refinement
 
 ```
-User: /refine-spec 123456789
+User: /refine-spec advanced-search-with-filters
 
-Agent: I found Confluence Page: Advanced Search
+Agent: I found feature specification: Advanced Search with Filters
 
        **Current Coverage:**
        📋 Product Spec: ~70% complete (missing success metrics)
@@ -422,7 +419,7 @@ Agent: ✅ Specifications refined successfully!
 ### Example 2: Technical Refinement
 
 ```
-User: /refine-spec https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789
+User: /refine-spec smart-search
 
 Agent: [Shows current state]
 
@@ -448,9 +445,9 @@ Agent: ✅ Technical Spec updated: 30% → 75% complete
 ### Example 3: Combined Refinement
 
 ```
-User: /refine-spec Advanced Search
+User: /refine-spec advanced-search-with-filters
 
-Agent: [Searches and finds page]
+Agent: [Reads spec file]
        [Shows current state]
 
 User: Option A
@@ -482,7 +479,7 @@ Agent: ✅ Both specifications updated successfully!
 - **Progressive enhancement**: Specs grow with each refinement
 - **No forced structure**: Natural information flow
 - **Uncertainty tracking**: Resolves old questions, adds new ones
-- **Single source of truth**: Everything stays in Confluence
-- **Version tracking**: Uses Confluence's version history with meaningful messages
+- **Single source of truth**: Everything stays in markdown files under docs/[feature-name]/
+- **Version tracking**: Git tracks all changes to spec files with commit history
 
 This unified refinement approach allows natural evolution of specifications without artificial boundaries between product and technical information.

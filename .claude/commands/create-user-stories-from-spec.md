@@ -2,80 +2,59 @@
 description: Decompose feature into user stories through conversational planning
 ---
 
-Decompose a feature (Confluence Page) into independently deliverable user stories in Jira using a conversational, engaging approach.
+Decompose a feature specification into independently deliverable user stories as markdown files using a conversational, engaging approach.
 
 ## Conversational Workflow
 
 This command uses an **engaging, conversational approach**:
-1. Accept Confluence Page ID/URL as argument
-2. Fetch page details and analyze specifications
-3. Ask for target Jira project key
-4. Ask if there's a decomposition meeting transcript
-5. Analyze transcript or work conversationally
-6. Propose workflow-based story breakdown
-7. Ask clarifying questions about boundaries
-8. Create Epic and user stories in Jira
-9. Provide clear summary
+1. Accept feature name as argument
+2. Read spec file and analyze specifications
+3. Ask if there's a decomposition meeting transcript
+4. Analyze transcript or work conversationally
+5. Propose workflow-based story breakdown
+6. Ask clarifying questions about boundaries
+7. Create user story markdown files in docs/[feature-name]/
+8. Provide clear summary
 
 ## Steps
 
-### Step 1: Get Page ID from Arguments
+### Step 1: Get Feature Name from Arguments
 
-The command accepts the Confluence Page as `$ARGUMENTS`:
-- Page ID (e.g., `123456789`)
-- Page URL (e.g., `https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789`)
-- Page Title (will search for it)
+The command accepts the feature name as `$ARGUMENTS`:
+- Feature directory name (e.g., `advanced-search-with-filters`)
+- Will read from `docs/[feature-name]/spec.md`
 
-**Use MCP Tool:** `mcp__atlassian__getConfluencePage` to fetch the page content.
+**Use Read Tool:** Read the file at `docs/$ARGUMENTS/spec.md` to fetch the specification.
 
-### Step 2: Fetch and Analyze Page
+### Step 2: Read and Analyze Spec File
 
-Query Confluence for the page and display current state:
+Read the spec file and display current state:
 
 ```markdown
-I found Confluence Page: [Page Title]
+I found feature specification: [Feature Name]
 
-**Page:** [Page Title]
-**URL:** [Confluence Page URL]
-**Space:** [Space name]
+**Feature:** [Feature Name]
+**File:** docs/[feature-name]/spec.md
 
-**Product Spec:** [✅ Found in page or ❌ Not found]
-**Technical Spec:** [✅ Found in page or ⏳ Minimal or ❌ Not found]
+**Product Spec:** [✅ Found or ❌ Not found]
+**Technical Spec:** [✅ Found or ⏳ Minimal or ❌ Not found]
 
-**Existing Jira Stories:** Checking for linked stories...
-[If stories exist, list them after querying Jira]
+**Existing User Stories:** Checking for story files...
+[List any existing .md files in docs/[feature-name]/ besides spec.md]
 
 [If no specs found, show warning:]
-⚠️ I couldn't find Product and Technical Specifications in this Confluence page.
-I recommend ensuring the page contains both specs created by `/create-spec` before decomposing.
+⚠️ I couldn't find Product and Technical Specifications in this file.
+I recommend ensuring the file contains both specs created by `/create-spec` before decomposing.
 
 [If specs found:]
 ✅ Ready to decompose into user stories.
 ```
 
-### Step 3: Ask for Jira Project
+### Step 3: Read Both Specs from Spec File
 
-Ask which Jira project to create stories in:
+Read **both Product and Technical specifications** from the spec file:
 
-```markdown
-Which Jira project should I create the user stories in?
-
-**Jira Project Key:** [Ask for project key, e.g., "PROJ", "ENG", "PROD"]
-
-If you're not sure, I can list available Jira projects for you.
-```
-
-**Use MCP Tool:** `mcp__atlassian__getVisibleJiraProjects` if user needs to see available projects.
-
-Once project key is provided, verify it and get issue types:
-
-**Use MCP Tool:** `mcp__atlassian__getJiraProjectIssueTypesMetadata` to get available issue types and ensure "Story" type exists.
-
-### Step 4: Read Both Specs from Confluence Page
-
-Read **both Product and Technical specifications** from the Confluence page content:
-
-The Confluence page should contain both specs, structured as:
+The spec file should contain both specs, structured as:
 
 ```markdown
 ## 📋 Product Specification
@@ -106,15 +85,15 @@ The Confluence page should contain both specs, structured as:
 - Testing requirements
 - Technical open questions and assumptions
 
-**If specs not found in Confluence page:**
+**If specs not found in spec file:**
 
 If Product Spec not found:
-- Warn: "⚠️ I couldn't find a Product Specification in the Confluence page. I recommend running `/create-spec` first. I'll proceed using the page content."
+- Warn: "⚠️ I couldn't find a Product Specification in the spec file. I recommend running `/create-spec` first. I'll proceed using the file content."
 
 If Technical Spec is placeholder or not found:
-- Note: "ℹ️ Technical Specification hasn't been created yet. I'll decompose based on Product Spec. For better technical guidance, consider running `/refine-spec [PAGE-ID]` first."
+- Note: "ℹ️ Technical Specification hasn't been created yet. I'll decompose based on Product Spec. For better technical guidance, consider running `/refine-spec [feature-name]` first."
 
-### Step 5: Request Decomposition Meeting Input
+### Step 4: Request Decomposition Meeting Input
 
 Ask user if they have a decomposition meeting:
 
@@ -127,7 +106,7 @@ Before I decompose this feature into user stories, did you have a story decompos
 Which would you prefer?
 ```
 
-### Step 6: Analyze Decomposition Input
+### Step 5: Analyze Decomposition Input
 
 **If transcript provided (Option A):**
 
@@ -166,9 +145,9 @@ I've analyzed your decomposition meeting transcript. Here's what I found:
 
 **If conversational (Option B):**
 
-Work through decomposition conversationally - see Step 7.
+Work through decomposition conversationally - see Step 6.
 
-### Step 7: Propose Workflow-Based Decomposition
+### Step 6: Propose Workflow-Based Decomposition
 
 Based on the feature spec, technical spec, and transcript (if available), propose a workflow-based decomposition where each story delivers one complete user workflow end-to-end.
 
@@ -201,7 +180,7 @@ Before I finalize these, I have a few questions about the boundaries...
 
 [Proceed directly to clarifying questions]
 
-### Step 8: Ask Clarifying Questions
+### Step 7: Ask Clarifying Questions
 
 Based on the proposed workflow-based decomposition, ask targeted questions:
 
@@ -240,7 +219,7 @@ Let me clarify the story boundaries:
 
 [Adjust questions based on the specific feature and decomposition approach]
 
-### Step 9: Propose Story Breakdown
+### Step 8: Propose Story Breakdown
 
 Based on all gathered information, propose the final story breakdown:
 
@@ -282,100 +261,69 @@ Does this decomposition look good, or would you like to adjust any stories?
 
 [Wait for user confirmation or adjustments]
 
-### Step 10: Create Epic in Jira
+### Step 9: Create User Story Files
 
-Before creating the individual stories, create an Epic that will serve as the parent for all stories in this feature:
+Create individual markdown files for each user story in the feature directory:
 
 ```markdown
-Creating Epic for this feature in Jira Project [PROJECT-KEY]...
+Creating user story files in docs/[feature-name]/...
 ```
 
-**Use MCP Tool:** `mcp__atlassian__createJiraIssue`
+**File Naming Convention:**
+- `story-01-[kebab-case-title].md`
+- `story-02-[kebab-case-title].md`
+- etc.
 
-**Epic Settings:**
-- **projectKey:** [PROJECT-KEY from user]
-- **issueTypeName:** "Epic"
-- **summary:** [Feature name from Confluence page title]
-- **description:**
-  ```markdown
-  Feature specification: [Confluence Page Title]
+**Use Write Tool:** Create each story file at `docs/[feature-name]/story-[NN]-[title].md`
 
-  [Brief overview from Product Spec - 1-2 sentences]
-
-  ## Reference
-  - **Confluence Spec:** [Page URL]
-  - **Space:** [Space name]
-
-  ## User Stories
-  This Epic contains [N] user stories that deliver this feature incrementally.
-  ```
-- **labels:** ["feature", "epic", plus context labels from the feature]
-
-**Store the Epic key** for linking stories in the next step.
-
+For each approved story, show progress:
 ```markdown
-✅ Created Epic [EPIC-KEY]: [Feature Name]
-   [Epic URL]
-
-Now creating [N] user stories under this Epic...
-```
-
-### Step 11: Create User Stories in Jira
-
-**CRITICAL - Jira Project Type Detection:**
-
-Before creating stories, you should detect the Jira project type to use the correct Epic linking method:
-
-1. **Ask the user**: "Is this a Team-managed (Next-Gen) or Company-managed (Classic) Jira project?"
-2. Or **detect automatically**: Try Option 2 first (additional_fields), fall back to Option 1 if needed
-3. **Default recommendation**: Use `additional_fields` approach (Option 2) as it works for most configurations
-
-This is crucial because Epic-Story relationships work differently in different Jira project types.
-
-**IMPORTANT - Uncertainty Handling in Stories:**
-
-Before creating stories, review **both Product and Technical specs** from the Confluence page for any remaining uncertainty markers (`[OPEN QUESTION]`, `[DECISION PENDING]`, `[CLARIFICATION NEEDED]`). See @.claude/uncertainty-markers.md for complete marker definitions.
-
-**If critical uncertainties still exist:**
-- Warn the user that stories may need refinement once uncertainties are resolved
-- Consider adding a note in the story description referencing the open question and linking to the Confluence page
-- Flag the story with a "blocked" or "needs-clarification" label
-
-**For each story, create with these guidelines:**
-- If an AC references an `[OPEN QUESTION]` from the Product Spec, note it in the story with link to Confluence page
-- If implementation depends on a `[DECISION PENDING]` from the Technical Spec, add to description with link
-- Stories with unresolved uncertainties should be marked for refinement
-- Link back to the Confluence page for full context
-
-For each approved story, create a Jira issue with complete details:
-
-```markdown
-Creating user stories in Jira Project [PROJECT-KEY]...
-
-[For each story, show progress:]
-✅ Created [ISSUE-KEY]: [Story Title]
-✅ Created [ISSUE-KEY]: [Story Title]
+✅ Created story-01-[title].md
+✅ Created story-02-[title].md
 [Continue for all stories]
 ```
 
-**Use MCP Tool:** `mcp__atlassian__createJiraIssue`
+### Step 10: Story File Format
 
-**Jira Issue Format:**
+**IMPORTANT - Uncertainty Handling in Stories:**
 
-**Summary (Title):** [Clear, action-oriented title, 3-7 words]
+Before creating story files, review **both Product and Technical specs** from the spec file for any remaining uncertainty markers (`[OPEN QUESTION]`, `[DECISION PENDING]`, `[CLARIFICATION NEEDED]`). See @.claude/uncertainty-markers.md for complete marker definitions.
 
-**Description:**
-Create the user story description using the template from @.claude/templates/user-story.md
+**If critical uncertainties still exist:**
+- Warn the user that stories may need refinement once uncertainties are resolved
+- Add a note in the story frontmatter: `blocked_by: "uncertainties in spec.md"`
+- Include a reference to the uncertainty in the story description
+- Link back to the spec file for full context
 
-Fill in all sections based on the story scope and information from the feature and technical specs.
+**For each story, create with these guidelines:**
+- If an AC references an `[OPEN QUESTION]` from the Product Spec, note it in the story with link to spec.md
+- If implementation depends on a `[DECISION PENDING]` from the Technical Spec, add to description with link
+- Stories with unresolved uncertainties should be marked with `status: blocked`
+- Always link back to `spec.md` for full context
 
-**Structure:**
+For each approved story, create a markdown file with complete details:
+
+**Use Write Tool:** Create markdown file using template from @.claude/templates/user-story.md
+
+**Story File Structure:**
 ```markdown
+---
+title: [Clear, action-oriented title, 3-7 words]
+status: todo
+priority: medium
+tags: [frontend, backend, api, etc.]
+dependencies: []
+blocked_by: ""
+story_number: [NN]
+---
+
+# [Story Title]
+
 **User Story:** As a [persona], I want [capability], so that [benefit]
 
 **Value:** [What value this delivers to users/business]
 
-**Confluence Spec:** [Link to Confluence page]
+**Feature Spec:** [../spec.md](../spec.md)
 
 ---
 
@@ -399,118 +347,52 @@ Fill in all sections based on the story scope and information from the feature a
 
 [Any technical considerations from technical spec]
 
-**Dependencies:** [List other story keys if dependencies exist]
+**Dependencies:** [List other story filenames if dependencies exist, e.g., "story-01-*.md"]
 
 **References:**
-- Confluence Spec: [Page URL]
+- Feature Spec: [spec.md](./spec.md)
 - Related Technical Docs: [If applicable]
 ```
 
-**Jira Issue Settings:**
-- **projectKey:** [PROJECT-KEY from user]
-- **issueTypeName:** "Story"
-- **summary:** [Story title]
-- **description:** [Full description in Markdown]
-- **labels:** ["user-story", plus additional context labels like "frontend", "backend", "api", etc.]
-- **priority:** [If priority was discussed, set it using priority field]
+**Story Frontmatter Fields:**
+- **title:** Story title (3-7 words)
+- **status:** `todo`, `in_progress`, `done`, or `blocked`
+- **priority:** `low`, `medium`, `high`
+- **tags:** Array of tags like `["frontend", "backend", "api"]`
+- **dependencies:** Array of story numbers this depends on (e.g., `[1, 2]`)
+- **blocked_by:** Description of blocker if status is `blocked`
+- **story_number:** Sequential number (1, 2, 3, etc.)
 
-**CRITICAL - Epic-Story Linking:**
-
-Jira has different approaches for linking Stories to Epics depending on project type. Here's how to use the MCP tool correctly:
-
-**RECOMMENDED: Use additional_fields (works for most Jira configurations)**
-
-```javascript
-// When calling mcp__atlassian__createJiraIssue for a Story:
-{
-  cloudId: "[CLOUD-ID]",
-  projectKey: "[PROJECT-KEY]",
-  issueTypeName: "Story",
-  summary: "[Story Title]",
-  description: "[Story Description in Markdown]",
-  additional_fields: {
-    parent: {
-      key: "[EPIC-KEY from Step 10]"  // e.g., "PROJ-41"
-    }
-  },
-  labels: ["user-story", "frontend", "backend", ...]
-}
-```
-
-**ALTERNATIVE: For Team-Managed (Next-Gen) Projects Only**
-
-If the above doesn't work (very rare), try:
-```javascript
-{
-  cloudId: "[CLOUD-ID]",
-  projectKey: "[PROJECT-KEY]",
-  issueTypeName: "Story",
-  summary: "[Story Title]",
-  description: "[Story Description in Markdown]",
-  parent: "[EPIC-KEY from Step 10]",  // Direct parent field
-  labels: ["user-story", ...]
-}
-```
-
-**Implementation Strategy:**
-1. **Default**: Always try `additional_fields` approach first (works 95% of the time)
-2. **If it fails**: Create the story without parent, then inform user to link manually
-3. **Never try both**: Pick one approach and stick with it for all stories in the Epic
-
-**If Epic Linking Fails:**
-
-If neither approach works and stories are created without Epic links:
-1. Inform the user that stories were created successfully but Epic linking failed
-2. Provide manual linking instructions:
-   ```markdown
-   ⚠️ Stories created but Epic linking failed. Please link manually:
-
-   **In Jira:**
-   1. Open each story ([STORY-KEY])
-   2. Click on the "Epic" field or "Parent" field in the details
-   3. Select or search for Epic [EPIC-KEY]
-   4. Save the story
-
-   **Or use bulk operations:**
-   1. Go to Jira board or backlog
-   2. Select all stories: [STORY-1], [STORY-2], etc.
-   3. Click "Bulk Change" → "Edit Issues"
-   4. Set "Parent" or "Epic Link" to [EPIC-KEY]
-   ```
-
-### Step 12: Provide Comprehensive Summary
+### Step 11: Provide Comprehensive Summary
 
 After creating all stories, provide a detailed summary:
 
 ```markdown
 ✅ Feature decomposed successfully!
 
-**Confluence Page:** [Page Title] - [Page URL]
-**Jira Project:** [PROJECT-KEY]
+**Feature:** [Feature Name]
+**Directory:** docs/[feature-name]/
+**Spec File:** docs/[feature-name]/spec.md
 
-**Epic Created:** [EPIC-KEY]: [Feature Name] - [Epic URL]
-  - All user stories are linked to this Epic
-  - Epic contains reference to Confluence specification
-
-**Stories Created:** [N] user stories under Epic [EPIC-KEY]
+**Stories Created:** [N] user stories
 
 **Story Breakdown:**
 
-1. **[ISSUE-KEY]: [Story Title]** - [URL]
-   - Parent Epic: [EPIC-KEY]
+1. **story-01-[title].md**
+   - Status: todo
    - Scope: [Frontend/Backend/Full-stack]
    - Focus: [1-line description]
    - ACs: [N] acceptance criteria
-   - Dependencies: [None or "Blocked by [ISSUE-KEY]" - documented in story description]
-   - Labels: [Labels applied]
+   - Dependencies: [None or "Depends on story-XX"]
+   - Tags: [Tags applied]
 
-2. **[ISSUE-KEY]: [Story Title]** - [URL]
-   - Parent Epic: [EPIC-KEY]
+2. **story-02-[title].md**
+   - Status: todo
    - Scope: [Frontend/Backend/Full-stack]
    - Focus: [1-line description]
    - ACs: [N] acceptance criteria
-   - Dependencies: [None or "Blocked by [ISSUE-KEY]" - documented in story description]
-   - Labels: [Labels applied]
+   - Dependencies: [None or "Depends on story-XX"]
+   - Tags: [Tags applied]
 
 [Continue for all stories]
 
@@ -519,9 +401,9 @@ After creating all stories, provide a detailed summary:
 
 **Implementation Order:**
 Based on dependencies and value delivery, recommended order:
-1. [ISSUE-KEY]: [Title] - Foundation story, no dependencies
-2. [ISSUE-KEY]: [Title] - Builds on previous story
-3. [ISSUE-KEY]: [Title] - Enhancement, can be done in parallel
+1. story-01-[title] - Foundation story, no dependencies
+2. story-02-[title] - Builds on previous story
+3. story-03-[title] - Enhancement, can be done in parallel
 [Continue with recommended order]
 
 **Coverage:**
@@ -534,25 +416,24 @@ Based on dependencies and value delivery, recommended order:
 **Next Steps:**
 
 **Immediate:**
-1. ✅ Review all stories in Jira and verify acceptance criteria
-2. [If dependencies exist:] Create dependency links manually (see instructions above)
-3. Prioritize stories in your backlog
-4. Estimate stories if your team uses estimation
-5. Assign stories to upcoming sprints
+1. ✅ Review all story files in docs/[feature-name]/ and verify acceptance criteria
+2. Update story status as you work on them (edit the `status` field in frontmatter)
+3. Track dependencies between stories using the `dependencies` field
 
 **For Implementation:**
-1. Start with: [ISSUE-KEY] - [Title]
+1. Start with: story-01-[title].md
 2. Implement story (optional): `/implement-story`
-   - Provide Jira story link and Confluence spec link
+   - Provide story file path
    - Agent creates implementation plan and executes
    - See CODING_README.md for complete workflow
 
 **For Refinement:**
 If you need to adjust the decomposition (split, merge, add stories):
-- Use Jira's native features (Split Issue, Edit, Link Issues)
-- Update the Confluence spec if requirements changed: `/refine-spec [PAGE-ID]`
+- Edit story markdown files directly
+- Create new story files if needed
+- Update the feature spec if requirements changed: `/refine-spec [feature-name]`
 
-The feature is now fully decomposed and ready for sprint planning and implementation! 🎉
+The feature is now fully decomposed and ready for implementation! 🎉
 ```
 
 ## Guidelines
@@ -640,15 +521,13 @@ If your team has separate frontend/backend teams, you can still split individual
 
 If something goes wrong:
 
-1. **No Product Spec in Confluence**: Warn but continue using Confluence page content
-2. **No Technical Spec in Confluence**: Note that it's optional, continue with Product Spec
-3. **Jira Project Not Found**: List available projects and ask user to select
-4. **Epic Issue Type Not Available**: Check available issue types, use "Story" with label "epic" as fallback
-5. **Story Issue Type Not Available**: List available issue types and ask which to use
-6. **Epic Creation Fails**: Provide Epic details for manual creation, continue with stories (without parent link)
-7. **Epic-Story Linking Fails**: Stories created but not linked to Epic - provide manual linking instructions (see Step 11)
-8. **Unclear Boundaries**: Ask specific questions about how to split
-9. **Incomplete Transcript**: Identify gaps and work conversationally to fill them
+1. **No Product Spec in file**: Warn but continue using spec file content
+2. **No Technical Spec in file**: Note that it's optional, continue with Product Spec
+3. **Spec file not found**: Verify feature name and check if docs/[feature-name]/spec.md exists
+4. **File creation fails**: Provide story content for manual creation
+5. **Unclear Boundaries**: Ask specific questions about how to split
+6. **Incomplete Transcript**: Identify gaps and work conversationally to fill them
+7. **Invalid feature name**: Verify the feature directory exists
 
 ## Examples
 
@@ -829,21 +708,21 @@ Agent: Creating Epic for this feature in Jira Project ENG...
 
 ## Important Notes
 
-- **Requires $ARGUMENTS**: Must provide Confluence Page ID/URL
-- **Reads from Confluence**: Fetches both Product and Technical specs from Confluence page
-- **Creates Epic First**: Creates an Epic issue to organize all stories for the feature
-- **Epic-Story Hierarchy**: All stories are linked to the Epic as parent
-- **Creates in Jira**: Creates user stories as Jira issues with proper Epic linking
-- **Dependencies Documented**: Dependencies are documented in story descriptions and Technical Notes sections
-- **Manual Dependency Links**: Issue links (blocks/is blocked by) must be created manually in Jira (instructions provided in summary)
+- **Requires $ARGUMENTS**: Must provide feature name (directory name)
+- **Reads from markdown**: Fetches both Product and Technical specs from docs/[feature-name]/spec.md
+- **Creates story files**: Creates individual markdown files for each user story in docs/[feature-name]/
+- **File naming**: Uses `story-NN-[title].md` format for easy sorting
+- **Frontmatter tracking**: Each story has structured frontmatter (status, priority, tags, dependencies)
+- **Dependencies tracked**: Dependencies tracked via `dependencies` array in frontmatter
+- **Git-tracked**: All stories are version controlled alongside code
 - **Transcript is Optional**: Preferred but can work conversationally
 - **Workflow-Based Decomposition**: Always decomposes by user workflow for maximum value delivery
 - **Adapts to Team Structure**: Can split workflows by layer during clarifying questions if needed
 - **Confirms Before Creating**: Shows proposed breakdown for approval
 - **Complete ACs**: Every story gets comprehensive acceptance criteria
-- **Maps to Specs**: References both Product and Technical specs from Confluence
-- **Explicit Dependencies**: Dependencies clearly documented in story descriptions with instructions for manual linking
+- **Maps to Specs**: References spec.md file in each story
+- **Explicit Dependencies**: Dependencies tracked in frontmatter and documented in story descriptions
 - **Suggests Order**: Recommends implementation order based on dependencies
-- **Links Back**: Epic and stories link back to Confluence page for full context
+- **Links Back**: Stories link back to spec.md for full context
 
 This streamlined, opinionated approach ensures stories are well-thought-out, deliver user value, and have comprehensive acceptance criteria while being fast and collaborative.

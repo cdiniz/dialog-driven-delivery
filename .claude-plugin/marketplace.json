@@ -1,0 +1,41 @@
+{
+  "name": "d3-marketplace",
+  "owner": {
+    "name": "D3 Team",
+    "email": "claudio@cdiniz.com"
+  },
+  "metadata": {
+    "description": "Dialog Driven Delivery (D3) - Conversational, transcript-first methodology for building software products",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "d3",
+      "source": "./d3",
+      "description": "Dialog Driven Delivery - Create specs, refine them, and decompose into user stories through conversational workflows",
+      "version": "1.0.0",
+      "author": {
+        "name": "D3 Team"
+      },
+      "homepage": "https://github.com/cdiniz/dialog-driven-delivery",
+      "repository": "https://github.com/cdiniz/dialog-driven-delivery",
+      "license": "MIT",
+      "keywords": ["documentation", "planning", "specifications", "user-stories", "workflow", "agile", "d3"],
+      "category": "productivity"
+    },
+    {
+      "name": "d3-atlassian",
+      "source": "./d3-atlassian",
+      "description": "Atlassian provider for D3 - Enables D3 to work with Confluence for specifications and Jira for user stories",
+      "version": "1.0.0",
+      "author": {
+        "name": "D3 Team"
+      },
+      "homepage": "https://github.com/cdiniz/dialog-driven-delivery",
+      "repository": "https://github.com/cdiniz/dialog-driven-delivery",
+      "license": "MIT",
+      "keywords": ["d3", "atlassian", "confluence", "jira", "provider"],
+      "category": "integrations"
+    }
+  ]
+}

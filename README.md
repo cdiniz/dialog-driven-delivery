@@ -71,25 +71,30 @@ See `d3-config-sample.md` for configuration examples.
 
 ## Installation
 
-### As Claude Code Plugins (Recommended)
+### From Marketplace (Recommended)
 
 ```bash
+# Add the D3 marketplace
+claude plugin marketplace add cdiniz/dialog-driven-delivery
+
 # Install the core D3 plugin
-claude plugin install d3 --plugin-dir ./d3
+claude plugin install d3@d3-marketplace
 
 # Install the Atlassian provider (if using Confluence + Jira)
-claude plugin install d3-atlassian --plugin-dir ./d3-atlassian
+claude plugin install d3-atlassian@d3-marketplace
 ```
-
-For production use, install from a marketplace (see [Plugin Marketplaces](#plugin-marketplaces) below).
 
 ### Local Development
 
-Test the plugins locally:
+For development or testing the plugins locally:
 
 ```bash
 # Test both plugins together
 claude --plugin-dir ./d3 --plugin-dir ./d3-atlassian
+
+# Or use local marketplace
+claude plugin marketplace add ./path/to/dialog-driven-delivery
+claude plugin install d3@d3-marketplace
 ```
 
 ---

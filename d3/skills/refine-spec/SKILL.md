@@ -5,547 +5,314 @@ description: Refine existing feature specifications based on new information (me
 
 ## Philosophy
 
-This command updates ANY part of the existing specifications based on new input. It automatically detects which sections need updating - Product, Technical, or both. The key principle: update only what has new information, preserve everything else.
-
-## Conversational Workflow
-
-1. Detect spec provider
-2. Accept Page ID or URL as argument
-3. Fetch and analyze current specifications
-4. Request new input (transcript, document, conversation)
-5. Analyze what's new vs what exists
-6. Show proposed changes (before/after)
-7. Apply updates to relevant sections using **bold** for new changes
-8. Provide comprehensive summary
-
-## Steps
-
-### Step 0: Detect Spec Provider
-
-**Provider Detection:**
-1. Read `CLAUDE.md` and look for D3 Configuration section
-2. If configuration found, extract Spec Provider name (e.g., "d3-atlassian:atlassian-spec-provider")
-3. If not found, use default provider "d3-atlassian:atlassian-spec-provider"
-
-**If configuration is missing or incomplete:**
-
-Show this guidance to the user:
-```markdown
-⚠️ D3 Configuration Not Found
-
-I couldn't find D3 provider configuration in CLAUDE.md.
-
-Please add this to your CLAUDE.md file:
-
-## D3 Configuration
-
-### Spec Provider
-**Skill:** d3-atlassian:atlassian-spec-provider
-**Configuration:**
-- Cloud ID: your-atlassian-cloud-id
-- Default Location: YOUR-SPACE-KEY
-- Default parent page: (optional) parent-page-url
-
-### Story Provider
-**Skill:** d3-atlassian:atlassian-story-provider
-**Configuration:**
-- Cloud ID: your-atlassian-cloud-id
-- Default Project: YOUR-PROJECT-KEY
+Update ANY part of existing specifications based on new input. Automatically detect which sections need updating - Product, Technical, or both. **Update only what has new information, preserve everything else.**
 
 ---
 
-**How to find your Cloud ID:**
-Visit your Atlassian site and check the URL or use the Atlassian MCP tools.
+## Workflow Checklist
 
-**Other providers available:**
-- Notion, Linear, GitHub, or create your own custom provider
+Copy this and track progress:
 
-See README.md for full details and alternative provider options.
+```
+Specification Refinement Progress:
+- [ ] Step 1: Detect provider configuration
+- [ ] Step 2: Fetch current specification
+- [ ] Step 3: Analyze current coverage
+- [ ] Step 4: Request refinement input
+- [ ] Step 5: Analyze new information
+- [ ] Step 6: Show proposed changes
+- [ ] Step 7: Validate changes
+- [ ] Step 8: Apply updates
+- [ ] Step 9: Provide summary
 ```
 
-Then stop and wait for the user to update their configuration.
+---
 
-**Store provider name** for use in Steps 1 and 8.
+## Steps
 
-### Step 1: Get Page ID and Fetch Specification
+### Step 1: Detect Provider
 
-The command accepts the Page ID or URL as `$ARGUMENTS`:
-- Page ID (e.g., `123456789`)
-- Page URL (e.g., `https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789`)
-- Page Title (will search for it)
+Detect provider configuration from CLAUDE.md. See [provider-detection.md](../../shared/provider-detection.md) for details.
 
-**If page ID provided:** Use Skill tool to invoke spec provider:
-```
-Skill(skill="[provider-name]", args="get_spec page_id=\"[PAGE-ID]\"")
-```
+Store provider name for Steps 2 and 8.
 
-**If page URL provided:** Extract page ID from URL, then use get_spec
+---
 
-**If page title provided:** Use Skill tool to search:
-```
-Skill(skill="[provider-name]", args="search_specs query=\"[PAGE-TITLE]\"")
-```
-Then use get_spec with the found page ID.
+### Step 2: Fetch Specification
 
-### Step 2: Analyze Current State
+Command accepts Page ID, URL, or title in `$ARGUMENTS`.
 
-Display the current specification state (from provider response):
+**Use provider's `get_spec` operation:**
+- If Page ID: Use directly
+- If URL: Extract Page ID from URL
+- If title: Search via `search_specs`, then use `get_spec`
+
+---
+
+### Step 3: Analyze Current State
+
+Display current spec coverage:
 
 ```markdown
 I found Specification: [Page Title]
 
-**Specification:** [Page Title]
-**URL:** [Page URL]
-**Location:** [Location name/key]
+**Specification:** [Title]
+**URL:** [URL]
+**Location:** [Location]
 **Last Modified:** [Date]
 
-## Current Specification Coverage
+## Current Coverage
 
 **📋 Product Specification:**
-- Overview: [Complete/Partial/Empty - key points if filled]
-- User Journey: [X workflows defined / Empty]
+- Overview: [Complete/Partial/Empty - brief summary]
+- User Journey: [X workflows / Empty]
 - Requirements: [Y requirements / Empty]
-- Open Questions: [Z unresolved questions]
+- Open Questions: [Z unresolved]
 
 **🔧 Technical Specification:**
-- Technical Approach: [Complete/Partial/Empty - key decisions if filled]
+- Technical Approach: [Complete/Partial/Empty - brief summary]
 - Architecture: [X diagrams / Empty]
 - API Contracts: [Y endpoints / Empty]
 - Data Models: [Z models / Empty]
-- Open Questions: [W unresolved questions]
+- Open Questions: [W unresolved]
 
-**Overall Coverage:** [Rough percentage or status for each spec]
+**Overall:** Product ~[X]% | Technical ~[Y]%
 ```
 
-### Step 3: Request Refinement Input
+---
 
-Ask for new information:
+### Step 4: Request Refinement Input
 
 ```markdown
-How would you like to provide the new information for refinement?
+How would you like to provide new information for refinement?
 
-**Option A: Meeting Transcript** - Paste a transcript from a recent discussion
+**Option A: Meeting Transcript** - Paste a recent discussion transcript
 **Option B: Document Update** - Paste updated documentation or decisions
-**Option C: Describe Changes** - Tell me what needs to be updated
-**Option D: Feedback/Review Notes** - Paste review feedback or comments
-
-Which would you prefer?
+**Option C: Describe Changes** - Tell me what needs updating
+**Option D: Feedback/Review** - Paste review feedback or comments
 ```
 
-### Step 4: Analyze New Information
+---
 
-**Smart Detection - Don't force categorization:**
+### Step 5: Analyze New Information
 
-Analyze the input to identify:
-1. **What's new** vs what already exists
-2. **What's changing** vs what's being added
-3. **Which sections** are affected (could be both Product and Technical)
+**Smart Detection** - Don't force categorization:
 
-**Product information indicators:**
-- User stories, workflows, personas
-- Requirements, features, scope
-- Success metrics, business value
-- UI/UX decisions
+Identify:
+1. What's new vs what exists
+2. What's changing vs what's being added
+3. Which sections affected (Product, Technical, or both)
 
-**Technical information indicators:**
-- Architecture, design patterns
-- Technology choices, frameworks
-- APIs, data models, integrations
-- Performance, security, testing
+**Indicators:**
+- **Product:** User stories, workflows, personas, requirements, business value, UI/UX
+- **Technical:** Architecture, technologies, APIs, data models, performance, security
 
-**Don't assume** - one transcript might update both specs!
+One input can update both specs!
 
-### Step 5: Identify Changes
+---
 
-Categorize the changes:
+### Step 6: Show Proposed Changes
+
+**Present clear before/after:**
 
 ```markdown
-I've analyzed your input and found information affecting:
-
-**📋 Product Specification Updates:**
-[If any product changes found:]
-- **Overview:** [Adding/Updating/No change] - [what specifically]
-- **User Journey:** [Adding X workflows/Updating workflow Y/No change]
-- **Requirements:** [Adding X requirements/Modifying Y/No change]
-- **Open Questions:** [Resolving X questions/Adding Y new questions]
-
-**🔧 Technical Specification Updates:**
-[If any technical changes found:]
-- **Technical Approach:** [Adding/Updating/No change] - [what specifically]
-- **Architecture:** [Adding X diagrams/Updating/No change]
-- **API Contracts:** [Adding X endpoints/Modifying Y/No change]
-- **Data Models:** [Adding/Updating/No change]
-- **Open Questions:** [Resolving X questions/Adding Y new questions]
-
-[If uncertainties about categorization:]
-I found information about [topic]. Should this update:
-- The Product Specification (user-facing aspects)
-- The Technical Specification (implementation details)
-- Both specifications
-```
-
-### Step 6: Ask Clarifying Questions
-
-Based on the new information, ask targeted questions:
-
-```markdown
-Let me clarify a few things about these updates:
-
-[For each major change:]
-1. [Specific question about the change]
-2. [Question about impact on other sections]
-3. [Question about resolving existing uncertainties]
-
-[General questions:]
-- Are there any existing open questions that this information resolves?
-- Should I remove any sections that are now obsolete?
-- Are there new uncertainties or decisions pending?
-```
-
-### Step 7: Show Proposed Changes
-
-**CRITICAL - Present clear before/after for each change:**
-
-```markdown
-Here are the proposed changes to your specifications:
+Here are the proposed changes:
 
 ---
 
 ## 📋 Product Specification Changes
 
-### Change 1: [Section Name - e.g., User Journey]
+### Change 1: [Section Name]
 
 **BEFORE:**
 ```
-[Current content - enough to show context]
+[Current content - enough for context]
 ```
 
 **AFTER:**
 ```
-[Proposed updated content with changes highlighted]
+[Proposed content with changes]
 ```
 
 **Rationale:** [Why this change]
-**Type:** [Addition/Modification/Clarification/Deletion]
-
----
-
-### Change 2: [Section Name]
-[Continue pattern]
+**Type:** [Addition/Modification/Clarification/Resolution]
 
 ---
 
 ## 🔧 Technical Specification Changes
 
-### Change 1: [Section Name - e.g., API Contracts]
+### Change 1: [Section Name]
 
-**BEFORE:**
-```
-[Current content]
-```
-
-**AFTER:**
-```
-[Proposed updated content]
-```
-
-**Rationale:** [Why this change]
-**Type:** [Addition/Modification/Clarification/Deletion]
+[Same pattern]
 
 ---
 
-**Summary of All Changes:**
-- 📋 Product Spec: [X sections updated, Y questions resolved]
-- 🔧 Technical Spec: [X sections updated, Y questions resolved]
-- ✅ Resolved Questions: [List any [OPEN QUESTION] markers being resolved]
-- ⚠️ New Questions: [List any new uncertainties being added]
+**Summary:**
+- 📋 Product: [X sections updated, Y questions resolved]
+- 🔧 Technical: [X sections updated, Y questions resolved]
+- ✅ Resolved: [List resolved uncertainties]
+- ⚠️ New: [List new uncertainties]
 
-Does this look correct? Should I proceed with updating the specification?
+Does this look correct?
 ```
+
+---
+
+### Step 7: Validate Changes
+
+**Validation Checklist:**
+
+```
+Change Validation:
+- [ ] All changes have clear rationale
+- [ ] Before/after shows enough context
+- [ ] Uncertainty markers properly updated
+- [ ] No hallucination - only documented changes
+- [ ] Both specs remain internally consistent
+```
+
+If resolved uncertainties → Remove markers and section entries
+If new uncertainties → Add markers and section entries
+
+---
 
 ### Step 8: Apply Updates
 
-Update the specification with the refined content:
+Use Skill tool to invoke spec provider:
 
-**Use Skill Tool to invoke spec provider:**
 ```
 Skill(
   skill="[provider-name]",
-  args="update_spec page_id=\"[PAGE-ID]\" body=\"[Updated Full Spec Content]\" version_message=\"[Brief description of changes]\""
+  args="update_spec page_id=\"[PAGE-ID]\" body=\"[Updated Full Spec]\" version_message=\"[Brief description]\""
 )
 ```
 
-**Parameters:**
-- **page_id:** Page ID from Step 1
-- **body:** Updated full specification content in Markdown
-- **version_message:** Brief description of changes made
-
 ```markdown
-Updating specification [Page Title]...
+Updating specification...
 
 ✅ Specification updated
-✅ [X] Product Specification sections modified
-✅ [Y] Technical Specification sections modified
-✅ [Z] Open questions resolved
+✅ [X] Product sections modified
+✅ [Y] Technical sections modified
+✅ [Z] Questions resolved
 ✅ [W] New questions/uncertainties added
-
-**Specification URL:** [URL to view updated specs]
 ```
 
-### Step 9: Provide Comprehensive Summary
+---
+
+### Step 9: Provide Summary
 
 ```markdown
 ✅ Specifications refined successfully!
 
-**Specification:** [Page Title]
-**URL:** [Page URL]
+**Specification:** [Title] - [URL]
 
 ## What Was Updated
 
 **📋 Product Specification:**
-[For each section, show status:]
-- Overview: [✅ No change / ✏️ Updated / ➕ Filled previously empty]
-- User Journey: [✅ No change / ✏️ Updated - added X workflows / ➕ Filled]
-- Requirements: [✅ No change / ✏️ Updated - added Y requirements / ➕ Filled]
-- Open Questions: [Resolved X, Added Y, Total now: Z]
+- Overview: [✅ No change / ✏️ Updated / ➕ Filled]
+- User Journey: [Status - what changed]
+- Requirements: [Status - what changed]
+- Open Questions: [Resolved X, Added Y, Total: Z]
 
 **🔧 Technical Specification:**
-- Technical Approach: [✅ No change / ✏️ Updated / ➕ Filled previously empty]
-- Architecture: [✅ No change / ✏️ Added X diagrams / ✏️ Updated]
-- API Contracts: [✅ No change / ➕ Added Y endpoints / ✏️ Modified]
-- Data Models: [✅ No change / ➕ Added Z models / ✏️ Updated]
-- Open Questions: [Resolved X, Added Y, Total now: Z]
+- Technical Approach: [Status]
+- Architecture: [Status]
+- API Contracts: [Status]
+- Data Models: [Status]
+- Open Questions: [Resolved X, Added Y, Total: Z]
 
-## Key Changes Made
+## Key Changes
 
-[List 3-5 most significant changes with rationale:]
-1. **[Change title]**: [What changed and why]
-2. **[Change title]**: [What changed and why]
+1. **[Change title]:** [What changed and why]
+2. **[Change title]:** [What changed and why]
+[List 3-5 most significant changes]
 
 ## Coverage Improvement
 
-**Before refinement:**
-- Product Spec: ~[X]% complete
-- Technical Spec: ~[Y]% complete
-
-**After refinement:**
-- Product Spec: ~[X]% complete
-- Technical Spec: ~[Y]% complete
+**Before:** Product ~[X]% | Technical ~[Y]%
+**After:** Product ~[X]% | Technical ~[Y]%
 
 ## Remaining Gaps
 
 [If sections still empty:]
-**Still need to define:**
-- [Empty Product sections if any]
-- [Empty Technical sections if any]
+**Still need to define:** [List empty sections]
 
 [If questions remain:]
-**Open questions requiring resolution:** [Total count]
-- Product questions: [X]
-- Technical questions: [Y]
-
-## Impact Assessment
-
-[If applicable:]
-**These changes may impact:**
-- Jira stories (if created): [List stories that might need review]
-- Timeline: [If scope changed significantly]
-- Technical complexity: [If architecture changed]
+**Open questions:** [Total count] - [X] product, [Y] technical
 
 ## Next Steps
 
-1. Review the updated specifications in Confluence: [URL]
-2. [If gaps remain] Schedule sessions to discuss:
-   - [Remaining product gaps]
-   - [Remaining technical gaps]
-3. [If ready] Create Jira stories: `/decompose`
-4. Continue refinement as needed: `/refine-spec`
-
-The specifications have been successfully updated with the new information.
+1. Review updated spec: [URL]
+2. [If gaps] Schedule discussions for remaining sections
+3. [If ready] Use `/d3:decompose [PAGE-ID]` to create stories
+4. Continue refinement: `/d3:refine-spec [PAGE-ID]`
 ```
 
-## Guidelines
+---
+
+## Key Principles
 
 ### Smart Update Detection
-
-1. **Don't force categorization** - Let content determine which spec to update
-2. **One input can update both** - Product and technical info often intermixed
-3. **Preserve existing content** - Only change what needs changing
-4. **Track resolution** - When [OPEN QUESTION] markers get answered, remove them
-5. **Add new uncertainties** - New information might raise new questions
-
-### Progressive Refinement Examples
-
-**Refinement 1: Product feedback**
-```
-Input: "Users want batch operations and keyboard shortcuts"
-Updates: Product Spec - Requirements section
-Technical Spec: No changes
-```
-
-**Refinement 2: Architecture decision**
-```
-Input: "Switching from REST to GraphQL for better performance"
-Updates: Technical Spec - Approach, Architecture, API sections
-Product Spec: No changes (user experience unchanged)
-```
-
-**Refinement 3: Combined review**
-```
-Input: Meeting covering UX changes and database optimization
-Updates: Product Spec - User Journey section
-         Technical Spec - Data Models section
-```
-
-### Handling Different Input Types
-
-**Meeting Transcript:**
-- Extract all decisions and discussions
-- Map to appropriate sections
-- Note any disagreements as uncertainties
-
-**Feedback/Review Notes:**
-- Identify what's being corrected vs enhanced
-- Show clear before/after
-- Document rationale for changes
-
-**Direct Updates:**
-- User specifies exact changes
-- Apply surgical updates
-- Preserve everything else
+1. **Don't force categorization** - Content determines which spec updates
+2. **One input updates both** - Product and technical info often intermixed
+3. **Preserve existing** - Only change what needs changing
+4. **Track resolution** - Remove resolved uncertainty markers
+5. **Add new uncertainties** - New information may raise questions
 
 ### Change Types
+- **Addition:** New content in previously empty section
+- **Enhancement:** Adding to existing content
+- **Modification:** Changing existing content
+- **Clarification:** Resolving uncertainty markers
+- **Resolution:** Answering open questions
 
-1. **Addition** - New content in previously empty section
-2. **Enhancement** - Adding to existing content
-3. **Modification** - Changing existing content
-4. **Clarification** - Resolving uncertainty markers
-5. **Deletion** - Removing obsolete content (rare)
-
-### Quality Checks
-
-Before finalizing updates:
-- ✓ All changes have clear rationale
-- ✓ Before/after shows enough context
-- ✓ Uncertainty markers updated appropriately (invoke `uncertainty-markers` skill for guidelines)
-- ✓ No hallucination - only documented changes applied
-- ✓ Both specs remain internally consistent
+---
 
 ## Error Handling
 
-1. **No changes detected**: Inform user no new information found, ask for clarification
-2. **Conflicting with existing**: Show conflict, ask how to resolve
-3. **Ambiguous updates**: Ask which section should be updated
-4. **Major scope change**: Warn about impact, confirm before proceeding
-5. **Specification update fails**: Provide full updated text for manual update
-6. **Page not found**: Verify page ID/URL and suggest searching for the page
-7. **Provider invocation fails**: Fall back to providing spec content for manual update
+- **No changes detected:** Inform user, ask for clarification
+- **Conflicting info:** Show conflict, ask how to resolve
+- **Ambiguous updates:** Ask which section to update
+- **Major scope change:** Warn about impact, confirm
+- **Update fails:** Provide full updated text for manual update
+- **Page not found:** Verify page ID/URL, suggest search
+- **Provider fails:** Fall back to providing content
 
-## Examples
+---
 
-### Example 1: Product Refinement
+## Example
+
+**Quick reference** (see [examples.md](references/examples.md) for detailed scenarios):
 
 ```
-User: /refine-spec 123456789
+User: /d3:refine-spec 123456789
 
-Agent: I found Specification: Advanced Search
-
-       **Current Coverage:**
-       📋 Product Spec: ~70% complete (missing success metrics)
-       🔧 Technical Spec: ~30% complete (basic approach only)
-
+Agent: Current: Product 70%, Technical 30%
        How would you like to provide new information?
 
-User: Option A
-      [Pastes product review meeting discussing success metrics and new requirements]
+User: Option A [pastes review meeting transcript]
 
-Agent: I found information affecting:
-
-       **📋 Product Specification Updates:**
-       - Overview: Adding success metrics
-       - Requirements: Adding 3 new requirements
-       - Open Questions: Resolving 2 questions
-
-       **🔧 Technical Specification Updates:**
-       - No changes detected
-
-       [Shows before/after for each change]
-
-       Should I proceed?
-
-User: Yes
-
-Agent: ✅ Specifications refined successfully!
-
-       Product Spec: 70% → 85% complete
-       Technical Spec: 30% (unchanged)
-```
-
-### Example 2: Technical Refinement
-
-```
-User: /refine-spec https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789
-
-Agent: [Shows current state]
-
-       How would you like to provide new information?
-
-User: Option C
-      We decided to use PostgreSQL full-text search instead of Elasticsearch
-
-Agent: I found information affecting:
-
-       **🔧 Technical Specification Updates:**
-       - Technical Approach: Updating search implementation
-       - Architecture: Updating diagrams
-       - Integrations: Removing Elasticsearch, updating PostgreSQL
-
+Agent: Found updates:
+       - Product: Adding 2 requirements
+       - Technical: No changes
        [Shows before/after]
 
-User: Yes, update it
+User: Apply changes
 
-Agent: ✅ Technical Spec updated: 30% → 75% complete
+Agent: ✅ Updated! Product: 70% → 85%
 ```
 
-### Example 3: Combined Refinement
-
-```
-User: /refine-spec Advanced Search
-
-Agent: [Searches and finds page]
-       [Shows current state]
-
-User: Option A
-      [Pastes comprehensive review meeting covering both aspects]
-
-Agent: I found information affecting both specifications:
-
-       **📋 Product Updates:**
-       - User Journey: Adding error recovery workflow
-       - Requirements: Modifying 2 requirements
-
-       **🔧 Technical Updates:**
-       - API Contracts: Adding 3 new endpoints
-       - Data Models: Adding audit log model
-
-       [Shows all before/after changes]
-
-User: Perfect, apply all changes
-
-Agent: ✅ Both specifications updated successfully!
-       Product: 85% → 92% complete
-       Technical: 75% → 88% complete
-```
+---
 
 ## Important Notes
 
-- **Smart detection**: Automatically determines which spec(s) to update
-- **Preserves content**: Only modifies what needs changing
-- **Progressive enhancement**: Specs grow with each refinement
-- **No forced structure**: Natural information flow
-- **Uncertainty tracking**: Resolves old questions, adds new ones
-- **Single source of truth**: Everything stays in one specification document
-- **Version tracking**: Uses version history with meaningful messages (when supported by provider)
-- **Provider-agnostic**: Works with any specification storage platform
+- **Smart detection:** Automatically determines which spec(s) to update
+- **Preserves content:** Only modifies what needs changing
+- **Progressive enhancement:** Specs grow with each refinement
+- **Natural flow:** No forced structure
+- **Uncertainty tracking:** Resolves old, adds new questions
+- **Single source of truth:** Everything in one document
+- **Version tracking:** Uses version history with messages (when supported)
+- **Provider-agnostic:** Works with any platform
 
-This unified refinement approach allows natural evolution of specifications without artificial boundaries between product and technical information.
+See [templates.md](references/templates.md) for template details and [examples.md](references/examples.md) for comprehensive examples.

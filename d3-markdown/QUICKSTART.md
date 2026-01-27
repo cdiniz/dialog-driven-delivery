@@ -34,10 +34,7 @@ claude plugin install d3-markdown@d3-marketplace
 cd my-awesome-project
 
 # Create D3 directories
-mkdir -p specs stories .d3
-
-# Initialize metadata file
-echo '{"version": "1.0", "stories": {}, "next_id": {"story": 1}}' > .d3/metadata.json
+mkdir -p specs stories
 
 # Create CLAUDE.md (or add to existing)
 cat >> CLAUDE.md << 'EOF'
@@ -179,11 +176,14 @@ vim stories/user-authentication/story-1-login.md
 Or check overall progress:
 
 ```bash
-# View metadata
-cat .d3/metadata.json | jq '.stories'
+# List all stories
+find stories -name "story-*.md"
 
 # Count done stories
-cat .d3/metadata.json | jq '.stories | map(select(.status == "done")) | length'
+rg "^status: done" stories/ -l | wc -l
+
+# View all statuses
+rg "^status:" stories/ --no-filename | sort | uniq -c
 ```
 
 ---
@@ -192,7 +192,7 @@ cat .d3/metadata.json | jq '.stories | map(select(.status == "done")) | length'
 
 ```bash
 # Add files
-git add specs/ stories/ .d3/ CLAUDE.md
+git add specs/ stories/ CLAUDE.md
 
 # Commit
 git commit -m "Add User Authentication feature planning"
@@ -221,10 +221,10 @@ claude code
 ✅ Created 3 stories in stories/user-authentication/
 
 # Check what was created
-cat .d3/metadata.json | jq .
+find stories -name "*.md"
 
 # Commit planning
-git add specs/ stories/ .d3/
+git add specs/ stories/
 git commit -m "Add auth feature planning"
 
 # Day 2-5: Implementation
@@ -252,8 +252,6 @@ my-awesome-project/
 │       ├── story-1-login.md            # ✅ Your stories
 │       ├── story-2-signup.md
 │       └── story-3-password-reset.md
-├── .d3/
-│   └── metadata.json                   # ✅ Tracking metadata
 ├── CLAUDE.md                           # ✅ D3 configuration
 └── .git/                               # ✅ Git repo
 ```
@@ -288,7 +286,7 @@ my-awesome-project/
 
 3. **Check progress:**
    ```bash
-   cat .d3/metadata.json | jq '.stories[] | {id, title, status}'
+   rg "^status:" stories/ --no-filename | sort | uniq -c
    ```
 
 ### Advanced Usage
@@ -302,21 +300,18 @@ rg "OAuth" specs/
 rg "\[OPEN QUESTION" specs/
 ```
 
-**View dependency graph:**
+**View dependencies:**
 ```bash
-cat .d3/metadata.json | jq '.stories[] | {id, blocks, dependencies}'
+# Stories that block others
+rg "^blocks:" stories/
+
+# Stories blocked by others
+rg "^dependencies:" stories/
 ```
 
 ---
 
 ## Troubleshooting
-
-### Problem: Metadata file is empty or corrupt
-
-```bash
-# Reinitialize
-echo '{"version": "1.0", "stories": {}, "next_id": {"story": 1}}' > .d3/metadata.json
-```
 
 ### Problem: Can't find spec
 

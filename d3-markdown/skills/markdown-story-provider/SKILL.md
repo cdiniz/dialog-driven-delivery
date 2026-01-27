@@ -16,7 +16,6 @@ Manages user stories as markdown files with YAML frontmatter. Stories are organi
 **Skill:** d3-markdown:markdown-story-provider
 **Configuration:**
 - Stories Directory: ./stories
-- Story Prefix: story-
 ```
 
 ---
@@ -71,12 +70,11 @@ Returns Story type only.
 ```
 
 **Implementation:**
-1. Read or initialize `.d3/metadata.json`
-2. Get next story ID (story-1, story-2, etc.)
-3. Determine spec directory from spec_id (e.g., "specs/user-authentication.md" → "user-authentication")
-4. Sanitize summary to filename
-5. Create story markdown file: `stories/{spec_dir}/{story_id}-{filename}.md`
-6. File structure:
+1. Determine spec directory from spec_id (e.g., "specs/user-authentication.md" → "user-authentication")
+2. Use Glob to find existing stories in that directory to determine next ID
+3. Sanitize summary to filename
+4. Create story markdown file: `stories/{spec_dir}/{story_id}-{filename}.md`
+5. File structure:
    ```markdown
    ---
    type: story
@@ -108,10 +106,7 @@ Returns Story type only.
    **References:**
    - Spec: [../../specs/user-authentication.md]
    ```
-7. Update metadata.json:
-   - Add story to stories object
-   - Increment next_id.story counter
-8. Return story metadata
+6. Return story metadata
 
 **Returns:**
 ```json
@@ -131,14 +126,12 @@ Returns Story type only.
 **Parse args:** from_key, to_key, link_type (blocks, is_blocked_by, relates_to)
 
 **Implementation:**
-1. Read metadata.json
-2. Update dependency graph based on link_type:
-   - `blocks`: from_key blocks to_key
-   - `is_blocked_by`: from_key is blocked by to_key
-3. Update story frontmatter in both markdown files:
-   - Update `blocks: []` array
-   - Update `dependencies: []` array
-4. Save metadata.json
+1. Use Glob to find story files by ID
+2. Read both story files
+3. Update frontmatter based on link_type:
+   - `blocks`: Add to_key to from_key's blocks array
+   - `is_blocked_by`: Add to_key to from_key's dependencies array
+4. Write updated files
 5. Return success
 
 **Returns:**
@@ -146,34 +139,6 @@ Returns Story type only.
 {
   "success": true,
   "link_type": "blocks"
-}
-```
-
----
-
-## Metadata File
-
-`.d3/metadata.json` structure:
-
-```json
-{
-  "version": "1.0",
-  "next_id": {
-    "story": 5
-  },
-  "stories": {
-    "story-1": {
-      "id": "story-1",
-      "path": "stories/user-authentication/story-1-login.md",
-      "title": "User Login",
-      "spec": "specs/user-authentication.md",
-      "status": "done",
-      "dependencies": [],
-      "blocks": ["story-2"],
-      "created": "2026-01-27",
-      "url": "file:///absolute/path"
-    }
-  }
 }
 ```
 
@@ -190,18 +155,13 @@ stories/
 │   ├── story-2-signup.md
 │   └── story-3-password-reset.md
 └── search-feature/
-    ├── story-4-basic-search.md
-    └── story-5-filters.md
-
-.d3/
-└── metadata.json
+    ├── story-1-basic-search.md
+    └── story-2-filters.md
 ```
 
 ---
 
 ## File Format Example
-
-### Story File
 
 ```markdown
 ---
@@ -255,16 +215,15 @@ created: 2026-01-27
 
 ## Notes
 
-- Use Read/Write tools for file operations
-- Initialize `.d3/metadata.json` if not exists
-- IDs are sequential integers (story-1, story-2, etc.)
-- Stories organized in subdirectories by spec/feature name
-- Track dependencies in both frontmatter and metadata.json
-- Status tracked in frontmatter: `status: todo|in_progress|done`
-- Users update status manually by editing file
+- No metadata file needed - all data lives in markdown frontmatter
+- Use Glob to find stories: `stories/**/story-*.md`
+- Use Grep to search by status: `rg "^status: todo"`
+- Story IDs determined by counting existing files in directory
+- Users update status by editing frontmatter directly
+- Dependencies tracked in frontmatter arrays
 
 ### Tools to Use
 - **Read/Write:** File operations
-- **Glob:** Find files
-- **Grep:** Search content
+- **Glob:** Find story files
+- **Grep:** Search by status, labels, dependencies
 - **Bash:** Git operations

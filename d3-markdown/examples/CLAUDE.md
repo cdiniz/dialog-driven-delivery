@@ -60,7 +60,6 @@ npm run build
 ### File Locations
 - **Specs:** `./specs/*.md`
 - **Stories:** `./stories/*/story-*.md`
-- **Metadata:** `./.d3/metadata.json`
 
 ---
 

@@ -46,10 +46,7 @@ claude plugin install d3-markdown@d3-marketplace
 
 ```bash
 # Create directories
-mkdir -p specs stories .d3
-
-# Initialize metadata
-echo '{"version": "1.0", "stories": {}, "next_id": {"story": 1}}' > .d3/metadata.json
+mkdir -p specs stories
 ```
 
 ### 3. Configure CLAUDE.md
@@ -103,10 +100,8 @@ my-project/
 │   │   ├── story-2-signup.md
 │   │   └── story-3-password-reset.md
 │   └── search-feature/
-│       ├── story-4-basic-search.md
-│       └── story-5-filters.md
-├── .d3/
-│   └── metadata.json
+│       ├── story-1-basic-search.md
+│       └── story-2-filters.md
 └── CLAUDE.md
 ```
 
@@ -218,7 +213,7 @@ vim stories/user-authentication/story-1-login.md
 # Update status in frontmatter: status: done
 
 # Day 11: Review
-cat .d3/metadata.json | jq '.stories'
+find stories -name "*.md" -exec head -20 {} \; | grep "^status:"
 ```
 
 ### Example 2: Refining Spec
@@ -246,7 +241,7 @@ git checkout -b feature/payment-integration
 /d3:decompose payment-integration
 
 # Create PR
-git add specs/ stories/ .d3/
+git add specs/ stories/
 git commit -m "Add payment integration planning"
 git push origin feature/payment-integration
 
@@ -263,7 +258,6 @@ git push origin feature/payment-integration
 # Don't ignore these!
 # specs/
 # stories/
-# .d3/
 
 # Ignore backups
 *.backup
@@ -329,20 +323,20 @@ rg "^dependencies:.*story-1" stories/
 rg "^blocks:" stories/
 ```
 
-### Metadata Queries
+### Story Queries
 
 ```bash
 # All stories
-cat .d3/metadata.json | jq '.stories'
-
-# Stories by status
-cat .d3/metadata.json | jq '.stories | map(select(.status == "done"))'
-
-# View dependencies
-cat .d3/metadata.json | jq '.stories[] | {id, blocks, dependencies}'
+find stories -name "story-*.md"
 
 # Count stories
-cat .d3/metadata.json | jq '.stories | length'
+find stories -name "story-*.md" | wc -l
+
+# View all story statuses
+rg "^status:" stories/ --no-filename | sort | uniq -c
+
+# List done stories
+rg "^status: done" stories/ -l
 ```
 
 ---
@@ -433,13 +427,6 @@ d3 dependencies --output deps.svg
 
 ## Troubleshooting
 
-### Problem: Metadata out of sync
-
-```bash
-# Regenerate metadata from markdown files
-d3 metadata rebuild
-```
-
 ### Problem: Can't find spec
 
 ```bash
@@ -449,14 +436,6 @@ find specs -name "*.md"
 # Use search instead
 /d3:refine-spec
 > [paste spec content to find by search]
-```
-
-### Problem: Story IDs conflict
-
-Edit `.d3/metadata.json` manually to fix IDs, or regenerate:
-
-```bash
-d3 metadata rebuild --fix-ids
 ```
 
 ---

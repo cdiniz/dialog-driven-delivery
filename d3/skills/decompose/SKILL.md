@@ -36,13 +36,51 @@ Every story must follow INVEST principles:
 ## Step 0: Detect Providers
 
 **Provider Detection:**
-1. Check if `.claude/d3-config.md` exists
-2. If found:
-   - Read **Spec Provider** configuration (e.g., "atlassian-spec")
-   - Read **Story Provider** configuration (e.g., "atlassian-story")
-3. If not found, default to:
-   - Spec Provider: "atlassian-spec" (using CLAUDE.md config)
-   - Story Provider: "atlassian-story" (using CLAUDE.md config)
+1. Read `CLAUDE.md` and look for D3 Configuration section
+2. If configuration found:
+   - Extract **Spec Provider** name (e.g., "d3-atlassian:atlassian-spec-provider")
+   - Extract **Story Provider** name (e.g., "d3-atlassian:atlassian-story-provider")
+3. If not found, use defaults:
+   - Spec Provider: "d3-atlassian:atlassian-spec-provider"
+   - Story Provider: "d3-atlassian:atlassian-story-provider"
+
+**If configuration is missing or incomplete:**
+
+Show this guidance to the user:
+```markdown
+⚠️ D3 Configuration Not Found
+
+I couldn't find D3 provider configuration in CLAUDE.md.
+
+Please add this to your CLAUDE.md file:
+
+## D3 Configuration
+
+### Spec Provider
+**Skill:** d3-atlassian:atlassian-spec-provider
+**Configuration:**
+- Cloud ID: your-atlassian-cloud-id
+- Default Location: YOUR-SPACE-KEY
+- Default parent page: (optional) parent-page-url
+
+### Story Provider
+**Skill:** d3-atlassian:atlassian-story-provider
+**Configuration:**
+- Cloud ID: your-atlassian-cloud-id
+- Default Project: YOUR-PROJECT-KEY
+
+---
+
+**How to find your Cloud ID:**
+Visit your Atlassian site and check the URL or use the Atlassian MCP tools.
+
+**Other providers available:**
+- Notion, Linear, GitHub, or create your own custom provider
+
+See README.md for full details and alternative provider options.
+```
+
+Then stop and wait for the user to update their configuration.
 
 **Store provider names** for use in Steps 1, 2, 7, and 8.
 

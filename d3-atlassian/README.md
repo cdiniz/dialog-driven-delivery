@@ -27,13 +27,13 @@ claude plugin install d3-atlassian
 
 ## Configuration
 
-### Method 1: Using d3-config.md (Recommended)
-
-Create `.claude/d3-config.md` in your project:
+Add this to your project's `CLAUDE.md` file:
 
 ```markdown
+## D3 Configuration
+
 ### Spec Provider
-**Skill:** atlassian-spec-provider
+**Skill:** d3-atlassian:atlassian-spec-provider
 **Configuration:**
 - Cloud ID: your-cloud-id
 - Default Location: PROJ
@@ -41,23 +41,13 @@ Create `.claude/d3-config.md` in your project:
 - Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456
 
 ### Story Provider
-**Skill:** atlassian-story-provider
+**Skill:** d3-atlassian:atlassian-story-provider
 **Configuration:**
 - Cloud ID: your-cloud-id
 - Default Project: PROJ
 ```
 
-### Method 2: Using CLAUDE.md
-
-Add to your project's `CLAUDE.md`:
-
-```markdown
-### Atlassian Configuration
-
-- **Cloud ID**: your-cloud-id
-- **Jira Project Code**: PROJ
-- **Confluence Space Code**: PROJ
-```
+If configuration is not found, D3 will prompt you with setup instructions.
 
 ## How It Works
 

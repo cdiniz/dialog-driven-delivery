@@ -49,7 +49,7 @@ Searches Confluence pages.
 
 ## Configuration
 
-Reads from `.claude/d3-config.md`:
+Reads from `CLAUDE.md`:
 - Cloud ID
 - Default Location (space key)
 

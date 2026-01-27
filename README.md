@@ -65,7 +65,7 @@ This workflow is built on **pragmatic principles** for ongoing product developme
 - **Markdown + GitHub:** GitHub MCP Server (specs in files, stories in issues)
 - **Mix & Match:** Any combination of spec and story providers
 
-See `d3-config-sample.md` for configuration examples.
+Configuration goes in your project's `CLAUDE.md` file (see Configuration section below).
 
 ---
 
@@ -134,7 +134,7 @@ Options:
 Commit, Create PR, and Merge
 ```
 
-**Tool Selection:** Configure providers in `.claude/d3-config.md` to use your preferred tools:
+**Tool Selection:** Configure providers in `CLAUDE.md` to use your preferred tools:
 - **Specifications:** Confluence, Notion, Markdown files, etc.
 - **Stories:** Jira, Linear, GitHub Issues, etc.
 - **Mix & Match:** Use different tools for specs and stories!
@@ -606,11 +606,13 @@ Story Providers (Pluggable)
 
 ### Configuration
 
-Edit `.claude/d3-config.md`:
+Add this section to your project's `CLAUDE.md` file:
 
 ```markdown
+## D3 Configuration
+
 ### Spec Provider
-**Skill:** atlassian-spec-provider
+**Skill:** d3-atlassian:atlassian-spec-provider
 **Configuration:**
 - Cloud ID: your-cloud-id
 - Default Location: BOOT
@@ -618,22 +620,25 @@ Edit `.claude/d3-config.md`:
 - Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/...
 
 ### Story Provider
-**Skill:** atlassian-story-provider
+**Skill:** d3-atlassian:atlassian-story-provider
 **Configuration:**
 - Cloud ID: your-cloud-id
 - Default Project: BOOT
 ```
 
-**Default Behavior:** If config file doesn't exist, D3 uses Atlassian providers with settings from `CLAUDE.md`.
+**How to find your Cloud ID:**
+Visit your Atlassian site URL - the cloud ID is typically visible in the URL or can be retrieved using Atlassian MCP tools.
+
+**Default Behavior:** If configuration is not found, D3 will prompt you with setup instructions.
 
 ### Creating Custom Providers
 
 To create a provider for a different tool (Notion, Linear, GitHub, etc.):
 
-1. **Review existing provider**: See `.claude/skills/atlassian-spec-provider/SKILL.md` or `.claude/skills/atlassian-story-provider/SKILL.md`
-2. **Create provider skill**: Implement operations in `.claude/skills/your-provider-name/SKILL.md`
+1. **Review existing provider**: See `d3-atlassian/skills/atlassian-spec-provider/SKILL.md` or `d3-atlassian/skills/atlassian-story-provider/SKILL.md`
+2. **Create provider skill**: Implement operations as a new Claude Code plugin
 3. **Map operations to your tool's MCP/API**: Each operation should call the appropriate tool
-4. **Configure**: Update `.claude/d3-config.md` to use your provider skill
+4. **Configure**: Update `CLAUDE.md` to reference your provider skill
 5. **Use D3 commands**: They work automatically with any provider!
 
 ---
@@ -736,7 +741,7 @@ That's expected and normal! You can:
 ### "Can I use this with other tools?"
 
 Yes! D3 is tool-agnostic through its provider architecture:
-- Configure providers in `.claude/d3-config.md`
+- Configure providers in `CLAUDE.md`
 - Use Confluence + Jira (default), Notion + Linear, Markdown + GitHub, or any combination
 - Create custom providers for your specific tools
 - See "Creating Custom Providers" section above
@@ -831,7 +836,6 @@ dialog-driven-delivery/
 │   ├── commands/             # Thin command triggers
 │   ├── skills/               # Main workflow skills
 │   ├── templates/            # Spec templates
-│   ├── d3-config-sample.md   # Configuration example
 │   └── README.md             # Plugin-specific docs
 ├── d3-atlassian/             # Atlassian provider plugin
 │   ├── .claude-plugin/

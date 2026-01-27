@@ -93,7 +93,7 @@ Works with any specification and work tracking tools:
 - **Specifications:** Confluence, Notion, Markdown, etc.
 - **Stories:** Jira, Linear, GitHub Issues, etc.
 
-Configure providers in `.claude/d3-config.md`
+Configure providers in your project's `CLAUDE.md` file
 
 ## Prerequisites
 
@@ -108,24 +108,26 @@ Install a provider plugin for your tools:
 
 ## Configuration
 
-Create `.claude/d3-config.md` in your project:
+Add this to your project's `CLAUDE.md` file:
 
 ```markdown
+## D3 Configuration
+
 ### Spec Provider
-**Skill:** atlassian-spec-provider
+**Skill:** d3-atlassian:atlassian-spec-provider
 **Configuration:**
 - Cloud ID: your-cloud-id
 - Default Location: PROJ
 - spaceId: 1234567
 
 ### Story Provider
-**Skill:** atlassian-story-provider
+**Skill:** d3-atlassian:atlassian-story-provider
 **Configuration:**
 - Cloud ID: your-cloud-id
 - Default Project: PROJ
 ```
 
-If this file doesn't exist, D3 defaults to Atlassian providers using configuration from `CLAUDE.md`.
+If configuration is not found, D3 will prompt you with setup instructions and example configuration.
 
 ## Typical Workflow
 

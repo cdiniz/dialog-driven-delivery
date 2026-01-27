@@ -23,9 +23,47 @@ This command updates ANY part of the existing specifications based on new input.
 ### Step 0: Detect Spec Provider
 
 **Provider Detection:**
-1. Check if `.claude/d3-config.md` exists and contains Spec Provider configuration
-2. If found, use configured provider (e.g., "atlassian-spec")
-3. If not found, default to "atlassian-spec" and use configuration from `CLAUDE.md`
+1. Read `CLAUDE.md` and look for D3 Configuration section
+2. If configuration found, extract Spec Provider name (e.g., "d3-atlassian:atlassian-spec-provider")
+3. If not found, use default provider "d3-atlassian:atlassian-spec-provider"
+
+**If configuration is missing or incomplete:**
+
+Show this guidance to the user:
+```markdown
+⚠️ D3 Configuration Not Found
+
+I couldn't find D3 provider configuration in CLAUDE.md.
+
+Please add this to your CLAUDE.md file:
+
+## D3 Configuration
+
+### Spec Provider
+**Skill:** d3-atlassian:atlassian-spec-provider
+**Configuration:**
+- Cloud ID: your-atlassian-cloud-id
+- Default Location: YOUR-SPACE-KEY
+- Default parent page: (optional) parent-page-url
+
+### Story Provider
+**Skill:** d3-atlassian:atlassian-story-provider
+**Configuration:**
+- Cloud ID: your-atlassian-cloud-id
+- Default Project: YOUR-PROJECT-KEY
+
+---
+
+**How to find your Cloud ID:**
+Visit your Atlassian site and check the URL or use the Atlassian MCP tools.
+
+**Other providers available:**
+- Notion, Linear, GitHub, or create your own custom provider
+
+See README.md for full details and alternative provider options.
+```
+
+Then stop and wait for the user to update their configuration.
 
 **Store provider name** for use in Steps 1 and 8.
 

@@ -49,7 +49,7 @@ Creates dependency links between issues.
 
 ## Configuration
 
-Reads from `.claude/d3-config.md` or `CLAUDE.md`:
+Reads from `CLAUDE.md`:
 - Cloud ID
 - Default Project (project key)
 

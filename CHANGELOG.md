@@ -55,7 +55,7 @@ All notable changes to the D3 project.
   - `feature-spec.md` - Product specification template
   - `technical-spec.md` - Technical specification template
   - `user-story.md` - User story template
-- Configuration: `d3-config-sample.md`
+- Configuration: Configured in project's `CLAUDE.md` file
 
 **Skills Provided**:
 - `/d3:create-spec` - Create comprehensive feature specifications
@@ -84,7 +84,7 @@ All notable changes to the D3 project.
 **For New Users**:
 1. Install `d3` plugin: `claude plugin install d3 --plugin-dir ./d3`
 2. Install provider: `claude plugin install d3-atlassian --plugin-dir ./d3-atlassian`
-3. Configure in `.claude/d3-config.md`
+3. Configure in project's `CLAUDE.md` file
 
 ### Documentation Updates
 

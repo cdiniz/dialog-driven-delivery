@@ -1,7 +1,7 @@
 ---
 type: story
 id: story-2
-epic: epic-1
+spec: specs/user-authentication.md
 title: User Login
 status: done
 priority: high
@@ -345,7 +345,6 @@ Expected coverage:
 ## References
 
 - Specification: [User Authentication](../../specs/user-authentication.md)
-- Epic: [User Authentication](../epics/epic-1-authentication.md)
 - API Docs: `/docs/api/auth/login`
 - PR: #123 (https://github.com/myorg/myrepo/pull/123)
 - Deploy: Deployed to production on 2026-01-30

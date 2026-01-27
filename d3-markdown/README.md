@@ -49,7 +49,7 @@ claude plugin install d3-markdown@d3-marketplace
 mkdir -p specs stories .d3
 
 # Initialize metadata
-echo '{"version": "1.0", "epics": {}, "stories": {}}' > .d3/metadata.json
+echo '{"version": "1.0", "stories": {}, "next_id": {"story": 1}}' > .d3/metadata.json
 ```
 
 ### 3. Configure CLAUDE.md
@@ -69,7 +69,6 @@ Add this to your project's `CLAUDE.md`:
 **Skill:** d3-markdown:markdown-story-provider
 **Configuration:**
 - Stories Directory: ./stories
-- Epic Prefix: epic-
 - Story Prefix: story-
 ```
 
@@ -83,7 +82,7 @@ Add this to your project's `CLAUDE.md`:
 /d3:decompose [spec-name]
 
 # Work on stories
-vim stories/epic-1/story-1-login.md
+vim stories/user-authentication/story-1-login.md
 ```
 
 ---
@@ -99,14 +98,11 @@ my-project/
 │   ├── search-feature.md
 │   └── payment-integration.md
 ├── stories/
-│   ├── epics/
-│   │   ├── epic-1-authentication.md
-│   │   └── epic-2-search.md
-│   ├── epic-1/
+│   ├── user-authentication/
 │   │   ├── story-1-login.md
 │   │   ├── story-2-signup.md
 │   │   └── story-3-password-reset.md
-│   └── epic-2/
+│   └── search-feature/
 │       ├── story-4-basic-search.md
 │       └── story-5-filters.md
 ├── .d3/
@@ -147,39 +143,13 @@ Use OAuth2 for authentication with JWT tokens...
 [Rest of technical spec...]
 ```
 
-### Epic Format
-
-```markdown
----
-type: epic
-id: epic-1
-title: User Authentication
-status: in_progress
-created: 2026-01-27
-spec: specs/user-authentication.md
----
-
-# Epic: User Authentication
-
-**Specification:** [User Authentication](../../specs/user-authentication.md)
-
-Complete user authentication system including login, signup, and password reset.
-
-## User Stories
-
-This Epic contains 3 INVEST-compliant user stories:
-- [x] story-1: User Login
-- [ ] story-2: User Signup
-- [ ] story-3: Password Reset
-```
-
 ### Story Format
 
 ```markdown
 ---
 type: story
 id: story-1
-epic: epic-1
+spec: specs/user-authentication.md
 title: User Login
 status: done
 size: medium
@@ -187,6 +157,7 @@ estimate: 5 days
 dependencies: []
 blocks: [story-2, story-3]
 labels: [authentication, backend, frontend]
+created: 2026-01-27
 ---
 
 # Story: User Login
@@ -215,8 +186,7 @@ labels: [authentication, backend, frontend]
 - Implement rate limiting: 5 attempts per 15 minutes
 
 **References:**
-- Specification: [User Authentication](../../specs/user-authentication.md)
-- Epic: [User Authentication](../epics/epic-1-authentication.md)
+- Spec: [User Authentication](../../specs/user-authentication.md)
 ```
 
 ---
@@ -238,14 +208,13 @@ labels: [authentication, backend, frontend]
 > Project: local
 > Decomposition meeting? No
 
-✅ Created Epic: epic-1-authentication
-✅ Created 3 stories:
+✅ Created 3 stories in stories/user-authentication/:
    - story-1-login.md
    - story-2-signup.md
    - story-3-password-reset.md
 
 # Day 3-10: Implementation
-vim stories/epic-1/story-1-login.md
+vim stories/user-authentication/story-1-login.md
 # Update status in frontmatter: status: done
 
 # Day 11: Review
@@ -350,8 +319,8 @@ rg "\[OPEN QUESTION" specs/
 # By status
 rg "^status: done" stories/
 
-# By epic
-ls stories/epic-1/
+# By feature/spec
+ls stories/user-authentication/
 
 # By dependency
 rg "^dependencies:.*story-1" stories/
@@ -363,14 +332,14 @@ rg "^blocks:" stories/
 ### Metadata Queries
 
 ```bash
-# All epics
-cat .d3/metadata.json | jq '.epics'
+# All stories
+cat .d3/metadata.json | jq '.stories'
 
 # Stories by status
 cat .d3/metadata.json | jq '.stories | map(select(.status == "done"))'
 
-# Dependency graph
-cat .d3/metadata.json | jq '.dependency_graph'
+# View dependencies
+cat .d3/metadata.json | jq '.stories[] | {id, blocks, dependencies}'
 
 # Count stories
 cat .d3/metadata.json | jq '.stories | length'
@@ -446,7 +415,7 @@ Update story status manually or via helper scripts:
 
 ```bash
 # Manual (edit frontmatter)
-vim stories/epic-1/story-1-login.md
+vim stories/user-authentication/story-1-login.md
 # Change: status: todo → status: in_progress
 
 # Future: CLI helper

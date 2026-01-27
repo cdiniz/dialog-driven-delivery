@@ -59,8 +59,7 @@ npm run build
 
 ### File Locations
 - **Specs:** `./specs/*.md`
-- **Epics:** `./stories/epics/*.md`
-- **Stories:** `./stories/epic-*/*.md`
+- **Stories:** `./stories/*/story-*.md`
 - **Metadata:** `./.d3/metadata.json`
 
 ---

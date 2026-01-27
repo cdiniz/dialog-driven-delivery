@@ -37,7 +37,7 @@ cd my-awesome-project
 mkdir -p specs stories .d3
 
 # Initialize metadata file
-echo '{"version": "1.0", "epics": {}, "stories": {}, "next_id": {"epic": 1, "story": 1}}' > .d3/metadata.json
+echo '{"version": "1.0", "stories": {}, "next_id": {"story": 1}}' > .d3/metadata.json
 
 # Create CLAUDE.md (or add to existing)
 cat >> CLAUDE.md << 'EOF'
@@ -54,7 +54,6 @@ cat >> CLAUDE.md << 'EOF'
 **Skill:** d3-markdown:markdown-story-provider
 **Configuration:**
 - Stories Directory: ./stories
-- Epic Prefix: epic-
 - Story Prefix: story-
 EOF
 ```
@@ -142,9 +141,10 @@ Did you have a decomposition meeting?
 
 Choose **Option B** - Claude will propose story breakdown based on INVEST principles.
 
-Review and confirm. Claude creates:
-- Epic file: `stories/epics/epic-1-authentication.md`
-- Story files: `stories/epic-1/story-1-*.md`, `story-2-*.md`, etc.
+Review and confirm. Claude creates story files in `stories/user-authentication/`:
+- `story-1-login.md`
+- `story-2-signup.md`
+- `story-3-password-reset.md`
 
 ---
 
@@ -157,7 +157,7 @@ Check your stories:
 find stories -name "story-*.md"
 
 # View first story
-cat stories/epic-1/story-1-*.md
+cat stories/user-authentication/story-1-*.md
 ```
 
 Pick a story and start coding!
@@ -170,7 +170,7 @@ As you work on stories, update the frontmatter:
 
 ```bash
 # Edit story file
-vim stories/epic-1/story-1-login.md
+vim stories/user-authentication/story-1-login.md
 
 # Change status in frontmatter:
 # status: todo → status: in_progress → status: done
@@ -218,8 +218,7 @@ claude code
 > /d3:decompose user-authentication
 > Project: local
 > Option B: Let's decompose together
-✅ Created Epic: epic-1
-✅ Created 3 stories
+✅ Created 3 stories in stories/user-authentication/
 
 # Check what was created
 cat .d3/metadata.json | jq .
@@ -230,7 +229,7 @@ git commit -m "Add auth feature planning"
 
 # Day 2-5: Implementation
 # Work on story-1
-vim stories/epic-1/story-1-login.md  # Check acceptance criteria
+vim stories/user-authentication/story-1-login.md  # Check acceptance criteria
 # ... implement ...
 # Update status to 'done'
 
@@ -249,9 +248,7 @@ my-awesome-project/
 ├── specs/
 │   └── user-authentication.md          # ✅ Your spec
 ├── stories/
-│   ├── epics/
-│   │   └── epic-1-authentication.md    # ✅ Your epic
-│   └── epic-1/
+│   └── user-authentication/
 │       ├── story-1-login.md            # ✅ Your stories
 │       ├── story-2-signup.md
 │       └── story-3-password-reset.md
@@ -270,13 +267,13 @@ my-awesome-project/
 1. **Work on a story:**
    ```bash
    # Pick story
-   cat stories/epic-1/story-1-login.md
+   cat stories/user-authentication/story-1-login.md
 
    # Implement
    # ... code ...
 
    # Update status
-   vim stories/epic-1/story-1-login.md
+   vim stories/user-authentication/story-1-login.md
    # Change: status: in_progress → status: done
 
    # Commit
@@ -318,7 +315,7 @@ cat .d3/metadata.json | jq '.stories[] | {id, blocks, dependencies}'
 
 ```bash
 # Reinitialize
-echo '{"version": "1.0", "epics": {}, "stories": {}, "next_id": {"epic": 1, "story": 1}}' > .d3/metadata.json
+echo '{"version": "1.0", "stories": {}, "next_id": {"story": 1}}' > .d3/metadata.json
 ```
 
 ### Problem: Can't find spec
@@ -336,13 +333,13 @@ find specs -name "*.md"
 
 Check that directories exist:
 ```bash
-ls -la stories/epics/
-ls -la stories/epic-1/
+ls -la stories/
+ls -la stories/user-authentication/
 ```
 
 If missing, create manually:
 ```bash
-mkdir -p stories/epics
+mkdir -p stories/user-authentication
 ```
 
 ---

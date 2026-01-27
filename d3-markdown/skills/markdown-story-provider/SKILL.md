@@ -1,11 +1,11 @@
 ---
 name: markdown-story-provider
-description: Create and manage user stories as local markdown files with YAML frontmatter in ./stories/ directory.
+description: Create and manage user stories as local markdown files organized by feature/spec.
 ---
 
 ## What This Does
 
-Manages user stories as markdown files with YAML frontmatter stored in `./stories/` directory.
+Manages user stories as markdown files with YAML frontmatter. Stories are organized in subdirectories by their related feature/spec.
 
 ---
 
@@ -16,7 +16,6 @@ Manages user stories as markdown files with YAML frontmatter stored in `./storie
 **Skill:** d3-markdown:markdown-story-provider
 **Configuration:**
 - Stories Directory: ./stories
-- Epic Prefix: epic-
 - Story Prefix: story-
 ```
 
@@ -44,13 +43,12 @@ Returns single "local" project.
 
 ### get_issue_types
 
-Returns Epic and Story types.
+Returns Story type only.
 
 **Returns:**
 ```json
 {
   "issue_types": [
-    {"id": "epic", "name": "Epic"},
     {"id": "story", "name": "Story"}
   ]
 }
@@ -58,52 +56,9 @@ Returns Epic and Story types.
 
 ---
 
-### create_epic
-
-**Parse args:** project_key, summary, description, labels (optional)
-
-**Implementation:**
-1. Read or initialize `.d3/metadata.json`
-2. Get next epic ID from metadata (epic-1, epic-2, etc.)
-3. Sanitize summary to filename
-4. Create epic markdown file: `stories/epics/{epic_id}-{filename}.md`
-5. File structure:
-   ```markdown
-   ---
-   type: epic
-   id: epic-1
-   title: [summary]
-   status: todo
-   created: [date]
-   labels: [labels]
-   ---
-
-   # Epic: [summary]
-
-   [description]
-
-   ## User Stories
-   (will be updated as stories created)
-   ```
-6. Update metadata.json with epic info
-7. Increment next_id.epic counter
-8. Return epic metadata
-
-**Returns:**
-```json
-{
-  "id": "epic-1",
-  "key": "epic-1",
-  "url": "file:///path/to/stories/epics/epic-1-authentication.md",
-  "summary": "User Authentication"
-}
-```
-
----
-
 ### create_story
 
-**Parse args:** project_key, epic_id, story_data (JSON object)
+**Parse args:** project_key, spec_id, story_data (JSON object)
 
 **story_data structure:**
 ```json
@@ -116,19 +71,19 @@ Returns Epic and Story types.
 ```
 
 **Implementation:**
-1. Read metadata.json
+1. Read or initialize `.d3/metadata.json`
 2. Get next story ID (story-1, story-2, etc.)
-3. Sanitize summary to filename
-4. Create story markdown file: `stories/{epic_id}/{story_id}-{filename}.md`
-5. File structure:
+3. Determine spec directory from spec_id (e.g., "specs/user-authentication.md" → "user-authentication")
+4. Sanitize summary to filename
+5. Create story markdown file: `stories/{spec_dir}/{story_id}-{filename}.md`
+6. File structure:
    ```markdown
    ---
    type: story
    id: story-1
-   epic: epic-1
+   spec: specs/user-authentication.md
    title: [summary]
    status: todo
-   priority: medium
    size: medium
    created: [date]
    dependencies: []
@@ -151,13 +106,11 @@ Returns Epic and Story types.
    ## Technical Notes
 
    **References:**
-   - Epic: [link to epic]
+   - Spec: [../../specs/user-authentication.md]
    ```
-6. Update metadata.json:
+7. Update metadata.json:
    - Add story to stories object
-   - Add story_id to epic's stories array
    - Increment next_id.story counter
-7. Update epic file: Add story to list under "## User Stories"
 8. Return story metadata
 
 **Returns:**
@@ -165,9 +118,9 @@ Returns Epic and Story types.
 {
   "id": "story-1",
   "key": "story-1",
-  "url": "file:///path/to/stories/epic-1/story-1-login.md",
+  "url": "file:///path/to/stories/user-authentication/story-1-login.md",
   "summary": "User Login",
-  "epic_link": "epic-1"
+  "spec_link": "specs/user-authentication.md"
 }
 ```
 
@@ -206,26 +159,14 @@ Returns Epic and Story types.
 {
   "version": "1.0",
   "next_id": {
-    "epic": 3,
-    "story": 8
-  },
-  "epics": {
-    "epic-1": {
-      "id": "epic-1",
-      "path": "stories/epics/epic-1-authentication.md",
-      "title": "User Authentication",
-      "status": "in_progress",
-      "stories": ["story-1", "story-2", "story-3"],
-      "created": "2026-01-27",
-      "url": "file:///absolute/path"
-    }
+    "story": 5
   },
   "stories": {
     "story-1": {
       "id": "story-1",
-      "path": "stories/epic-1/story-1-login.md",
+      "path": "stories/user-authentication/story-1-login.md",
       "title": "User Login",
-      "epic": "epic-1",
+      "spec": "specs/user-authentication.md",
       "status": "done",
       "dependencies": [],
       "blocks": ["story-2"],
@@ -240,16 +181,15 @@ Returns Epic and Story types.
 
 ## Directory Structure
 
+Stories are organized by their related feature/spec:
+
 ```
 stories/
-├── epics/
-│   ├── epic-1-authentication.md
-│   └── epic-2-search.md
-├── epic-1/
+├── user-authentication/
 │   ├── story-1-login.md
 │   ├── story-2-signup.md
 │   └── story-3-password-reset.md
-└── epic-2/
+└── search-feature/
     ├── story-4-basic-search.md
     └── story-5-filters.md
 
@@ -259,36 +199,7 @@ stories/
 
 ---
 
-## File Format Examples
-
-### Epic File
-
-```markdown
----
-type: epic
-id: epic-1
-title: User Authentication
-status: todo
-created: 2026-01-27
-spec: specs/user-authentication.md
-labels: [authentication, security]
----
-
-# Epic: User Authentication
-
-[Description]
-
-## User Stories
-
-- [ ] story-1: User Login
-- [ ] story-2: User Signup
-
-## Progress
-
-- Total Stories: 2
-- Completed: 0
-- Todo: 2
-```
+## File Format Example
 
 ### Story File
 
@@ -296,33 +207,48 @@ labels: [authentication, security]
 ---
 type: story
 id: story-1
-epic: epic-1
+spec: specs/user-authentication.md
 title: User Login
 status: todo
 size: medium
 dependencies: []
 blocks: []
 labels: [backend, frontend]
+created: 2026-01-27
 ---
 
 # Story: User Login
 
 **As a** registered user
-**I want** to log in
+**I want** to log in with my credentials
 **So that** I can access my account
 
 ---
 
 ## Acceptance Criteria
 
-**AC1:** [Given-When-Then]
+**AC1: Successful login**
+- **Given** a registered user with valid credentials
+- **When** they enter email and password and click login
+- **Then** they are redirected to dashboard
+- **And** session is created with 24h expiry
+
+**AC2: Invalid credentials**
+- **Given** a user enters invalid credentials
+- **When** they click login
+- **Then** error message is displayed
+- **And** login form remains visible
 
 ---
 
 ## Technical Notes
 
+- Use bcrypt for password hashing
+- Implement rate limiting: 5 attempts per 15 minutes
+- Session token stored in httpOnly cookie
+
 **References:**
-- Epic: [../epics/epic-1-authentication.md]
+- Spec: [../../specs/user-authentication.md]
 ```
 
 ---
@@ -331,11 +257,11 @@ labels: [backend, frontend]
 
 - Use Read/Write tools for file operations
 - Initialize `.d3/metadata.json` if not exists
-- IDs are sequential integers (epic-1, story-1, etc.)
-- Update epic file when adding stories
+- IDs are sequential integers (story-1, story-2, etc.)
+- Stories organized in subdirectories by spec/feature name
 - Track dependencies in both frontmatter and metadata.json
 - Status tracked in frontmatter: `status: todo|in_progress|done`
-- Users update manually by editing file
+- Users update status manually by editing file
 
 ### Tools to Use
 - **Read/Write:** File operations

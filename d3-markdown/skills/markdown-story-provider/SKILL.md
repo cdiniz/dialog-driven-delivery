@@ -1,13 +1,13 @@
 ---
 name: markdown-story-provider
-description: Create and manage user stories as local markdown files or GitHub Issues. Supports two modes - local (markdown files with frontmatter) or github-issues (native GitHub Issues via gh CLI). Perfect for solo developers and teams.
+description: Create and manage user stories as local markdown files or GitHub Issues. Supports local mode (markdown files) or github-issues mode (native GitHub Issues via gh CLI).
 ---
 
 ## What This Does
 
-Handles all user story operations for D3. Two modes available:
-1. **Local Mode:** Stories as markdown files with YAML frontmatter
-2. **GitHub Issues Mode:** Stories as native GitHub Issues
+Manages user stories in two modes:
+1. **Local Mode:** Stories as markdown files with YAML frontmatter in `./stories/`
+2. **GitHub Issues Mode:** Stories as native GitHub Issues via `gh` CLI
 
 ---
 
@@ -39,383 +39,204 @@ Handles all user story operations for D3. Two modes available:
 
 ## Operations
 
-All operations adapt based on configured mode.
+Operations adapt based on configured mode.
 
 ### list_projects
 
-**Local Mode:** Returns single "local" project
+**Local Mode:** Return single "local" project
 
-**GitHub Mode:** Returns repository info from `gh repo view`
+**GitHub Mode:** Query repository using `gh repo view --json`
 
-**Implementation (Local):**
-```bash
-echo '{
+**Returns:**
+```json
+{
   "projects": [{
     "id": "local",
     "key": "LOCAL",
     "name": "Local Project",
-    "url": "file://'"$(pwd)/stories"'"
+    "url": "file:///path/to/stories"
   }]
-}' | jq
+}
 ```
 
-**Implementation (GitHub):**
-```bash
-gh repo view --json nameWithOwner,name,url | jq '{
-  projects: [{
-    id: .nameWithOwner,
-    key: (.nameWithOwner | split("/")[1] | ascii_upcase),
-    name: .name,
-    url: .url
-  }]
-}'
-```
+---
 
 ### get_issue_types
 
-**Local Mode:** Returns Epic and Story types
+**Both Modes:** Return Epic and Story types
 
-**GitHub Mode:** Returns GitHub label-based types
-
-**Implementation (Local):**
-```bash
-echo '{
+**Returns:**
+```json
+{
   "issue_types": [
     {"id": "epic", "name": "Epic"},
     {"id": "story", "name": "Story"}
   ]
-}' | jq
+}
 ```
 
-**Implementation (GitHub):**
-```bash
-echo '{
-  "issue_types": [
-    {"id": "epic", "name": "Epic"},
-    {"id": "story", "name": "Story"},
-    {"id": "task", "name": "Task"}
-  ]
-}' | jq
-```
+---
 
 ### create_epic
 
 **Parse args:** project_key, summary, description, labels (optional)
 
 **Local Mode Implementation:**
-```bash
-# Load or initialize metadata
-if [ ! -f ".d3/metadata.json" ]; then
-  mkdir -p .d3
-  echo '{"version": "1.0", "epics": {}, "stories": {}, "next_id": {"epic": 1, "story": 1}}' > .d3/metadata.json
-fi
+1. Read or initialize `.d3/metadata.json`
+2. Get next epic ID from metadata (epic-1, epic-2, etc.)
+3. Sanitize summary to filename
+4. Create epic markdown file: `stories/epics/{epic_id}-{filename}.md`
+5. File structure:
+   ```markdown
+   ---
+   type: epic
+   id: epic-1
+   title: [summary]
+   status: todo
+   created: [date]
+   labels: [labels]
+   ---
 
-# Get next epic ID
-next_id=$(jq -r '.next_id.epic' .d3/metadata.json)
-epic_id="epic-${next_id}"
+   # Epic: [summary]
 
-# Sanitize summary for filename
-filename=$(echo "$summary" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
-filepath="stories/epics/${epic_id}-${filename}.md"
+   [description]
 
-# Create epics directory
-mkdir -p stories/epics
-
-# Create epic markdown file
-cat > "$filepath" << EOF
----
-type: epic
-id: $epic_id
-title: $summary
-status: todo
-created: $(date +%Y-%m-%d)
-spec: ${spec_link:-}
-labels: [${labels:-epic}]
----
-
-# Epic: $summary
-
-$description
-
-## User Stories
-
-This Epic contains 0 user stories (will be updated as stories are created).
-
-## Progress
-
-- Total Stories: 0
-- Completed: 0
-- In Progress: 0
-- Todo: 0
-EOF
-
-# Update metadata
-jq --arg id "$epic_id" \
-   --arg path "$filepath" \
-   --arg title "$summary" \
-   --arg created "$(date +%Y-%m-%d)" \
-   '.epics[$id] = {
-     id: $id,
-     path: $path,
-     title: $title,
-     status: "todo",
-     stories: [],
-     created: $created,
-     url: ("file://'"$(pwd)"'/" + $path)
-   } | .next_id.epic = (.next_id.epic + 1)' \
-   .d3/metadata.json > .d3/metadata.json.tmp && \
-   mv .d3/metadata.json.tmp .d3/metadata.json
-
-# Return epic metadata
-jq -r --arg id "$epic_id" '.epics[$id] | {
-  id,
-  key: .id,
-  url,
-  summary: .title
-}' .d3/metadata.json
-```
+   ## User Stories
+   (will be updated as stories created)
+   ```
+6. Update metadata.json with epic info
+7. Increment next_id.epic counter
+8. Return epic metadata
 
 **GitHub Mode Implementation:**
-```bash
-# Create GitHub issue with epic label
-result=$(gh issue create \
-  --title "Epic: $summary" \
-  --body "$description" \
-  --label "epic" \
-  --label "${labels}" \
-  --json number,url,title)
+1. Use Bash to run: `gh issue create --title "Epic: {summary}" --body "{description}" --label "epic"`
+2. Parse output for issue number
+3. Return metadata
 
-# Format as provider response
-echo "$result" | jq '{
-  id: (.number | tostring),
-  key: ("#" + (.number | tostring)),
-  url,
-  summary: .title
-}'
+**Returns:**
+```json
+{
+  "id": "epic-1",
+  "key": "epic-1",
+  "url": "file:///path/to/stories/epics/epic-1-authentication.md",
+  "summary": "User Authentication"
+}
 ```
+
+---
 
 ### create_story
 
-**Parse args:** project_key, epic_id, story_data (JSON with summary, description, acceptance_criteria, labels, etc.)
+**Parse args:** project_key, epic_id, story_data (JSON object)
+
+**story_data structure:**
+```json
+{
+  "summary": "User Login",
+  "description": "As a user...",
+  "acceptance_criteria": "AC1: Given...\nWhen...\nThen...",
+  "labels": ["frontend", "backend"]
+}
+```
 
 **Local Mode Implementation:**
-```bash
-# Parse story_data JSON
-summary=$(echo "$story_data" | jq -r '.summary')
-description=$(echo "$story_data" | jq -r '.description')
-acceptance_criteria=$(echo "$story_data" | jq -r '.acceptance_criteria // ""')
-labels=$(echo "$story_data" | jq -r '.labels // [] | join(", ")')
+1. Read metadata.json
+2. Get next story ID (story-1, story-2, etc.)
+3. Sanitize summary to filename
+4. Create story markdown file: `stories/{epic_id}/{story_id}-{filename}.md`
+5. File structure:
+   ```markdown
+   ---
+   type: story
+   id: story-1
+   epic: epic-1
+   title: [summary]
+   status: todo
+   priority: medium
+   size: medium
+   created: [date]
+   dependencies: []
+   blocks: []
+   labels: [labels]
+   ---
 
-# Get next story ID
-next_id=$(jq -r '.next_id.story' .d3/metadata.json)
-story_id="story-${next_id}"
+   # Story: [summary]
 
-# Sanitize summary for filename
-filename=$(echo "$summary" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
+   [description]
 
-# Create epic subdirectory
-mkdir -p "stories/${epic_id}"
-filepath="stories/${epic_id}/${story_id}-${filename}.md"
+   ---
 
-# Combine description and acceptance criteria
-full_description="$description
+   ## Acceptance Criteria
 
----
+   [acceptance_criteria]
 
-## Acceptance Criteria
+   ---
 
-$acceptance_criteria"
+   ## Technical Notes
 
-# Create story markdown file
-cat > "$filepath" << EOF
----
-type: story
-id: $story_id
-epic: $epic_id
-title: $summary
-status: todo
-priority: medium
-size: medium
-created: $(date +%Y-%m-%d)
-dependencies: []
-blocks: []
-labels: [${labels}]
----
-
-# Story: $summary
-
-$full_description
-
----
-
-## Technical Notes
-
-[To be filled during implementation]
-
-**References:**
-- Epic: [$(jq -r --arg id "$epic_id" '.epics[$id].title' .d3/metadata.json)](../epics/${epic_id}*.md)
-
----
-
-## Progress
-
-- [ ] Implementation started
-- [ ] Tests written
-- [ ] Code reviewed
-- [ ] Merged
-EOF
-
-# Update metadata
-jq --arg story_id "$story_id" \
-   --arg epic_id "$epic_id" \
-   --arg path "$filepath" \
-   --arg title "$summary" \
-   --arg created "$(date +%Y-%m-%d)" \
-   '.stories[$story_id] = {
-     id: $story_id,
-     path: $path,
-     title: $title,
-     epic: $epic_id,
-     status: "todo",
-     dependencies: [],
-     blocks: [],
-     created: $created,
-     url: ("file://'"$(pwd)"'/" + $path)
-   } | .epics[$epic_id].stories += [$story_id] | .next_id.story = (.next_id.story + 1)' \
-   .d3/metadata.json > .d3/metadata.json.tmp && \
-   mv .d3/metadata.json.tmp .d3/metadata.json
-
-# Update epic file with story reference
-epic_file=$(find stories/epics -name "${epic_id}*.md" | head -1)
-if [ -n "$epic_file" ]; then
-  # Add story to epic's list (update markdown)
-  sed -i.backup "/## User Stories/a\\
-- [ ] ${story_id}: $summary" "$epic_file"
-
-  # Update story count
-  story_count=$(jq -r --arg id "$epic_id" '.epics[$id].stories | length' .d3/metadata.json)
-  sed -i.backup "s/Total Stories: [0-9]*/Total Stories: $story_count/" "$epic_file"
-  sed -i.backup "s/Todo: [0-9]*/Todo: $story_count/" "$epic_file"
-fi
-
-# Return story metadata
-jq -r --arg id "$story_id" '.stories[$id] | {
-  id,
-  key: .id,
-  url,
-  summary: .title,
-  epic_link: .epic
-}' .d3/metadata.json
-```
+   **References:**
+   - Epic: [link to epic]
+   ```
+6. Update metadata.json:
+   - Add story to stories object
+   - Add story_id to epic's stories array
+   - Increment next_id.story counter
+7. Update epic file: Add story to list under "## User Stories"
+8. Return story metadata
 
 **GitHub Mode Implementation:**
-```bash
-# Parse story data
-summary=$(echo "$story_data" | jq -r '.summary')
-description=$(echo "$story_data" | jq -r '.description')
-acceptance_criteria=$(echo "$story_data" | jq -r '.acceptance_criteria // ""')
-labels=$(echo "$story_data" | jq -r '.labels // [] | join(",")')
+1. Combine description and acceptance_criteria
+2. Add reference to epic: "Part of #{epic_id}"
+3. Use Bash: `gh issue create --title "{summary}" --body "{full_body}" --label "user-story" --label "{labels}"`
+4. Return metadata
 
-# Combine description and acceptance criteria
-full_body="$description
-
-## Acceptance Criteria
-
-$acceptance_criteria
+**Returns:**
+```json
+{
+  "id": "story-1",
+  "key": "story-1",
+  "url": "file:///path/to/stories/epic-1/story-1-login.md",
+  "summary": "User Login",
+  "epic_link": "epic-1"
+}
+```
 
 ---
-
-Part of #${epic_id}"
-
-# Create GitHub issue
-result=$(gh issue create \
-  --title "$summary" \
-  --body "$full_body" \
-  --label "user-story" \
-  --label "$labels" \
-  --json number,url,title)
-
-# Format response
-echo "$result" | jq --arg epic "$epic_id" '{
-  id: (.number | tostring),
-  key: ("#" + (.number | tostring)),
-  url,
-  summary: .title,
-  epic_link: $epic
-}'
-```
 
 ### link_issues (optional)
 
 **Parse args:** from_key, to_key, link_type (blocks, is_blocked_by, relates_to)
 
 **Local Mode Implementation:**
-```bash
-# Update metadata dependency graph
-case "$link_type" in
-  "blocks")
-    # from_key blocks to_key
-    jq --arg from "$from_key" \
-       --arg to "$to_key" \
-       '.stories[$from].blocks += [$to] | .stories[$to].dependencies += [$from]' \
-       .d3/metadata.json > .d3/metadata.json.tmp && \
-       mv .d3/metadata.json.tmp .d3/metadata.json
-
-    # Update story frontmatter
-    from_file=$(jq -r --arg id "$from_key" '.stories[$id].path' .d3/metadata.json)
-    to_file=$(jq -r --arg id "$to_key" '.stories[$id].path' .d3/metadata.json)
-
-    # Add to blocks array in from_file
-    sed -i.backup "/^blocks:/s/\[\]/[$to_key]/" "$from_file"
-    # Add to dependencies array in to_file
-    sed -i.backup "/^dependencies:/s/\[\]/[$from_key]/" "$to_file"
-    ;;
-  "is_blocked_by")
-    # Inverse of blocks
-    jq --arg from "$from_key" \
-       --arg to "$to_key" \
-       '.stories[$from].dependencies += [$to] | .stories[$to].blocks += [$from]' \
-       .d3/metadata.json > .d3/metadata.json.tmp && \
-       mv .d3/metadata.json.tmp .d3/metadata.json
-    ;;
-esac
-
-echo '{"success": true, "link_type": "'"$link_type"'"}' | jq
-```
+1. Read metadata.json
+2. Update dependency graph based on link_type:
+   - `blocks`: from_key blocks to_key
+   - `is_blocked_by`: from_key is blocked by to_key
+3. Update story frontmatter in both markdown files:
+   - Update `blocks: []` array
+   - Update `dependencies: []` array
+4. Save metadata.json
+5. Return success
 
 **GitHub Mode Implementation:**
-```bash
-# GitHub doesn't have native issue linking API
-# Use issue references in comments instead
+1. Add comments to issues referencing each other
+2. Use Bash: `gh issue comment #{from_key} --body "Blocks #{to_key}"`
+3. Return success (note: GitHub has no native API for issue links)
 
-from_issue="#${from_key}"
-to_issue="#${to_key}"
-
-case "$link_type" in
-  "blocks")
-    gh issue comment "$from_issue" --body "Blocks $to_issue"
-    gh issue comment "$to_issue" --body "Blocked by $from_issue"
-    ;;
-  "is_blocked_by")
-    gh issue comment "$from_issue" --body "Blocked by $to_issue"
-    gh issue comment "$to_issue" --body "Blocks $from_issue"
-    ;;
-  "relates_to")
-    gh issue comment "$from_issue" --body "Related to $to_issue"
-    gh issue comment "$to_issue" --body "Related to $from_issue"
-    ;;
-esac
-
-echo '{"success": true, "link_type": "'"$link_type"'", "note": "Added as comments"}' | jq
+**Returns:**
+```json
+{
+  "success": true,
+  "link_type": "blocks"
+}
 ```
 
 ---
 
-## Metadata Management
+## Metadata File
 
-### Metadata File Structure
+`.d3/metadata.json` structure (Local Mode only):
 
-`.d3/metadata.json`:
 ```json
 {
   "version": "1.0",
@@ -430,9 +251,8 @@ echo '{"success": true, "link_type": "'"$link_type"'", "note": "Added as comment
       "title": "User Authentication",
       "status": "in_progress",
       "stories": ["story-1", "story-2", "story-3"],
-      "spec": "specs/authentication.md",
       "created": "2026-01-27",
-      "url": "file:///path/to/stories/epics/epic-1-authentication.md"
+      "url": "file:///absolute/path"
     }
   },
   "stories": {
@@ -443,10 +263,9 @@ echo '{"success": true, "link_type": "'"$link_type"'", "note": "Added as comment
       "epic": "epic-1",
       "status": "done",
       "dependencies": [],
-      "blocks": ["story-2", "story-3"],
+      "blocks": ["story-2"],
       "created": "2026-01-27",
-      "completed": "2026-01-29",
-      "url": "file:///path/to/stories/epic-1/story-1-login.md"
+      "url": "file:///absolute/path"
     }
   }
 }
@@ -454,9 +273,7 @@ echo '{"success": true, "link_type": "'"$link_type"'", "note": "Added as comment
 
 ---
 
-## Notes
-
-### File Structure (Local Mode)
+## Directory Structure (Local Mode)
 
 ```
 stories/
@@ -470,146 +287,105 @@ stories/
 └── epic-2/
     ├── story-4-basic-search.md
     └── story-5-filters.md
+
+.d3/
+└── metadata.json
 ```
 
-### ID Generation (Local Mode)
-- Epic IDs: `epic-1`, `epic-2`, etc. (sequential)
-- Story IDs: `story-1`, `story-2`, etc. (sequential across all epics)
-- IDs tracked in `.d3/metadata.json`
+---
+
+## File Format Examples
+
+### Epic File
+
+```markdown
+---
+type: epic
+id: epic-1
+title: User Authentication
+status: todo
+created: 2026-01-27
+spec: specs/user-authentication.md
+labels: [authentication, security]
+---
+
+# Epic: User Authentication
+
+[Description]
+
+## User Stories
+
+- [ ] story-1: User Login
+- [ ] story-2: User Signup
+
+## Progress
+
+- Total Stories: 2
+- Completed: 0
+- Todo: 2
+```
+
+### Story File
+
+```markdown
+---
+type: story
+id: story-1
+epic: epic-1
+title: User Login
+status: todo
+size: medium
+dependencies: []
+blocks: []
+labels: [backend, frontend]
+---
+
+# Story: User Login
+
+**As a** registered user
+**I want** to log in
+**So that** I can access my account
+
+---
+
+## Acceptance Criteria
+
+**AC1:** [Given-When-Then]
+
+---
+
+## Technical Notes
+
+**References:**
+- Epic: [../epics/epic-1-authentication.md]
+```
+
+---
+
+## Notes
+
+### Local Mode
+- Use Read/Write tools for file operations
+- Initialize `.d3/metadata.json` if not exists
+- IDs are sequential integers (epic-1, story-1, etc.)
+- Update epic file when adding stories
+- Track dependencies in both frontmatter and metadata.json
 
 ### GitHub Issues Mode
-- Epic: GitHub issue with "epic" label
-- Story: GitHub issue with "user-story" label
-- Dependencies: Referenced in issue comments (no native API)
-- IDs: GitHub issue numbers (#1, #2, etc.)
+- Requires `gh` CLI installed and authenticated
+- Use Bash tool to run `gh` commands
+- Epic and story types via labels
+- Dependencies via issue comments (GitHub has no native link API)
+- Issue numbers become IDs (#1, #2, etc.)
 
-### Git Integration (Local Mode)
-- Markdown files are git-tracked
-- Metadata file is git-tracked
-- Automatic backup files created (`.backup` extension)
-- Supports manual git operations
-
-### Status Updates (Local Mode)
-- Update frontmatter manually: `status: todo → status: in_progress`
-- Metadata syncs when file is read
+### Status Updates
+- Status tracked in frontmatter: `status: todo|in_progress|done`
+- Users update manually by editing file
 - Future: CLI helper for status updates
 
----
-
-## Best Practices
-
-### Local Mode
-1. **Regular commits:** Commit specs and stories together
-2. **Branch strategy:** Use branches for different epics
-3. **Code review:** Review stories in PRs before implementation
-4. **Metadata backups:** Backup `.d3/metadata.json` regularly
-5. **Status discipline:** Keep frontmatter status updated
-
-### GitHub Issues Mode
-1. **Use labels:** Epic, user-story, bug, enhancement
-2. **Use milestones:** Group stories by sprint/release
-3. **Use projects:** Kanban board for story tracking
-4. **Reference issues:** Use #N syntax for cross-references
-5. **Templates:** Create issue templates for stories
-
----
-
-## Troubleshooting
-
-### Local Mode
-
-**Problem:** Metadata out of sync
-```bash
-# Rebuild metadata from markdown files
-find stories -name "*.md" -exec grep -H "^id:" {} \; | \
-  jq -R 'split(":") | {(.[1]): {path: .[0]}}' | jq -s 'add'
-```
-
-**Problem:** Story IDs conflict
-```bash
-# Edit .d3/metadata.json manually to fix IDs
-# Or regenerate with sequential IDs
-```
-
-**Problem:** Can't find epic or story
-```bash
-# Search by content
-rg "title: User Login" stories/
-
-# List all stories
-find stories -name "story-*.md"
-```
-
-### GitHub Issues Mode
-
-**Problem:** gh CLI not installed
-```bash
-# Install gh CLI
-brew install gh  # macOS
-# Or see: https://cli.github.com/
-```
-
-**Problem:** Not authenticated
-```bash
-gh auth login
-```
-
-**Problem:** Wrong repository
-```bash
-# Check current repo
-gh repo view
-
-# Set in configuration
-```
-
----
-
-## Migration Between Modes
-
-### Local to GitHub Issues
-```bash
-# For each story in metadata.json:
-# 1. Create GitHub issue with gh CLI
-# 2. Map local ID to GitHub issue number
-# 3. Update references
-```
-
-### GitHub Issues to Local
-```bash
-# For each GitHub issue:
-# 1. Download issue content with gh CLI
-# 2. Convert to markdown file with frontmatter
-# 3. Update metadata.json
-```
-
----
-
-## Future Enhancements
-
-- [ ] CLI tool for status updates: `d3 story update story-1 --status done`
-- [ ] Sync between local and GitHub modes
-- [ ] Story board HTML generator
-- [ ] Burndown charts from metadata
-- [ ] Dependency visualization
-- [ ] Automated metadata repair
-- [ ] Story templates with custom fields
-
----
-
-## Comparison
-
-| Feature | Local Mode | GitHub Issues |
-|---------|-----------|---------------|
-| Storage | Markdown files | GitHub Issues |
-| Offline | Yes | No |
-| Git history | Full | Limited |
-| Collaboration | Via PRs | Native GitHub |
-| UI | Terminal/Editor | GitHub UI |
-| Notifications | None | GitHub notifications |
-| Search | grep/rg | GitHub search |
-| Free | Yes | Yes (public repos) |
-| Setup | 2 minutes | 5 minutes |
-
-**Use Local Mode when:** Solo developer, want full git integration, prefer files
-
-**Use GitHub Issues when:** Team collaboration, want GitHub UI, open source project
+### Tools to Use
+- **Read/Write:** File operations
+- **Glob:** Find files
+- **Grep:** Search content
+- **Bash:** Git operations, gh CLI commands
+- **File stats:** Get modification times

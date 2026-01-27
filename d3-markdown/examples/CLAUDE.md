@@ -110,7 +110,7 @@ git push
 ## Notes
 
 This is a simple solo developer setup. As your team grows, you can:
-- Switch to Atlassian provider (Confluence + Jira)
+- Switch to an enterprise provider if needed
 - Use GitHub Issues mode for better collaboration
 - Add more sophisticated tracking tools
 

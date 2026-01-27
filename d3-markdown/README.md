@@ -20,7 +20,7 @@ Store your specifications and user stories as markdown files in your git reposit
 - ✅ **Reviewable:** Specs and stories in code review
 - ✅ **Searchable:** Use grep, ripgrep, or IDE search
 - ✅ **Collaborative:** Pull requests for planning
-- ✅ **Flexible:** Switch to Jira later if needed
+- ✅ **Flexible:** Migrate to enterprise tools later if needed
 
 ### For Open Source Projects
 - ✅ **Transparent:** Planning visible to contributors
@@ -412,48 +412,48 @@ cat .d3/metadata.json | jq '.stories | length'
 
 ---
 
-## Comparison with Atlassian Provider
+## Comparison with Enterprise Tools
 
-| Feature | Atlassian | Markdown | Best For |
-|---------|-----------|----------|----------|
-| Setup Time | 30 minutes | 2 minutes | Markdown |
-| Monthly Cost | $7-10/user | Free | Markdown |
-| Offline Work | No | Yes | Markdown |
+| Feature | Enterprise Tools | Markdown | Best For |
+|---------|-----------------|----------|----------|
+| Setup Time | 30+ minutes | 2 minutes | Markdown |
+| Monthly Cost | $7-20/user | Free | Markdown |
+| Offline Work | Usually No | Yes | Markdown |
 | Version Control | Basic | Full (git) | Markdown |
 | Collaboration | Excellent | Good (PRs) | Depends |
-| Rich UI | Excellent | Basic | Atlassian |
-| Search | Excellent | Good (grep) | Atlassian |
-| Reporting | Excellent | DIY | Atlassian |
-| Enterprise Scale | Excellent | Limited | Atlassian |
-| Portability | Locked-in | Fully portable | Markdown |
-| Learning Curve | Moderate | Minimal | Markdown |
+| Rich UI | Excellent | Basic | Enterprise |
+| Search | Excellent | Good (grep) | Enterprise |
+| Reporting | Excellent | DIY | Enterprise |
+| Enterprise Scale | Excellent | Good (5-10) | Enterprise |
+| Portability | Vendor lock-in | Fully portable | Markdown |
+| Learning Curve | Moderate-High | Minimal | Markdown |
 
 **Recommendation:**
-- **Solo/2-3 person teams:** Markdown provider
-- **4-10 person teams:** Markdown, consider Atlassian when scaling
-- **10+ person teams:** Atlassian provider
+- **Solo/2-3 person teams:** Markdown provider (perfect fit)
+- **4-10 person teams:** Markdown (works well with git workflows)
+- **10+ person teams:** Consider enterprise provider for scale
 - **Open source projects:** Markdown (GitHub Issues mode)
 
 ---
 
 ## Migration
 
-### From Markdown to Atlassian
+### From Markdown to Other Tools
 
 ```bash
 # Export stories to CSV
 ./scripts/export-to-csv.sh
 
-# Import to Jira via CSV importer
-# (Jira has native CSV import)
+# Import to your work tracking tool via CSV
+# Most tools support CSV import
 
-# Update CLAUDE.md to use Atlassian provider
+# Update CLAUDE.md to use appropriate provider
 ```
 
-### From Atlassian to Markdown
+### From Other Tools to Markdown
 
 ```bash
-# Export from Jira to CSV
+# Export from your work tracking tool to CSV
 # Convert CSV to markdown files
 ./scripts/import-from-csv.sh
 
@@ -533,7 +533,7 @@ d3 metadata rebuild --fix-ids
 - [ ] Dashboard generator (HTML view of all stories)
 - [ ] Burndown chart generation
 - [ ] GitHub Issues sync (two-way)
-- [ ] Export to Jira/Linear formats
+- [ ] Export to CSV for work tracking tools
 - [ ] Story templates
 - [ ] Automated metadata updates via git hooks
 

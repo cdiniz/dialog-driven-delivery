@@ -1,51 +1,32 @@
 ---
 name: markdown-story-provider
-description: Create and manage user stories as local markdown files or GitHub Issues. Supports local mode (markdown files) or github-issues mode (native GitHub Issues via gh CLI).
+description: Create and manage user stories as local markdown files with YAML frontmatter in ./stories/ directory.
 ---
 
 ## What This Does
 
-Manages user stories in two modes:
-1. **Local Mode:** Stories as markdown files with YAML frontmatter in `./stories/`
-2. **GitHub Issues Mode:** Stories as native GitHub Issues via `gh` CLI
+Manages user stories as markdown files with YAML frontmatter stored in `./stories/` directory.
 
 ---
 
 ## Configuration
 
-### Local Mode (Default)
-
 ```markdown
 ### Story Provider
 **Skill:** d3-markdown:markdown-story-provider
 **Configuration:**
-- Mode: local
 - Stories Directory: ./stories
 - Epic Prefix: epic-
 - Story Prefix: story-
-```
-
-### GitHub Issues Mode
-
-```markdown
-### Story Provider
-**Skill:** d3-markdown:markdown-story-provider
-**Configuration:**
-- Mode: github-issues
-- GitHub Repo: username/repository-name
 ```
 
 ---
 
 ## Operations
 
-Operations adapt based on configured mode.
-
 ### list_projects
 
-**Local Mode:** Return single "local" project
-
-**GitHub Mode:** Query repository using `gh repo view --json`
+Returns single "local" project.
 
 **Returns:**
 ```json
@@ -63,7 +44,7 @@ Operations adapt based on configured mode.
 
 ### get_issue_types
 
-**Both Modes:** Return Epic and Story types
+Returns Epic and Story types.
 
 **Returns:**
 ```json
@@ -81,7 +62,7 @@ Operations adapt based on configured mode.
 
 **Parse args:** project_key, summary, description, labels (optional)
 
-**Local Mode Implementation:**
+**Implementation:**
 1. Read or initialize `.d3/metadata.json`
 2. Get next epic ID from metadata (epic-1, epic-2, etc.)
 3. Sanitize summary to filename
@@ -107,11 +88,6 @@ Operations adapt based on configured mode.
 6. Update metadata.json with epic info
 7. Increment next_id.epic counter
 8. Return epic metadata
-
-**GitHub Mode Implementation:**
-1. Use Bash to run: `gh issue create --title "Epic: {summary}" --body "{description}" --label "epic"`
-2. Parse output for issue number
-3. Return metadata
 
 **Returns:**
 ```json
@@ -139,7 +115,7 @@ Operations adapt based on configured mode.
 }
 ```
 
-**Local Mode Implementation:**
+**Implementation:**
 1. Read metadata.json
 2. Get next story ID (story-1, story-2, etc.)
 3. Sanitize summary to filename
@@ -184,12 +160,6 @@ Operations adapt based on configured mode.
 7. Update epic file: Add story to list under "## User Stories"
 8. Return story metadata
 
-**GitHub Mode Implementation:**
-1. Combine description and acceptance_criteria
-2. Add reference to epic: "Part of #{epic_id}"
-3. Use Bash: `gh issue create --title "{summary}" --body "{full_body}" --label "user-story" --label "{labels}"`
-4. Return metadata
-
 **Returns:**
 ```json
 {
@@ -207,7 +177,7 @@ Operations adapt based on configured mode.
 
 **Parse args:** from_key, to_key, link_type (blocks, is_blocked_by, relates_to)
 
-**Local Mode Implementation:**
+**Implementation:**
 1. Read metadata.json
 2. Update dependency graph based on link_type:
    - `blocks`: from_key blocks to_key
@@ -217,11 +187,6 @@ Operations adapt based on configured mode.
    - Update `dependencies: []` array
 4. Save metadata.json
 5. Return success
-
-**GitHub Mode Implementation:**
-1. Add comments to issues referencing each other
-2. Use Bash: `gh issue comment #{from_key} --body "Blocks #{to_key}"`
-3. Return success (note: GitHub has no native API for issue links)
 
 **Returns:**
 ```json
@@ -235,7 +200,7 @@ Operations adapt based on configured mode.
 
 ## Metadata File
 
-`.d3/metadata.json` structure (Local Mode only):
+`.d3/metadata.json` structure:
 
 ```json
 {
@@ -273,7 +238,7 @@ Operations adapt based on configured mode.
 
 ---
 
-## Directory Structure (Local Mode)
+## Directory Structure
 
 ```
 stories/
@@ -364,28 +329,16 @@ labels: [backend, frontend]
 
 ## Notes
 
-### Local Mode
 - Use Read/Write tools for file operations
 - Initialize `.d3/metadata.json` if not exists
 - IDs are sequential integers (epic-1, story-1, etc.)
 - Update epic file when adding stories
 - Track dependencies in both frontmatter and metadata.json
-
-### GitHub Issues Mode
-- Requires `gh` CLI installed and authenticated
-- Use Bash tool to run `gh` commands
-- Epic and story types via labels
-- Dependencies via issue comments (GitHub has no native link API)
-- Issue numbers become IDs (#1, #2, etc.)
-
-### Status Updates
 - Status tracked in frontmatter: `status: todo|in_progress|done`
 - Users update manually by editing file
-- Future: CLI helper for status updates
 
 ### Tools to Use
 - **Read/Write:** File operations
 - **Glob:** Find files
 - **Grep:** Search content
-- **Bash:** Git operations, gh CLI commands
-- **File stats:** Get modification times
+- **Bash:** Git operations

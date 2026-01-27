@@ -11,24 +11,9 @@
 ### Story Provider
 **Skill:** d3-markdown:markdown-story-provider
 **Configuration:**
-- Mode: local
 - Stories Directory: ./stories
 - Epic Prefix: epic-
 - Story Prefix: story-
-
----
-
-## Alternative: GitHub Issues Mode
-
-If you prefer using GitHub Issues for story tracking, use this configuration instead:
-
-```markdown
-### Story Provider
-**Skill:** d3-markdown:markdown-story-provider
-**Configuration:**
-- Mode: github-issues
-- GitHub Repo: yourusername/your-repo-name
-```
 
 ---
 
@@ -111,7 +96,7 @@ git push
 
 This is a simple solo developer setup. As your team grows, you can:
 - Switch to an enterprise provider if needed
-- Use GitHub Issues mode for better collaboration
 - Add more sophisticated tracking tools
+- Integrate with other platforms via custom providers
 
 The beauty of D3 with markdown is that everything is in git, so you can always migrate later without losing history!

@@ -26,7 +26,7 @@ Store your specifications and user stories as markdown files in your git reposit
 - ✅ **Transparent:** Planning visible to contributors
 - ✅ **No barriers:** No account setup for contributors
 - ✅ **Fork-friendly:** Contributors can fork planning too
-- ✅ **Native GitHub:** Optional GitHub Issues integration
+- ✅ **Git-native:** Full version control for planning docs
 
 ---
 
@@ -68,7 +68,6 @@ Add this to your project's `CLAUDE.md`:
 ### Story Provider
 **Skill:** d3-markdown:markdown-story-provider
 **Configuration:**
-- Mode: local
 - Stories Directory: ./stories
 - Epic Prefix: epic-
 - Story Prefix: story-
@@ -219,39 +218,6 @@ labels: [authentication, backend, frontend]
 - Specification: [User Authentication](../../specs/user-authentication.md)
 - Epic: [User Authentication](../epics/epic-1-authentication.md)
 ```
-
----
-
-## Modes
-
-### Local Mode (Default)
-
-Stories stored as markdown files with frontmatter. All tracking via `.d3/metadata.json`.
-
-**Best for:**
-- Solo developers
-- Small teams (<5)
-- Projects without GitHub
-- Maximum simplicity
-
-### GitHub Issues Mode (Optional)
-
-Stories created as GitHub Issues with labels. Leverages GitHub's native features.
-
-**Configuration:**
-```markdown
-### Story Provider
-**Skill:** d3-markdown:markdown-story-provider
-**Configuration:**
-- Mode: github-issues
-- GitHub Repo: username/my-project
-```
-
-**Best for:**
-- Teams already using GitHub
-- Open source projects
-- Wanting GitHub's UI and notifications
-- Integration with GitHub Projects
 
 ---
 
@@ -432,7 +398,7 @@ cat .d3/metadata.json | jq '.stories | length'
 - **Solo/2-3 person teams:** Markdown provider (perfect fit)
 - **4-10 person teams:** Markdown (works well with git workflows)
 - **10+ person teams:** Consider enterprise provider for scale
-- **Open source projects:** Markdown (GitHub Issues mode)
+- **Open source projects:** Markdown (fully transparent planning)
 
 ---
 

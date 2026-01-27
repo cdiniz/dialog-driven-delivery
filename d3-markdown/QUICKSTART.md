@@ -53,7 +53,6 @@ cat >> CLAUDE.md << 'EOF'
 ### Story Provider
 **Skill:** d3-markdown:markdown-story-provider
 **Configuration:**
-- Mode: local
 - Stories Directory: ./stories
 - Epic Prefix: epic-
 - Story Prefix: story-
@@ -311,17 +310,6 @@ rg "\[OPEN QUESTION" specs/
 cat .d3/metadata.json | jq '.stories[] | {id, blocks, dependencies}'
 ```
 
-**Use GitHub Issues mode:**
-
-Update CLAUDE.md to use GitHub Issues instead of local files:
-```markdown
-### Story Provider
-**Skill:** d3-markdown:markdown-story-provider
-**Configuration:**
-- Mode: github-issues
-- GitHub Repo: yourusername/your-repo
-```
-
 ---
 
 ## Troubleshooting
@@ -374,7 +362,7 @@ Once comfortable with markdown provider:
 1. **Scale up:** Add more team members using git workflows
 2. **Customize:** Create custom templates in `.d3/templates/`
 3. **Automate:** Add git hooks for metadata updates
-4. **Migrate:** Switch to enterprise provider when team grows (10+ people) if needed
+4. **Grow:** Switch to enterprise provider when team grows (10+ people) if needed
 
 ---
 

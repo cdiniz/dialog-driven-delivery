@@ -36,6 +36,20 @@
       "license": "MIT",
       "keywords": ["d3", "atlassian", "confluence", "jira", "provider"],
       "category": "integrations"
+    },
+    {
+      "name": "d3-markdown",
+      "source": "./d3-markdown",
+      "description": "Markdown provider for D3 - Local-first provider using markdown files for specs and stories. Perfect for solo developers and small teams. No SaaS required.",
+      "version": "1.0.0",
+      "author": {
+        "name": "D3 Team"
+      },
+      "homepage": "https://github.com/cdiniz/dialog-driven-delivery",
+      "repository": "https://github.com/cdiniz/dialog-driven-delivery",
+      "license": "MIT",
+      "keywords": ["d3", "markdown", "local", "git-based", "solo-developer", "provider"],
+      "category": "productivity"
     }
   ]
 }

@@ -89,6 +89,32 @@ Wait for confirmation.
 
 ### Step 5: Generate Specification
 
+**Pre-Filling Analysis:**
+
+Before filling templates, explicitly identify:
+
+1. **What WAS discussed:**
+   - List specific topics mentioned in transcript
+   - Note which template sections these map to
+
+2. **What was NOT discussed:**
+   - List template sections with no corresponding information
+   - These will use `_To be defined - not yet discussed_` placeholder
+
+**Example analysis:**
+```markdown
+Discussed:
+- Business goal (AOV increase) → Overview section
+- Show products from category → Requirements section
+- Track clicks → Success Metrics section
+
+NOT discussed:
+- API endpoints → API Contracts section (use placeholder)
+- Architecture → Architecture section (use placeholder)
+- Data schemas → Data Models section (use placeholder)
+- Error handling → Error Handling section (use placeholder)
+```
+
 **Load Templates:**
 
 1. Use template paths from provider detection (Step 0):
@@ -111,10 +137,62 @@ Wait for confirmation.
 ```
 
 **Filling Guidelines:**
-1. Map extracted information to appropriate template sections
-2. Fill only what you know - don't invent content
-3. Use explicit placeholders for empty sections: `_To be defined - not yet discussed_`
-4. Preserve template section numbering
+
+1. **Map extracted information** to appropriate template sections
+2. **Fill ONLY what you know** - don't invent content
+3. **Use explicit placeholders** for empty sections: `_To be defined - not yet discussed_`
+4. **Preserve template section numbering**
+
+**CRITICAL - What NOT to Fill In:**
+
+❌ **DO NOT invent technical details that weren't discussed:**
+- API endpoint names (e.g., `/api/products/recommendations`)
+- Architecture diagrams or component names
+- Database schemas or table structures
+- Technology choices (unless explicitly mentioned)
+- Specific error codes or status codes
+- Authentication/authorization details
+- Deployment strategies
+- Performance metrics or SLAs
+
+❌ **DO NOT elaborate beyond what was said:**
+- If transcript says "show products", don't specify carousel, grid, list layout
+- If transcript says "track clicks", don't invent analytics event schemas
+- If transcript says "same category", don't define category taxonomy
+
+✅ **DO fill in ONLY what was explicitly discussed:**
+- Business goals mentioned in transcript
+- User workflows described
+- Requirements stated by stakeholders
+- Metrics or success criteria defined
+- Constraints or edge cases discussed
+
+**Example from transcript: "Show 2-3 products from same category, track clicks"**
+
+✅ **Correct filling:**
+```markdown
+## Requirements
+- Show 2-3 related products from same category
+- Track click-through to product details
+- Order by price descending (or markup)
+- Metric: Average order value (AOV)
+
+## API Contracts
+_To be defined - not yet discussed_
+
+## Architecture
+_To be defined - not yet discussed_
+```
+
+❌ **Incorrect filling (hallucination):**
+```markdown
+## API Contracts
+GET /api/products/{id}/recommendations
+Response: { recommendations: Product[] }
+
+## Architecture
+[Detailed diagram with microservices]
+```
 
 **Uncertainty Markers:**
 
@@ -126,6 +204,7 @@ For detailed guidance, see `uncertainty-markers` skill or invoke it when needed.
 - If reasonable inference → `[ASSUMPTION: statement]`
 - If multiple approaches → `[DECISION PENDING: option A vs B]`
 - **Never make silent assumptions**
+- **When in doubt, use `_To be defined - not yet discussed_` instead of guessing**
 - Link all markers to Section 4 (Open Questions & Assumptions)
 
 ---
@@ -223,10 +302,39 @@ Provider returns: `{id, url, title, version}`
 ## Key Principles
 
 ### Non-Greedy Filling
+
+**Core Philosophy:** D3 prevents AI hallucination by being radically honest about what is unknown.
+
 1. **Empty is honest:** Better to show gaps than hallucinate
 2. **Partial is fine:** Can have complete Product Spec with empty Technical Spec
 3. **Progressive:** Specs grow through refinement cycles
 4. **Explicit gaps:** Team knows what to discuss next
+5. **Default to placeholder:** When in doubt, use `_To be defined - not yet discussed_`
+
+**Common Pattern in Initial Specs:**
+
+Most feature discussions focus on product/business aspects. Technical details come later.
+
+**Typical Coverage After First Meeting:**
+- Product Spec: 40-70% filled
+- Technical Spec: 10-30% filled (often just high-level approach)
+
+This is EXPECTED and CORRECT. Don't try to "complete" the technical spec by inventing details.
+
+**Example - What to fill from: "Show 2-3 products from same category, track clicks":**
+
+✅ **Fill these sections:**
+- Overview: Business goal (increase AOV)
+- Requirements: Show products, track clicks
+- Success Metrics: AOV, click-through rate
+
+❌ **Leave empty (use `_To be defined_`):**
+- API Contracts (no endpoints discussed)
+- Data Models (only "categories" mentioned, no schema)
+- Architecture (no components discussed)
+- Error Handling (not discussed)
+- Security (not discussed)
+- Performance SLAs (not discussed)
 
 ### Smart Context Detection
 
@@ -234,7 +342,7 @@ Don't force categorization - analyze what's present:
 - **Product indicators:** User stories, personas, workflows, business value, UI/UX
 - **Technical indicators:** Architecture, technologies, APIs, data models, performance
 
-Fill what's there!
+**Fill ONLY what's there - don't elaborate or invent!**
 
 ---
 
@@ -242,10 +350,22 @@ Fill what's there!
 
 - **Ambiguous scope:** Ask clarifying questions about purpose
 - **No concrete info:** Warn spec will be mostly empty, confirm creation
+- **Minimal technical discussion:** This is NORMAL - don't try to fill technical sections with invented details
 - **Conflicting info:** Mark with `[DECISION PENDING]` in Open Questions
 - **Creation fails:** Provide full spec text for manual creation
 - **Location not found:** List available locations
 - **Provider fails:** Fall back to providing spec content
+
+**When Technical Spec is Mostly Empty:**
+
+If technical sections are >70% empty placeholders, this is EXPECTED and CORRECT for initial specs.
+
+Show message:
+```markdown
+Note: Technical specification is mostly empty - this is expected for initial specs.
+Technical details are typically defined in subsequent refinement sessions.
+Use `/d3:refine-spec` when technical decisions are made.
+```
 
 ---
 

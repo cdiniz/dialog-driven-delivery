@@ -117,6 +117,22 @@ Identify:
 
 One input can update both specs!
 
+**CRITICAL - Non-Greedy Updates:**
+
+Only update sections with information EXPLICITLY provided in new input:
+
+❌ **DO NOT:**
+- Invent technical details (endpoints, schemas) that weren't discussed
+- Elaborate beyond what was stated
+- Fill empty sections just because they're empty
+- Remove `_To be defined_` placeholders without replacement content
+
+✅ **DO:**
+- Add only explicitly stated information
+- Replace placeholders with actual content when discussed
+- Add uncertainty markers for ambiguous new information
+- Preserve empty sections if not discussed in new input
+
 ---
 
 ### Step 6: Show Proposed Changes

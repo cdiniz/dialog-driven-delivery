@@ -183,23 +183,37 @@ Located in `d3/templates/`:
 
 **Customizing Templates:**
 
-To use custom templates, add a Templates section to your CLAUDE.md:
+To use custom templates for your project:
 
-```markdown
-## D3 Configuration
+1. **Copy default templates:**
+   ```bash
+   mkdir -p custom-templates
+   cp d3/templates/feature-spec.md custom-templates/
+   cp d3/templates/technical-spec.md custom-templates/
+   cp d3/templates/user-story.md custom-templates/
+   ```
 
-### Templates (optional)
-- Feature Spec: ./my-templates/custom-feature-spec.md
-- Technical Spec: ./my-templates/custom-technical-spec.md
-- User Story: ./my-templates/custom-user-story.md
+2. **Edit templates** to match your team's needs
 
-### Spec Provider
-[Your provider configuration]
-```
+3. **Configure in CLAUDE.md:**
+   ```markdown
+   ## D3 Configuration
 
-Template paths are relative to project root.
+   ### Templates (optional)
+   - Feature Spec: ./custom-templates/feature-spec.md
+   - Technical Spec: ./custom-templates/technical-spec.md
+   - User Story: ./custom-templates/user-story.md
 
-If the Templates section is not present, D3 uses the default templates from `d3/templates/`.
+   ### Spec Provider
+   [Your provider configuration]
+   ```
+
+4. **Use D3 commands normally** - they'll automatically use your custom templates
+
+**Notes:**
+- Template paths are relative to project root
+- If the Templates section is not present, D3 uses defaults from `d3/templates/`
+- No breaking changes - existing projects work without configuration
 
 **Generic Template Format:**
 

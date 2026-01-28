@@ -36,15 +36,23 @@ Detect provider configuration from CLAUDE.md. See [provider-detection.md](../../
 
 Store provider name for Steps 2 and 8.
 
+**Load Templates:**
+
+Load template paths from provider detection to ensure refinements maintain proper structure:
+- `feature_spec_template` (default: `d3/templates/feature-spec.md`)
+- `technical_spec_template` (default: `d3/templates/technical-spec.md`)
+
+These templates will be used to validate that updates maintain the expected structure.
+
 ---
 
 ### Step 2: Fetch Specification
 
-Command accepts Page ID, URL, or title in `$ARGUMENTS`.
+Command accepts spec identifier, URL, or title in `$ARGUMENTS`.
 
 **Use provider's `get_spec` operation:**
-- If Page ID: Use directly
-- If URL: Extract Page ID from URL
+- If spec identifier: Use directly
+- If URL: Extract spec identifier from URL
 - If title: Search via `search_specs`, then use `get_spec`
 
 ---
@@ -169,7 +177,13 @@ Change Validation:
 - [ ] Uncertainty markers properly updated
 - [ ] No hallucination - only documented changes
 - [ ] Both specs remain internally consistent
+- [ ] Updates maintain template structure (from Step 1)
 ```
+
+**Template Structure Validation:**
+- Ensure updates fit within template sections (loaded in Step 1)
+- Maintain section hierarchy and organization
+- Preserve template formatting conventions
 
 If resolved uncertainties → Remove markers and section entries
 If new uncertainties → Add markers and section entries
@@ -178,12 +192,19 @@ If new uncertainties → Add markers and section entries
 
 ### Step 8: Apply Updates
 
+**Prepare Updated Spec:**
+
+Ensure the updated specification maintains template structure (from Step 1):
+- All sections follow template organization
+- Section hierarchy preserved
+- Template formatting conventions maintained
+
 Use Skill tool to invoke spec provider:
 
 ```
 Skill(
   skill="[provider-name]",
-  args="update_spec page_id=\"[PAGE-ID]\" body=\"[Updated Full Spec]\" version_message=\"[Brief description]\""
+  args="update_spec page_id=\"[spec-id]\" body=\"[Updated Full Spec]\" version_message=\"[Brief description]\""
 )
 ```
 
@@ -244,8 +265,8 @@ Updating specification...
 
 1. Review updated spec: [URL]
 2. [If gaps] Schedule discussions for remaining sections
-3. [If ready] Use `/d3:decompose [PAGE-ID]` to create stories
-4. Continue refinement: `/d3:refine-spec [PAGE-ID]`
+3. [If ready] Use `/d3:decompose [spec-identifier]` to create stories
+4. Continue refinement: `/d3:refine-spec [spec-identifier]`
 ```
 
 ---
@@ -275,7 +296,7 @@ Updating specification...
 - **Ambiguous updates:** Ask which section to update
 - **Major scope change:** Warn about impact, confirm
 - **Update fails:** Provide full updated text for manual update
-- **Page not found:** Verify page ID/URL, suggest search
+- **Spec not found:** Verify spec identifier/URL, suggest search
 - **Provider fails:** Fall back to providing content
 
 ---

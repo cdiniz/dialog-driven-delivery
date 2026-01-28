@@ -16,7 +16,7 @@ Complete technical specification structure for implementation guidance.
 
 ## Combined Specification Structure
 
-The create-spec skill creates a single Confluence page with both specifications:
+The create-spec skill creates a specification document with both specifications:
 
 ```markdown
 # Feature: [Feature Name]

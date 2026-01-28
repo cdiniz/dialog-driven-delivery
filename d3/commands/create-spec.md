@@ -4,7 +4,7 @@ description: Create comprehensive feature specification from any input context
 
 # /create-spec
 
-This command invokes the `create-spec` skill to create a comprehensive feature specification in Confluence.
+This command invokes the `create-spec` skill to create a comprehensive feature specification using your configured provider.
 
 ## Quick Usage
 
@@ -14,7 +14,7 @@ This command invokes the `create-spec` skill to create a comprehensive feature s
 
 ## What This Command Does
 
-Creates a single Confluence page containing both Product and Technical specifications from any input context (meeting transcript, document, or conversational discussion). The skill fills only known information and marks uncertainties explicitly, allowing specs to grow progressively over time.
+Creates a specification document containing both Product and Technical specifications from any input context (meeting transcript, document, or conversational discussion). The skill fills only known information and marks uncertainties explicitly, allowing specs to grow progressively over time.
 
 ## Examples
 
@@ -32,8 +32,8 @@ Creates a single Confluence page containing both Product and Technical specifica
 
 ## Next Steps
 
-- Refine specification: `/refine-spec [PAGE-ID]`
-- Decompose into stories: `/decompose [PAGE-ID]`
+- Refine specification: `/refine-spec [spec-identifier]`
+- Decompose into stories: `/decompose [spec-identifier]`
 
 ## See Also
 

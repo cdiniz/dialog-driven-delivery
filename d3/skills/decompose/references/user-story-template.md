@@ -39,14 +39,14 @@ Split first workflow by layer, keep others as full-stack to maintain momentum
 Before creating stories, check specs for uncertainty markers. Use the `uncertainty-markers` skill for complete guidelines:
 
 **If uncertainties exist:**
-- `[OPEN QUESTION]` → Note in story description with Confluence link
+- `[OPEN QUESTION]` → Note in story description with spec link
 - `[DECISION PENDING]` → Flag story with "needs-clarification" label
 - `[CLARIFICATION NEEDED]` → Add to Technical Notes section
 - `[ASSUMPTION]` → Document in Technical Notes for validation
 
 ## Epic-Story Linking
 
-Stories are linked to Epic as parent using `additional_fields` approach (works for most Jira configurations):
+Stories are linked to Epic as parent using provider-specific mechanisms. For example, Jira uses `additional_fields`:
 
 ```javascript
 {
@@ -62,7 +62,7 @@ If linking fails, manual linking instructions are provided in the decompose summ
 
 ## Dependency Documentation
 
-Dependencies are documented in story descriptions under Technical Notes section. Manual issue links must be created in Jira after stories are created (instructions provided in summary).
+Dependencies are documented in story descriptions under Technical Notes section. Manual issue links must be created in your work tracking tool after stories are created (instructions provided in summary).
 
 ## Key Principles
 
@@ -70,7 +70,7 @@ Dependencies are documented in story descriptions under Technical Notes section.
 2. **End-to-end value** in each story
 3. **Complete ACs** covering all scenarios
 4. **Clear dependencies** documented
-5. **Link to Confluence** for full context
+5. **Link to specification** for full context
 6. **Adapt to team structure** when needed
 7. **Handle uncertainties** explicitly
    

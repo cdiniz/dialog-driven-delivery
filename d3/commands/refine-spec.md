@@ -4,12 +4,12 @@ description: Refine existing feature specifications based on new information
 
 # /refine-spec
 
-This command invokes the `refine-spec` skill to update existing Confluence specifications with new information.
+This command invokes the `refine-spec` skill to update existing specifications with new information.
 
 ## Quick Usage
 
 ```
-/refine-spec [PAGE-ID or URL]
+/refine-spec [spec-identifier or URL]
 ```
 
 ## What This Command Does
@@ -38,8 +38,8 @@ Updates any part of existing Product and Technical specifications based on new i
 
 ## Next Steps
 
-- Continue refining: `/refine-spec [PAGE-ID]`
-- Decompose into stories: `/decompose [PAGE-ID]`
+- Continue refining: `/refine-spec [spec-identifier]`
+- Decompose into stories: `/decompose [spec-identifier]`
 
 ## See Also
 

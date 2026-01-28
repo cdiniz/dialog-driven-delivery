@@ -70,16 +70,21 @@ Returns Story type only.
 ```
 
 **Implementation:**
+
 1. Determine spec directory from spec_id (e.g., "specs/user-authentication.md" → "user-authentication")
 2. Use Glob to find existing stories in that directory to determine next ID
 3. Sanitize summary to filename
-4. Create story markdown file: `stories/{spec_dir}/{story_id}-{filename}.md`
-5. File structure:
-   ```markdown
+
+4. **Transform generic template to markdown format:**
+
+   **Transformation:** Wrap generic story template content in YAML frontmatter (markdown-specific format)
+
+   **YAML frontmatter (added by provider):**
+   ```yaml
    ---
    type: story
-   id: story-1
-   spec: specs/user-authentication.md
+   id: [story_id]
+   spec: [spec_path]
    title: [summary]
    status: todo
    size: medium
@@ -88,24 +93,19 @@ Returns Story type only.
    blocks: []
    labels: [labels]
    ---
-
-   # Story: [summary]
-
-   [description]
-
-   ---
-
-   ## Acceptance Criteria
-
-   [acceptance_criteria]
-
-   ---
-
-   ## Technical Notes
-
-   **References:**
-   - Spec: [../../specs/user-authentication.md]
    ```
+
+   **Body content:** From user-story.md template (generic structure)
+   - Template provides sections: Description, Acceptance Criteria, Technical Notes, etc.
+   - Provider fills template sections with story_data content
+   - Appends markdown body after YAML frontmatter
+
+   **Key responsibilities:**
+   - **Frontmatter:** Provider-specific metadata wrapper
+   - **Body structure:** From template (configurable via CLAUDE.md)
+   - **Content:** From story_data parameter
+
+5. Write story file to `stories/{spec_dir}/{story_id}-{filename}.md`
 6. Return story metadata
 
 **Returns:**

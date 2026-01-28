@@ -2,6 +2,11 @@
 
 ## D3 Configuration
 
+### Templates (optional - remove if using defaults)
+- Feature Spec: ./custom-templates/feature-spec.md
+- Technical Spec: ./custom-templates/technical-spec.md
+- User Story: ./custom-templates/user-story.md
+
 ### Spec Provider
 **Skill:** d3-markdown:markdown-spec-provider
 **Configuration:**

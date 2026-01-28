@@ -51,13 +51,13 @@ Store provider names for later steps.
 
 ### Step 2: Fetch Specification
 
-Parse page ID from `$ARGUMENTS` (ID, URL, or title).
+Parse spec identifier from `$ARGUMENTS` (ID, URL, or title).
 
 Use spec provider's `get_spec` operation.
 
 **Display:**
 ```markdown
-I found Specification: [Page Title]
+I found Specification: [Spec Title]
 
 **Specification:** [Title]
 **URL:** [URL]
@@ -204,12 +204,12 @@ Skill(
 
 **Epic Description:**
 ```markdown
-Feature specification: [Spec Page Title]
+Feature specification: [Spec Title]
 
 [Brief overview from Product Spec]
 
 ## Reference
-- Specification: [Page URL]
+- Specification: [Spec URL]
 - Location: [Location name]
 
 ## User Stories
@@ -240,15 +240,29 @@ Skill(
 
 **Story Structure:**
 
-Use template from `../../templates/user-story.md`
+**Load Story Template:**
 
-**Key sections:**
+1. Use `user_story_template` path from provider detection (Step 0)
+   - Default: `d3/templates/user-story.md`
+2. Use Read tool to load template content
+3. Use template structure for story content
+
+**Provider Note:**
+The template provides generic structure (Description, Acceptance Criteria, Technical Notes, etc.).
+The story provider will transform this to its required format (e.g., YAML frontmatter for markdown,
+Jira fields for Atlassian).
+
+**Key sections to populate:**
 - User Story: As [persona], I want [capability], so that [benefit]
 - Value: What this delivers
 - Acceptance Criteria: 3-12 Given-When-Then scenarios (happy path, errors, edge cases)
 - Technical Notes: From technical spec
 - Dependencies: List story keys if dependencies exist
 - References: Link to specification
+
+**For each story:**
+- Populate template sections with story content
+- Pass to story provider for format transformation and creation
 
 ---
 
@@ -314,7 +328,7 @@ Use template from `../../templates/user-story.md`
 
 ## Error Handling
 
-- **No specs:** Warn, continue with page content
+- **No specs:** Warn, continue with spec content
 - **Project not found:** List available projects
 - **Epic linking fails:** Provide manual instructions
 - **Unclear boundaries:** Ask clarifying questions

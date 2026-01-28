@@ -18,7 +18,7 @@ Specification Creation Progress:
 - [ ] Step 1: Detect provider configuration
 - [ ] Step 2: Request and analyze input context
 - [ ] Step 3: Get specification location
-- [ ] Step 4: Propose page title
+- [ ] Step 4: Propose specification title
 - [ ] Step 5: Generate specification content
 - [ ] Step 6: Validate uncertainty markers
 - [ ] Step 7: Create specification in provider
@@ -61,7 +61,7 @@ How would you like to provide the feature information?
 Where would you like to create this specification?
 
 **Location:** [Location key or name]
-**Parent Page (optional):** [Parent page if applicable]
+**Parent (optional):** [Parent container/location if applicable]
 ```
 
 ---
@@ -89,9 +89,13 @@ Wait for confirmation.
 
 ### Step 5: Generate Specification
 
-Create spec using templates from:
-- Product: `../../templates/feature-spec.md`
-- Technical: `../../templates/technical-spec.md`
+**Load Templates:**
+
+1. Use template paths from provider detection (Step 0):
+   - `feature_spec_template` (default: `d3/templates/feature-spec.md`)
+   - `technical_spec_template` (default: `d3/templates/technical-spec.md`)
+2. Use Read tool to load template content from these paths
+3. Use template structure to organize spec content
 
 **Structure:**
 ```markdown
@@ -210,8 +214,8 @@ Provider returns: `{id, url, title, version}`
 
 1. Review: [URL]
 2. [If gaps] Schedule discussions for missing sections
-3. Use `/d3:refine-spec [PAGE-ID]` to add information
-4. Once complete, use `/d3:decompose [PAGE-ID]` for user stories
+3. Use `/d3:refine-spec [spec-identifier]` to add information
+4. Once complete, use `/d3:decompose [spec-identifier]` for user stories
 ```
 
 ---

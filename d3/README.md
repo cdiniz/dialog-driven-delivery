@@ -170,6 +170,44 @@ Adaptive sections based on feature type:
 - Integrations
 - And more...
 
+### Template Customization
+
+D3 uses markdown templates for specifications and user stories. You can customize these templates per project.
+
+**Default Templates:**
+
+Located in `d3/templates/`:
+- `feature-spec.md` - Feature specification (product requirements)
+- `technical-spec.md` - Technical specification (implementation details)
+- `user-story.md` - User story structure
+
+**Customizing Templates:**
+
+To use custom templates, add a Templates section to your CLAUDE.md:
+
+```markdown
+## D3 Configuration
+
+### Templates (optional)
+- Feature Spec: ./my-templates/custom-feature-spec.md
+- Technical Spec: ./my-templates/custom-technical-spec.md
+- User Story: ./my-templates/custom-user-story.md
+
+### Spec Provider
+[Your provider configuration]
+```
+
+Template paths are relative to project root.
+
+If the Templates section is not present, D3 uses the default templates from `d3/templates/`.
+
+**Generic Template Format:**
+
+Templates should be generic markdown that works across all providers:
+- Use markdown structure with placeholders
+- Providers transform templates to their specific format (YAML frontmatter, Jira fields, etc.)
+- Keep templates platform-agnostic
+
 ## Skills Included
 
 - **create-spec** - Main skill for specification creation

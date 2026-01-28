@@ -393,15 +393,36 @@ rg "^status: done" stories/ -l
 
 ## Advanced Features
 
-### Custom Templates
+### Template Customization
 
-Create custom templates for specs and stories:
+D3 uses generic templates from `d3/templates/` that work across all providers.
 
-```bash
-mkdir -p .d3/templates/
-cp d3/templates/feature-spec.md .d3/templates/my-spec-template.md
-# Edit template as needed
-```
+To customize templates for your project:
+
+1. **Copy default templates:**
+   ```bash
+   mkdir -p custom-templates
+   cp d3/templates/feature-spec.md custom-templates/
+   cp d3/templates/technical-spec.md custom-templates/
+   cp d3/templates/user-story.md custom-templates/
+   ```
+
+2. **Edit templates** to match your team's needs
+
+3. **Configure in CLAUDE.md:**
+   ```markdown
+   ## D3 Configuration
+
+   ### Templates (optional)
+   - Feature Spec: ./custom-templates/feature-spec.md
+   - Technical Spec: ./custom-templates/technical-spec.md
+   - User Story: ./custom-templates/user-story.md
+
+   ### Spec Provider
+   ...
+   ```
+
+The markdown provider will automatically transform generic templates to markdown format with YAML frontmatter.
 
 ### Status Tracking
 

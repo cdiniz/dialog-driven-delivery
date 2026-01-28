@@ -56,6 +56,83 @@ See README.md for full details and alternative provider options.
 
 Then stop and wait for the user to update their configuration.
 
+## Template Configuration Detection
+
+After detecting providers, check for optional template configuration in CLAUDE.md.
+
+### Template Configuration Format
+
+Look for an optional Templates section under `## D3 Configuration`:
+
+```markdown
+## D3 Configuration
+
+### Templates (optional)
+- Feature Spec: ./custom-templates/feature-spec.md
+- Technical Spec: ./custom-templates/technical-spec.md
+- User Story: ./custom-templates/user-story.md
+
+### Spec Provider
+...
+```
+
+### Template Loading Logic
+
+For each template type (Feature Spec, Technical Spec, User Story):
+
+1. **Check for custom path** in Templates section
+2. **If custom path found:**
+   - Use Read tool to load template from the custom path (relative to project root)
+   - If Read fails, show error: "Cannot read template at [path]. Please check the path in CLAUDE.md Templates section."
+3. **If no custom path (default behavior):**
+   - Use Read tool to load from `d3/templates/[template-name].md`:
+     - Feature Spec → `d3/templates/feature-spec.md`
+     - Technical Spec → `d3/templates/technical-spec.md`
+     - User Story → `d3/templates/user-story.md`
+   - If Read fails, show error: "Cannot find default template at d3/templates/[template-name].md"
+
+### Store Template Paths
+
+After loading, store these for use by skills:
+
+```markdown
+**Template Configuration:**
+- feature_spec_template: [path-used]
+- technical_spec_template: [path-used]
+- user_story_template: [path-used]
+```
+
+Skills will use these paths to load template content when needed.
+
+### Example: Templates Section Present
+
+```markdown
+## D3 Configuration
+
+### Templates
+- Feature Spec: ./my-templates/custom-feature.md
+- Technical Spec: ./my-templates/custom-technical.md
+- User Story: ./my-templates/custom-story.md
+
+### Spec Provider
+**Skill:** d3-markdown:markdown-spec-provider
+...
+```
+
+**Result:** Use custom templates from `./my-templates/`
+
+### Example: Templates Section Absent
+
+```markdown
+## D3 Configuration
+
+### Spec Provider
+**Skill:** d3-markdown:markdown-spec-provider
+...
+```
+
+**Result:** Use default templates from `d3/templates/`
+
 ## Usage in Skills
 
 In your skill, reference this guide:

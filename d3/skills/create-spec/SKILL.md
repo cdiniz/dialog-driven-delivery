@@ -104,9 +104,9 @@ Before filling templates, explicitly identify:
 **Example analysis:**
 ```markdown
 Discussed:
-- Business goal (AOV increase) → Overview section
-- Show products from category → Requirements section
-- Track clicks → Success Metrics section
+- Business goal/value proposition → Overview section
+- User actions/workflows → Requirements section
+- Success metrics → Success Metrics section
 
 NOT discussed:
 - API endpoints → API Contracts section (use placeholder)
@@ -146,7 +146,7 @@ NOT discussed:
 **CRITICAL - What NOT to Fill In:**
 
 ❌ **DO NOT invent technical details that weren't discussed:**
-- API endpoint names (e.g., `/api/products/recommendations`)
+- API endpoint names (e.g., `/api/resource/{id}/action`)
 - Architecture diagrams or component names
 - Database schemas or table structures
 - Technology choices (unless explicitly mentioned)
@@ -156,9 +156,9 @@ NOT discussed:
 - Performance metrics or SLAs
 
 ❌ **DO NOT elaborate beyond what was said:**
-- If transcript says "show products", don't specify carousel, grid, list layout
-- If transcript says "track clicks", don't invent analytics event schemas
-- If transcript says "same category", don't define category taxonomy
+- If transcript says "display items", don't specify carousel, grid, list, or card layout
+- If transcript says "track actions", don't invent analytics event schemas
+- If transcript says "filter by type", don't define the taxonomy or filtering logic
 
 ✅ **DO fill in ONLY what was explicitly discussed:**
 - Business goals mentioned in transcript
@@ -167,31 +167,40 @@ NOT discussed:
 - Metrics or success criteria defined
 - Constraints or edge cases discussed
 
-**Example from transcript: "Show 2-3 products from same category, track clicks"**
+**Example from typical product-focused transcript:**
 
 ✅ **Correct filling:**
 ```markdown
 ## Requirements
-- Show 2-3 related products from same category
-- Track click-through to product details
-- Order by price descending (or markup)
-- Metric: Average order value (AOV)
+- [Specific requirements mentioned in transcript]
+- [User actions described]
+- [Business rules stated]
+
+## Success Metrics
+- [Metrics explicitly mentioned]
 
 ## API Contracts
 _To be defined - not yet discussed_
 
 ## Architecture
+_To be defined - not yet discussed_
+
+## Data Models
 _To be defined - not yet discussed_
 ```
 
 ❌ **Incorrect filling (hallucination):**
 ```markdown
 ## API Contracts
-GET /api/products/{id}/recommendations
-Response: { recommendations: Product[] }
+GET /api/resource/{id}/action
+Response: { data: Object[] }
+[Invented endpoint structure]
 
 ## Architecture
-[Detailed diagram with microservices]
+[Detailed diagram with invented components]
+
+## Data Models
+[Invented schema and table structure]
 ```
 
 **Uncertainty Markers:**
@@ -321,16 +330,18 @@ Most feature discussions focus on product/business aspects. Technical details co
 
 This is EXPECTED and CORRECT. Don't try to "complete" the technical spec by inventing details.
 
-**Example - What to fill from: "Show 2-3 products from same category, track clicks":**
+**Example - Typical product discussion:**
+
+When transcript focuses on business/product aspects only:
 
 ✅ **Fill these sections:**
-- Overview: Business goal (increase AOV)
-- Requirements: Show products, track clicks
-- Success Metrics: AOV, click-through rate
+- Overview: Business goals, value proposition
+- Requirements: User-facing features, workflows
+- Success Metrics: Business metrics mentioned
 
 ❌ **Leave empty (use `_To be defined_`):**
 - API Contracts (no endpoints discussed)
-- Data Models (only "categories" mentioned, no schema)
+- Data Models (entity names mentioned but no schema)
 - Architecture (no components discussed)
 - Error Handling (not discussed)
 - Security (not discussed)

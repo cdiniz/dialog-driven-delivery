@@ -126,12 +126,33 @@ Only update sections with information EXPLICITLY provided in new input:
 - Elaborate beyond what was stated
 - Fill empty sections just because they're empty
 - Remove `_To be defined_` placeholders without replacement content
+- Fill template examples/placeholders with invented content
 
 ✅ **DO:**
 - Add only explicitly stated information
 - Replace placeholders with actual content when discussed
 - Add uncertainty markers for ambiguous new information
 - Preserve empty sections if not discussed in new input
+
+**Section-by-Section Update Process:**
+
+For EACH section being updated:
+
+1. **Ask:** "Does the new information explicitly address this section?"
+2. **If YES:** Update with actual content from new information
+3. **If NO:** Leave section unchanged (keep existing content OR placeholder)
+
+**Template Placeholders Are NOT Prompts to Fill:**
+
+If existing spec has:
+```markdown
+## API Contracts
+_To be defined - not yet discussed_
+```
+
+And new information doesn't mention API contracts → **Leave it as is, don't fill it.**
+
+The template structure shows what COULD go there, not what MUST be filled during refinement.
 
 ---
 

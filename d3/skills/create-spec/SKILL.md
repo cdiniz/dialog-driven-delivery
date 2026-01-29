@@ -132,17 +132,27 @@ Templates show EXAMPLES like `[New API endpoint]` or `POST /api/path` or archite
 ❌ **WRONG:** See `[New API endpoint]` → invent endpoint name
 ✅ **CORRECT:** See `[New API endpoint]` → if not discussed, replace ENTIRE section with `_To be defined - not yet discussed_`
 
-**If a section wasn't discussed:**
+**Example - Sections not discussed:**
 ```markdown
-## API Contracts
+## 5. Technical Specifications
+
+### API Contracts
 _To be defined - not yet discussed_
 
-## Architecture
+### Data Models
 _To be defined - not yet discussed_
 
-## Data Models
+### Event Models
+_To be defined - not yet discussed_
+
+## 6. Integrations
+_To be defined - not yet discussed_
+
+## 7. Testing Requirements
 _To be defined - not yet discussed_
 ```
+
+**Note:** Section headings and numbering are ALWAYS present. Only the content is placeholder.
 
 **Load Templates:**
 
@@ -167,10 +177,19 @@ _To be defined - not yet discussed_
 
 **Filling Guidelines:**
 
+**CRITICAL - ALWAYS Create Full Structure:**
+
+1. **ALWAYS include BOTH Product and Technical Specification sections**
+2. **ALWAYS create ALL section headings from the templates** (even if empty)
+3. **Preserve complete template structure** - all sections, all numbering
+4. **Never skip sections** - use placeholders for empty content
+
+**Content Filling:**
+
 1. **Map extracted information** to appropriate template sections
 2. **Fill ONLY what you know** - don't invent content
-3. **Use explicit placeholders** for empty sections: `_To be defined - not yet discussed_`
-4. **Preserve template section numbering**
+3. **For sections NOT discussed:** Keep the section heading, use `_To be defined - not yet discussed_` as content
+4. **For sections discussed:** Fill with actual content from transcript
 
 **CRITICAL - What NOT to Fill In:**
 
@@ -344,10 +363,13 @@ Provider returns: `{id, url, title, version}`
 **Core Philosophy:** D3 prevents AI hallucination by being radically honest about what is unknown.
 
 1. **Empty is honest:** Better to show gaps than hallucinate
-2. **Partial is fine:** Can have complete Product Spec with empty Technical Spec
-3. **Progressive:** Specs grow through refinement cycles
-4. **Explicit gaps:** Team knows what to discuss next
-5. **Default to placeholder:** When in doubt, use `_To be defined - not yet discussed_`
+2. **Structure always present:** Create ALL section headings, even if content is placeholder
+3. **Partial is fine:** Can have complete Product Spec with mostly-placeholder Technical Spec
+4. **Progressive:** Specs grow through refinement cycles
+5. **Explicit gaps:** Team knows what to discuss next
+6. **Default to placeholder:** When in doubt, use `_To be defined - not yet discussed_`
+
+**Important:** "Empty section" means section heading EXISTS with placeholder content `_To be defined - not yet discussed_`, NOT that the section is missing/skipped.
 
 **Common Pattern in Initial Specs:**
 

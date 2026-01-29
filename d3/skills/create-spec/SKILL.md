@@ -115,6 +115,35 @@ NOT discussed:
 - Error handling → Error Handling section (use placeholder)
 ```
 
+**Section-by-Section Filling Process:**
+
+For EACH section in the templates:
+
+1. **Ask:** "Was this specific topic explicitly discussed in the transcript?"
+2. **If YES:** Fill with actual content from transcript
+3. **If NO:** Use `_To be defined - not yet discussed_` for the ENTIRE section
+
+**CRITICAL - Template Placeholders Are NOT Content:**
+
+Templates show EXAMPLES like `[New API endpoint]` or `POST /api/path` or architecture diagrams.
+
+**These are STRUCTURE GUIDES showing what COULD go there, NOT content to fill in.**
+
+❌ **WRONG:** See `[New API endpoint]` → invent endpoint name
+✅ **CORRECT:** See `[New API endpoint]` → if not discussed, replace ENTIRE section with `_To be defined - not yet discussed_`
+
+**If a section wasn't discussed:**
+```markdown
+## API Contracts
+_To be defined - not yet discussed_
+
+## Architecture
+_To be defined - not yet discussed_
+
+## Data Models
+_To be defined - not yet discussed_
+```
+
 **Load Templates:**
 
 1. Use template paths from provider detection (Step 0):

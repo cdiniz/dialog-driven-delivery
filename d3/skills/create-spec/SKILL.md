@@ -1,11 +1,11 @@
 ---
 name: create-spec
-description: Creates D3-style feature specifications that prevent AI hallucination by filling only explicitly discussed information. Generates unified Product + Technical spec from meeting transcripts, documents, or conversation. Marks unknowns explicitly instead of guessing. Use when creating specs, documenting planning meetings, or when user mentions "specification", "feature doc", "spec", or "requirements document".
+description: Create comprehensive feature specification from any input context (meeting transcripts, documents, or conversational discussion). Creates a unified specification containing both Product and Technical specifications. Use when starting a new feature, documenting a planning meeting, or when user asks to create/write a spec, specification, or feature documentation. Fills only known information and marks uncertainties 
 ---
 
 ## Philosophy
 
-Create a **single specification** containing BOTH Product and Technical specs. Fill only what you know from context - empty sections are better than hallucinated content. Specs grow progressively through `/refine-spec`.
+Create a **single specification** containing BOTH Product and Technical specs. Fill only what you know from context - empty sections are better than hallucinated content. Specs grow progressively through refinenement.
 
 ---
 
@@ -21,8 +21,9 @@ Specification Creation Progress:
 - [ ] Step 4: Propose specification title
 - [ ] Step 5: Generate specification content
 - [ ] Step 6: Validate uncertainty markers
-- [ ] Step 7: Create specification in provider
-- [ ] Step 8: Provide summary
+- [ ] Step 7: Validate content and template
+- [ ] Step 8: Create specification in provider
+- [ ] Step 9: Provide summary
 ```
 
 ---
@@ -180,7 +181,15 @@ Would you like to:
 
 ---
 
-### Step 7: Create Specification
+### Step 7: Validate content and template
+
+Use a subtask to review the specification against the following checklist:
+- [ ] ALL Headers from the spec templates are present
+- [ ] Verify if each section was discussed, if it was not, make sure it's `_To be defined - not yet discussed_`
+- [ ] Only proceed when all sections are or verified
+
+
+### Step 8: Create Specification
 
 Use Skill tool to invoke spec provider:
 
@@ -195,7 +204,7 @@ Provider returns: `{id, url, title, version}`
 
 ---
 
-### Step 8: Provide Summary
+### Step 9: Provide Summary
 
 ```markdown
 ✅ Feature specification created successfully!

@@ -2,11 +2,26 @@
 
 A pragmatic, streamlined methodology for building software products through **conversational, transcript-first** documentation and development. Designed for real-world teams where features are defined through meetings, refined through discussion, and implemented incrementally.
 
-**Tool-Agnostic Architecture:** Works with any specification storage (Confluence, Notion, Markdown) and work tracking system (Jira, Linear, GitHub). Uses pluggable providers for maximum flexibility.
+**Expandable Provider Architecture:** Built-in support for Atlassian (Confluence + Jira) and Markdown (local files + git). Easily expandable to any specification storage (Notion, Obsidian) and work tracking system (Linear, GitHub Issues) through pluggable provider skills.
 
 ---
 
 ## Quick Start
+
+### Initial Setup (One-Time)
+
+```bash
+# 1. Install D3 (see Installation section)
+claude plugin install d3@d3-marketplace
+claude plugin install d3-atlassian@d3-marketplace  # or d3-markdown
+
+# 2. Configure provider in CLAUDE.md (see Configuration section)
+# Add provider config to CLAUDE.md
+
+# 3. (Optional) Customize templates for your team
+# Copy default templates to your repo and configure custom paths
+# See Template Customization section below
+```
 
 ### Complete Feature Development Flow
 
@@ -43,7 +58,7 @@ This workflow is built on **pragmatic principles** for ongoing product developme
 7. **Flexibility**: Use what adds value, customize templates for your context
 8. **Unified Approach**: Single commands handle both product and technical aspects naturally
 9. **Tool-Agnostic**: Provider-based architecture works with any tools
-10. **Skills-Based Architecture**: Commands invoke detailed skills for automatic activation and progressive disclosure
+10. **Command-Based Workflow**: Direct commands with full workflow guidance and validation
 
 ---
 
@@ -55,17 +70,25 @@ This workflow is built on **pragmatic principles** for ongoing product developme
 
 ### Provider-Specific (choose one or more)
 
-**Default Setup (Atlassian):**
+**Built-in Providers:**
+
+**Option 1: Atlassian (Enterprise-Ready)**
 - **Confluence** for feature specifications
 - **Jira** for user stories and tracking
 - **Atlassian MCP Server** configured for Claude Code
 
-**Alternative Setups:**
-- **Notion + Linear:** Notion MCP Server + Linear MCP Server
-- **Markdown + GitHub:** GitHub MCP Server (specs in files, stories in issues)
-- **Mix & Match:** Any combination of spec and story providers
+**Option 2: Markdown (Lightweight, Git-Native)**
+- **Local markdown files** for feature specifications (`./specs/`)
+- **Local markdown files** for user stories (organized by feature)
+- **Git** for version control
+- No external services required
 
-Configuration goes in your project's `CLAUDE.md` file (see Configuration section below).
+**Expandable to Other Tools:**
+- **Notion + Linear:** Create custom provider plugins
+- **GitHub Issues:** Create custom provider plugin
+- **Mix & Match:** Use different tools for specs and stories
+
+**Next Step:** After installation, configure your chosen provider(s) - see the **Configuration** section below for detailed setup instructions.
 
 ---
 
@@ -80,9 +103,50 @@ claude plugin marketplace add cdiniz/dialog-driven-delivery
 # Install the core D3 plugin
 claude plugin install d3@d3-marketplace
 
-# Install the Atlassian provider (if using Confluence + Jira)
+# Install provider plugins (choose one or both):
+# - Atlassian provider (Confluence + Jira)
 claude plugin install d3-atlassian@d3-marketplace
+# - Markdown provider (local files + git)
+claude plugin install d3-markdown@d3-marketplace
 ```
+
+### Post-Installation Setup
+
+After installing D3, configure your project:
+
+**1. Configure your provider:**
+See the **Configuration** section below for detailed provider setup (Atlassian or Markdown).
+
+**2. (Optional) Customize templates for your team:**
+
+D3 includes default templates via the `d3-templates` skill. Teams can optionally customize templates for their specific needs.
+
+```bash
+# Create templates directory
+mkdir -p .d3/templates
+
+# Copy default templates from the d3-templates skill
+cp -r ~/.claude/plugins/d3/skills/d3-templates/references/* .d3/templates/
+
+# Configure custom paths in CLAUDE.md (see Template Customization section)
+
+# Commit to your repo
+git add .d3/
+git commit -m "Add customized D3 templates"
+```
+
+**When to customize templates:**
+- **Domain-specific sections**: Add sections specific to your industry (healthcare, finance, etc.)
+- **Compliance requirements**: Add required sections for SOC2, HIPAA, GDPR, etc.
+- **Team conventions**: Reflect your team's established patterns and practices
+- **Tech stack specifics**: Add framework-specific sections (React patterns, API versioning, etc.)
+
+**Default behavior (no customization needed):**
+- D3 loads templates automatically from the `d3-templates` skill
+- Works out of the box without any template configuration
+- Templates are standard, pragmatic, and suitable for most teams
+
+---
 
 ### Local Development
 
@@ -96,6 +160,161 @@ claude --plugin-dir ./d3 --plugin-dir ./d3-atlassian
 claude plugin marketplace add ./path/to/dialog-driven-delivery
 claude plugin install d3@d3-marketplace
 ```
+
+---
+
+## Configuration
+
+D3 configuration lives in your project's `CLAUDE.md` file. This tells D3 which providers to use and how to connect to your tools.
+
+### Quick Setup
+
+**If configuration is not found:** D3 commands will automatically prompt you with setup instructions on first use.
+
+**To configure manually:** Add a `## D3 Configuration` section to your `CLAUDE.md` as shown below.
+
+---
+
+### Atlassian Provider Configuration
+
+For teams using Confluence (specs) and Jira (stories):
+
+```markdown
+## D3 Configuration
+
+### Spec Provider
+**Skill:** d3-atlassian:atlassian-spec-provider
+**Configuration:**
+- Cloud ID: your-cloud-id
+- Default Location: PROJ
+- spaceId: 1234567
+- Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789
+
+### Story Provider
+**Skill:** d3-atlassian:atlassian-story-provider
+**Configuration:**
+- Cloud ID: your-cloud-id
+- Default Project: PROJ
+```
+
+**Finding your values:**
+- **Cloud ID**: Visit your Atlassian site URL - visible in URL or retrieve using Atlassian MCP tools
+- **Space ID**: Found in Confluence space settings or URL
+- **Default parent page**: URL of the Confluence page where specs should be created
+- **Default Project**: Your Jira project key (e.g., "PROJ", "ENG", "PRODUCT")
+
+**Prerequisites:**
+- Atlassian MCP Server installed and configured for Claude Code
+- Access to your Confluence space and Jira project
+
+---
+
+### Markdown Provider Configuration
+
+For teams using local markdown files with git:
+
+```markdown
+## D3 Configuration
+
+### Spec Provider
+**Skill:** d3-markdown:markdown-spec-provider
+**Configuration:**
+- Specs Directory: ./specs
+- Default Location: local
+
+### Story Provider
+**Skill:** d3-markdown:markdown-story-provider
+**Configuration:**
+- Stories Directory: ./specs/stories
+- Default Project: local
+```
+
+---
+
+### Template Customization (Optional)
+
+D3 provides **default templates via the d3-templates skill** that work out of the box. Teams can optionally customize templates for their specific needs.
+
+**Default Templates Included:**
+
+**Feature Specification Template** (5 sections):
+1. **Overview** - What, why, who, and success metrics
+2. **User Journey** - Primary workflow with edge cases
+3. **Requirements** - Must have, should have, out of scope, constraints
+4. **Open Questions & Assumptions** - All uncertainties in one place
+5. **References** - Related docs, design links
+
+**Technical Specification Template** (8 sections):
+1. **Technical Approach** - Solution approach overview
+2. **System Changes** - New components, modifications to existing
+3. **Architecture** - Optional mermaid diagrams
+4. **Architectural Context** - Patterns, ADRs, guidelines
+5. **Technical Specifications** - API Contracts, Data Models, Event Models (all optional)
+6. **Integrations** - Internal/External systems, new dependencies
+7. **Testing Requirements** - Test coverage, test scenarios, test data
+8. **Open Questions** - Questions, assumptions
+
+**User Story Template:**
+- Story name and description
+- Acceptance criteria (Given-When-Then format)
+- Relevant documentation links
+
+---
+
+**How Template Loading Works:**
+
+D3 commands automatically load templates using this priority:
+
+1. **Custom templates** (if configured in CLAUDE.md) → Use your customized templates
+2. **Default templates** (if no custom config) → Use d3-templates skill references
+
+No configuration needed unless you want to customize!
+
+---
+
+**When to Customize Templates:**
+
+Only customize if you need:
+- Domain-specific sections (healthcare, finance, legal, etc.)
+- Compliance requirements (SOC2, HIPAA, GDPR sections)
+- Team-specific conventions (your code review checklist, deployment steps, etc.)
+- Technology-specific sections (React patterns, API versioning, etc.)
+
+**Customization Workflow:**
+
+1. **Copy default templates to your repository:**
+   ```bash
+   mkdir -p .d3/templates
+   cp -r ~/.claude/plugins/d3/skills/d3-templates/references/* .d3/templates/
+   ```
+
+2. **Configure custom paths in CLAUDE.md:**
+   ```markdown
+   ## D3 Configuration
+   
+   ### Templates 
+     - Feature Product Spec: ./d3/templates/feature-product-spec.md
+     - Feature Technical Spec: ./d3/templates/feature-technical-spec.md
+     - User Story: ./d3/templates/user-story.md
+   ```
+
+3. **Customize templates for your needs:**
+   Edit files in `.d3/templates/` to match your team's requirements.
+
+4. **Version control your templates:**
+   ```bash
+   git add .d3/
+   git commit -m "Add customized D3 templates"
+   ```
+
+5. **Evolve over time:**
+   Update templates as your product and practices mature.
+
+**Benefits of Customization:**
+- Templates reflect your team's domain and patterns
+- Compliance requirements built into every spec
+- Version controlled alongside your code
+- Changes tracked and reviewable
 
 ---
 
@@ -138,19 +357,6 @@ Commit, Create PR, and Merge
 - **Specifications:** Confluence, Notion, Markdown files, etc.
 - **Stories:** Jira, Linear, GitHub Issues, etc.
 - **Mix & Match:** Use different tools for specs and stories!
-
----
-
-## Skills-Based Architecture
-
-D3 uses a **skills-based architecture** for automatic activation and progressive disclosure:
-
-- **Commands** (`/create-spec`, `/refine-spec`, `/decompose`): Thin triggers that invoke skills
-- **Skills** (`.claude/skills/*/SKILL.md`): Detailed workflows with full implementation guidance
-- **Benefits**:
-  - Skills activate automatically based on context (not just explicit commands)
-  - Progressive disclosure reduces context usage
-  - Shared resources (templates, uncertainty markers) referenced, not duplicated
 
 ---
 
@@ -578,15 +784,19 @@ D3 Core Skills (Tool-Agnostic)
     └── decompose    → Uses Spec Provider + Story Provider
 
 Spec Providers (Pluggable)
-    ├── atlassian-spec (Confluence)
-    ├── notion-spec (Notion databases) [Future]
-    └── markdown-spec (Local files) [Future]
+    ├── atlassian-spec (Confluence) ✅ Built-in
+    ├── markdown-spec (Local files) ✅ Built-in
+    ├── notion-spec (Notion databases) [Expandable]
+    └── [Your custom provider] [Expandable]
 
 Story Providers (Pluggable)
-    ├── atlassian-story (Jira)
-    ├── linear-story (Linear) [Future]
-    └── github-story (GitHub Issues) [Future]
+    ├── atlassian-story (Jira) ✅ Built-in
+    ├── markdown-story (Local markdown files) ✅ Built-in
+    ├── linear-story (Linear) [Expandable]
+    └── github-story (GitHub Issues) [Expandable]
 ```
+
+**Expandability:** The provider architecture makes it easy to add support for any tool. Built-in providers (Atlassian and Markdown) serve as reference implementations. Create custom providers by implementing the standard interfaces below.
 
 ### Provider Interfaces
 
@@ -603,33 +813,6 @@ Story Providers (Pluggable)
 - `create_epic()` - Create epic/feature container
 - `create_story()` - Create user story
 - `link_issues()` - Create dependencies (optional)
-
-### Configuration
-
-Add this section to your project's `CLAUDE.md` file:
-
-```markdown
-## D3 Configuration
-
-### Spec Provider
-**Skill:** d3-atlassian:atlassian-spec-provider
-**Configuration:**
-- Cloud ID: your-cloud-id
-- Default Location: BOOT
-- spaceId: 1234567
-- Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/...
-
-### Story Provider
-**Skill:** d3-atlassian:atlassian-story-provider
-**Configuration:**
-- Cloud ID: your-cloud-id
-- Default Project: BOOT
-```
-
-**How to find your Cloud ID:**
-Visit your Atlassian site URL - the cloud ID is typically visible in the URL or can be retrieved using Atlassian MCP tools.
-
-**Default Behavior:** If configuration is not found, D3 will prompt you with setup instructions.
 
 ### Creating Custom Providers
 
@@ -821,9 +1004,14 @@ D3 is distributed as **Claude Code plugins** for easy installation and updates.
 
 ### Plugin Structure
 
+**Built-in Plugins:**
 - **`d3`** - Core plugin containing main skills and commands
 - **`d3-atlassian`** - Atlassian provider (Confluence + Jira)
-- **Future:** `d3-notion`, `d3-linear`, `d3-github`, etc.
+- **`d3-markdown`** - Markdown provider (local files + git)
+
+**Expandable:**
+- Create custom provider plugins for Notion, Linear, GitHub Issues, etc.
+- See "Creating Custom Providers" section for implementation guide
 
 ### Repository Structure
 
@@ -837,7 +1025,12 @@ dialog-driven-delivery/
 │   ├── skills/               # Main workflow skills
 │   ├── templates/            # Spec templates
 │   └── README.md             # Plugin-specific docs
-├── d3-atlassian/             # Atlassian provider plugin
+├── d3-atlassian/             # Atlassian provider plugin (built-in)
+│   ├── .claude-plugin/
+│   │   └── plugin.json       # Plugin manifest
+│   ├── skills/               # Provider skills
+│   └── README.md             # Provider docs
+├── d3-markdown/              # Markdown provider plugin (built-in)
 │   ├── .claude-plugin/
 │   │   └── plugin.json       # Plugin manifest
 │   ├── skills/               # Provider skills
@@ -850,8 +1043,12 @@ dialog-driven-delivery/
 Test plugins locally before publishing:
 
 ```bash
-# Test both plugins together
-claude --plugin-dir ./d3 --plugin-dir ./d3-atlassian
+# Test all built-in plugins together
+claude --plugin-dir ./d3 --plugin-dir ./d3-atlassian --plugin-dir ./d3-markdown
+
+# Test with specific provider
+claude --plugin-dir ./d3 --plugin-dir ./d3-atlassian  # Atlassian only
+claude --plugin-dir ./d3 --plugin-dir ./d3-markdown   # Markdown only
 
 # Test core plugin only
 claude --plugin-dir ./d3
@@ -866,26 +1063,6 @@ To distribute these plugins:
 3. Users install via `/plugin install d3@your-marketplace`
 
 See [Claude Code Plugin Marketplaces](https://code.claude.com/docs/en/plugin-marketplaces) for details.
-
----
-
-## Project Configuration
-
-Add to your project's `CLAUDE.md`:
-
-```markdown
-### Atlassian Configuration
-
-- **Cloud ID**: your-cloud-id
-- **Jira Project Code**: PROJ
-- **Confluence Space Code**: PROJ
-
-### Development Commands
-
-- `pnpm test:all` - Run all tests
-- `pnpm test:web` - Run frontend tests
-- `pnpm test:api` - Run backend tests
-```
 
 ---
 

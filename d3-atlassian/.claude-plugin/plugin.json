@@ -1,6 +1,6 @@
 {
   "name": "d3-atlassian",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Atlassian provider for D3 (Dialog Driven Delivery). Enables D3 to work with Confluence for specifications and Jira for user stories.",
   "author": {
     "name": "D3 Team"

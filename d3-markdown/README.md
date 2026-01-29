@@ -393,50 +393,6 @@ rg "^status: done" stories/ -l
 
 ## Advanced Features
 
-### Template Customization
-
-D3 uses generic templates from `d3/templates/` that work across all providers.
-
-To customize templates for your project:
-
-1. **Copy default templates:**
-   ```bash
-   mkdir -p custom-templates
-   cp d3/templates/feature-spec.md custom-templates/
-   cp d3/templates/technical-spec.md custom-templates/
-   cp d3/templates/user-story.md custom-templates/
-   ```
-
-2. **Edit templates** to match your team's needs
-
-3. **Configure in CLAUDE.md:**
-   ```markdown
-   ## D3 Configuration
-
-   ### Templates (optional)
-   - Feature Spec: ./custom-templates/feature-spec.md
-   - Technical Spec: ./custom-templates/technical-spec.md
-   - User Story: ./custom-templates/user-story.md
-
-   ### Spec Provider
-   ...
-   ```
-
-The markdown provider will automatically transform generic templates to markdown format with YAML frontmatter.
-
-### Status Tracking
-
-Update story status manually or via helper scripts:
-
-```bash
-# Manual (edit frontmatter)
-vim stories/user-authentication/story-1-login.md
-# Change: status: todo → status: in_progress
-
-# Future: CLI helper
-d3 story update story-1 --status done
-```
-
 ### Dependency Visualization
 
 ```bash

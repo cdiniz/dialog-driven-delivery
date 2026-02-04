@@ -21,7 +21,10 @@ Lists available Confluence spaces.
 Creates a Confluence page.
 
 **Parse args:** location_id, title, body, parent_id (optional)
-**Preprocessing:** Remove `[ ]` from body (Confluence doesn't allow empty brackets)
+**Preprocessing:**
+- Remove empty checkbox markers `[ ]` from task lists (Confluence doesn't support them)
+- **CRITICAL:** Preserve uncertainty markers: `[OPEN QUESTION: ...]`, `[DECISION PENDING: ...]`, `[ASSUMPTION: ...]`, `[CLARIFICATION NEEDED: ...]`
+- Only strip: `- [ ]` → `- ` and `- [x]` → `- ` in list contexts
 **MCP:** `mcp__atlassian__createConfluencePage` with contentFormat: "markdown"
 **Returns:** id, url, title, version
 
@@ -36,7 +39,10 @@ Retrieves a Confluence page.
 Updates a Confluence page.
 
 **Parse args:** page_id, body, version_message (optional)
-**Preprocessing:** Remove `[ ]` from body
+**Preprocessing:**
+- Remove empty checkbox markers `[ ]` from task lists (Confluence doesn't support them)
+- **CRITICAL:** Preserve uncertainty markers: `[OPEN QUESTION: ...]`, `[DECISION PENDING: ...]`, `[ASSUMPTION: ...]`, `[CLARIFICATION NEEDED: ...]`
+- Only strip: `- [ ]` → `- ` and `- [x]` → `- ` in list contexts
 **MCP:** `mcp__atlassian__updateConfluencePage` with contentFormat: "markdown"
 **Returns:** id, url, version, last_modified
 

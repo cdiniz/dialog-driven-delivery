@@ -64,7 +64,7 @@ This tooling applies those principles through a concrete workflow:
 ## Prerequisites
 
 ### Required
-- **Claude Code** installed and configured
+- **Claude Code or Claude Cowork** installed and configured
 - **Git** for version control
 
 ### Provider-Specific (choose one or more)

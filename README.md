@@ -1,8 +1,10 @@
-# Dialog Driven Delivery (D3)
+# Dialog Driven Delivery (D3) — Tooling
 
-A pragmatic, streamlined methodology for building software products through **conversational, transcript-first** documentation and development. Designed for real-world teams where features are defined through meetings, refined through discussion, and implemented incrementally.
+[D3](https://dialogdrivendelivery.com/) is a methodology for AI-enabled software delivery, built from real engagements by practitioners at Equal Experts. It helps teams—not just individuals—work effectively with AI by focusing on collaboration and context, not tooling.
 
-**Expandable Provider Architecture:** Built-in support for Atlassian (Confluence + Jira) and Markdown (local files + git). Easily expandable to any specification storage (Notion, Obsidian) and work tracking system (Linear, GitHub Issues) through pluggable provider skills.
+**This repository provides the tooling that implements D3's workflow as Claude Code plugins.** It turns the methodology's principles into a concrete, repeatable process: capture conversations, create structured specifications, and decompose features into implementable stories.
+
+Works with your existing tools. Built-in providers for Atlassian (Confluence + Jira) and Markdown (local files + git). Expandable to any specification storage or work tracking system through pluggable provider skills.
 
 ---
 
@@ -33,32 +35,29 @@ claude plugin install d3-atlassian@d3-marketplace  # or d3-markdown
 # 2. Decomposition Phase
 /d3:decompose PAGE-ID                  # Break into user stories
 
-# 3. Implementation Phase (your choice of development method)
-# Options:
-# - Use your team's existing workflow
-# - Use superpowers skills (optional, for structured AI-assisted development):
-#   - brainstorming, writing-plans, test-driven-development, etc.
-# - Mix and match approaches as needed
+# 3. Implementation Phase
+# Use your team's existing development workflow
 
 # 4. Merge and repeat for next story
 ```
 
 ---
 
-## Philosophy
+## Methodology
 
-This workflow is built on **pragmatic principles** for ongoing product development:
+D3 is grounded in [three principles](https://dialogdrivendelivery.com/) observed across real engagements:
 
-1. **Feature-Centric**: Most teams work on features
-2. **Conversational & Engaging**: Commands ask for meeting transcripts and work interactively
-3. **Incremental Delivery**: Break features into independently deliverable user stories
-4. **Iterative Refinement**: Story decomposition can be refined as the team learns
-5. **Quality Through Design**: Thoughtful specs prevent issues before they occur
-6. **Explicit Over Implicit**: Uncertainties are marked, not assumed (prevents AI hallucination)
-7. **Flexibility**: Use what adds value, customize templates for your context
-8. **Unified Approach**: Single commands handle both product and technical aspects naturally
-9. **Tool-Agnostic**: Provider-based architecture works with any tools
-10. **Command-Based Workflow**: Direct commands with full workflow guidance and validation
+1. **Cross-functional dialogue is the source** — Product, engineering, and design conversations create context that documentation alone cannot. Capture the dialogue, not just the outcome.
+2. **Context engineering is the core skill** — AI follows context. The richer and more structured that context, the better the output. Structuring specifications and curating decisions determines AI effectiveness.
+3. **Human accountability is non-negotiable** — AI drafts. Humans review. Every specification, every story, every decision passes through human judgment.
+
+This tooling applies those principles through a concrete workflow:
+
+- **Feature-centric**: Specifications at feature level, not task level
+- **Transcript-first**: Commands accept meeting transcripts as primary input
+- **Incremental delivery**: Features decompose into independently deliverable stories
+- **Explicit over implicit**: Uncertainties are marked, not assumed — prevents AI hallucination
+- **Tool-agnostic**: Provider architecture works with whatever tools your team already uses
 
 ---
 
@@ -268,7 +267,7 @@ D3 commands automatically load templates using this priority:
 1. **Custom templates** (if configured in CLAUDE.md) → Use your customized templates
 2. **Default templates** (if no custom config) → Use d3-templates skill references
 
-No configuration needed unless you want to customize!
+No configuration needed unless you want to customize.
 
 ---
 
@@ -323,7 +322,7 @@ Only customize if you need:
 ### Simplified Development Flow
 
 ```
-Any Initial Meeting/Discussion
+Cross-functional Meeting/Discussion
         ↓
 /d3:create-spec (paste transcript/document/description)
         ↓
@@ -342,13 +341,7 @@ Updated Specification (product, technical, or both)
         ↓
 Epic + User Stories (linked to specification with dependencies)
         ↓
-[Implementation - Use Your Preferred Development Method]
-Options:
-• Your team's existing workflow and practices
-• Superpowers skills (optional AI-assisted development):
-  - brainstorming, writing-plans, test-driven-development,
-    systematic-debugging, code-reviewer, verification-before-completion
-• Any combination that works for your team
+[Implementation using your team's workflow]
         ↓
 Commit, Create PR, and Merge
 ```
@@ -356,7 +349,7 @@ Commit, Create PR, and Merge
 **Tool Selection:** Configure providers in `CLAUDE.md` to use your preferred tools:
 - **Specifications:** Confluence, Notion, Markdown files, etc.
 - **Stories:** Jira, Linear, GitHub Issues, etc.
-- **Mix & Match:** Use different tools for specs and stories!
+- **Mix & Match:** Use different tools for specs and stories
 
 ---
 
@@ -366,30 +359,17 @@ Commit, Create PR, and Merge
 
 | Command | Phase | Purpose |
 |---------|-------|---------|
-| `/d3:create-spec` | Planning | Create feature specification |
-| `/d3:refine-spec` | Planning | Update specifications |
-| `/d3:decompose` | Planning | Break into user stories |
-
-**For Implementation:** Use superpowers skills for development workflow
+| `/d3:create-spec` | Planning | Create feature specification from conversation |
+| `/d3:refine-spec` | Planning | Update specifications with new information |
+| `/d3:decompose` | Planning | Break into implementable user stories |
 
 ### When to Use Each Command
 
-**Planning & Requirements**
-- **Just starting a feature?** → `/d3:create-spec`
+- **Starting a feature?** → `/d3:create-spec`
 - **Got new information?** → `/d3:refine-spec`
-- **Ready for implementation?** → `/d3:decompose`
+- **Ready to implement?** → `/d3:decompose`
 
-**Development & Delivery**
-
-After decomposition, implement using your preferred method:
-- **Your existing workflow** → Continue with your team's practices
-- **Want AI assistance?** → Optionally use superpowers skills:
-  - `brainstorming` (design approach)
-  - `writing-plans` (create implementation plan)
-  - `test-driven-development` (TDD workflow)
-  - `systematic-debugging` (debug issues)
-  - `code-reviewer` (review work)
-  - `verification-before-completion` (verify before commit)
+After decomposition, implement using your team's existing workflow.
 
 ---
 
@@ -434,10 +414,10 @@ Agent: Based on your input, I found information about [summary].
 
 You: Yes
 
-Agent: ✅ Feature specification created successfully!
+Agent: Feature specification created.
 
-       📋 Product Spec: 70% complete (requirements clear, metrics missing)
-       🔧 Technical Spec: 10% complete (only basic approach mentioned)
+       Product Spec: 70% complete (requirements clear, metrics missing)
+       Technical Spec: 10% complete (only basic approach mentioned)
 
        Missing information can be added later using /d3:refine-spec [PAGE-ID]
 ```
@@ -480,8 +460,8 @@ You: /d3:refine-spec 123456789
 Agent: I found Specification: Advanced Search
 
        **Current Coverage:**
-       📋 Product Spec: ~70% complete
-       🔧 Technical Spec: ~30% complete
+       Product Spec: ~70% complete
+       Technical Spec: ~30% complete
 
        How would you like to provide the new information?
 
@@ -490,11 +470,11 @@ You: Option A
 
 Agent: I've analyzed your input and found information affecting:
 
-       📋 Product Specification Updates:
+       Product Specification Updates:
        - Requirements: Adding 2 new requirements
        - Open Questions: Resolving 1 question
 
-       🔧 Technical Specification Updates:
+       Technical Specification Updates:
        - Architecture: Adding 2 diagrams
        - API Contracts: Adding 3 endpoints
 
@@ -504,7 +484,7 @@ Agent: I've analyzed your input and found information affecting:
 
 You: Yes
 
-Agent: ✅ Specifications refined successfully!
+Agent: Specifications refined.
        Product Spec: 70% → 85% complete
        Technical Spec: 30% → 75% complete
 ```
@@ -544,8 +524,8 @@ Agent: ✅ Specifications refined successfully!
 You: /d3:decompose 123456789
 
 Agent: I found Specification: Advanced Search
-       Product Spec: ✅ 85% complete
-       Technical Spec: ✅ 75% complete
+       Product Spec: 85% complete
+       Technical Spec: 75% complete
 
        Which project should I create the user stories in?
 
@@ -587,18 +567,18 @@ You: Yes
 
 Agent: Creating Epic for this feature in Project PROJ...
 
-       ✅ Created Epic PROJ-41: Advanced Search with Filters
+       Created Epic PROJ-41: Advanced Search with Filters
           https://yourproject.example.com/browse/PROJ-41
 
        Now creating user stories under this Epic...
 
-       ✅ Created PROJ-42: Basic text search (under Epic PROJ-41)
-       ✅ Created PROJ-43: Add status filter (under Epic PROJ-41)
+       Created PROJ-42: Basic text search (under Epic PROJ-41)
+       Created PROJ-43: Add status filter (under Epic PROJ-41)
        ...
 
        Creating dependency links between stories...
 
-       ✅ Linked PROJ-42 blocks PROJ-43
+       Linked PROJ-42 blocks PROJ-43
        ...
 ```
 
@@ -613,59 +593,22 @@ Agent: Creating Epic for this feature in Project PROJ...
 
 ### After Decomposition: Implementation
 
-After creating your user stories with `/d3:decompose`, implement them using your preferred development method.
-
-**Implementation Options:**
-
-**Option 1: Your Team's Existing Workflow**
-- Use your established development practices
-- D3 provides the specs and stories, you handle implementation however works best
-
-**Option 2: Superpowers Skills (Optional AI-Assisted Development)**
-
-If you want structured AI assistance during implementation, superpowers provides specialized skills:
-
-- **`brainstorming`**: Design implementation approach before coding
-- **`writing-plans`**: Create detailed implementation plans
-- **`test-driven-development`**: TDD workflow for feature implementation
-- **`systematic-debugging`**: Debug issues systematically
-- **`code-reviewer`**: Review completed work against plan and standards
-- **`verification-before-completion`**: Verify tests and quality before committing
-
-**Example Workflow with Superpowers (Optional):**
-```
-1. Pick a story from your project tracker
-2. Use brainstorming skill to design approach (optional)
-3. Use writing-plans skill to create implementation plan (optional)
-4. Implement using your preferred method
-5. Use code-reviewer skill to review work (optional)
-6. Use verification-before-completion skill before committing (optional)
-7. Create PR and merge
-```
-
-**Option 3: Mix and Match**
-- Use superpowers for complex features
-- Use your existing workflow for straightforward tasks
-- Adapt based on team needs and preferences
+After creating your user stories with `/d3:decompose`, implement them using your team's existing development workflow. D3 focuses on the planning phase — turning conversations into structured context. How you write the code is up to you.
 
 ---
 
 ## Key Features
 
-### Simplified, Pragmatic Templates
+### Pragmatic Templates
 
-Our feature specs use a **streamlined 5-section template** (vs traditional 10+ sections):
-- **Section 1: Overview** - What, why, who, and success metrics
-- **Section 2: User Journey** - Primary workflow with edge cases
-- **Section 3: Requirements** - Must have, should have, out of scope, constraints
-- **Section 4: Open Questions & Assumptions** - All uncertainties in one place
-- **Section 5: Risks** - High/medium risks with mitigations
+Feature specs use a **streamlined 5-section template** (vs traditional 10+ sections):
+- **Section 1: Overview** — What, why, who, and success metrics
+- **Section 2: User Journey** — Primary workflow with edge cases
+- **Section 3: Requirements** — Must have, should have, out of scope, constraints
+- **Section 4: Open Questions & Assumptions** — All uncertainties in one place
+- **Section 5: Risks** — High/medium risks with mitigations
 
-Benefits:
-- ✅ 2-3 pages instead of 5-10 pages
-- ✅ Faster to write and review
-- ✅ Still captures all essentials
-- ✅ Can expand sections for complex features
+This produces 2-3 pages instead of 5-10. Faster to write, faster to review, still captures everything that matters.
 
 ### Specification Storage
 
@@ -675,22 +618,14 @@ Benefits:
 ```markdown
 # Feature: [Feature Name]
 
-## 📋 Product Specification
+## Product Specification
 [Complete product/feature spec]
 
-## 🔧 Technical Specification
+## Technical Specification
 [Complete technical implementation spec]
 ```
 
-**Benefits:**
-- **Single Source of Truth**: One page contains BOTH specs
-- **Built-in Collaboration**: Product and engineering teams collaborate in one place
-- **No Context Switching**: View specs, track work, all integrated
-- **Always Accessible**: Web-based access
-- **Version Control**: Platform tracks changes
-- **Unified Discussions**: Comments on both specs stay together
-- **Native Integration**: Specs link to stories, stories link back
-- **Rich Content**: Support for images, diagrams, tables
+One page holds both specs. Product and engineering collaborate in one place. Specs link to stories, stories link back. No context switching.
 
 ### Work Tracking for Stories
 
@@ -712,24 +647,18 @@ Features are decomposed into a hierarchical structure in your configured story p
 
 This creates a clear hierarchy: **Epic → Stories → Tasks** (if needed)
 
-### Conversational & Engaging
+### Conversational Workflow
 
-All commands use **conversational workflow**:
-- ✅ Ask for meeting transcripts (preferred input)
-- ✅ Work conversationally if no transcript
-- ✅ Show what was found before asking questions
-- ✅ Propose options with pros/cons
-- ✅ Confirm before creating artifacts
-- ✅ Provide clear summaries with next steps
+Commands work the way teams actually work:
+- Ask for meeting transcripts (preferred input)
+- Work conversationally if no transcript available
+- Show what was found before asking questions
+- Propose options with pros/cons
+- Confirm before creating artifacts
 
 ### Transcript-First
 
-Commands are designed for **real team meetings**:
-- Paste planning meeting transcripts
-- Paste technical discussion transcripts
-- Paste decomposition meeting transcripts
-- Paste refinement session notes
-- Agent extracts information and fills gaps conversationally
+Designed for real team meetings. Paste planning transcripts, technical discussion recordings, decomposition sessions, or refinement notes. The agent extracts information and fills gaps conversationally.
 
 ### Uncertainty Markers: Preventing AI Hallucination
 
@@ -753,10 +682,10 @@ One of the most critical features of this workflow is **explicit uncertainty man
 
 **Example:**
 ```markdown
-❌ BAD (silent hallucination):
+BAD (silent hallucination):
 Users authenticate via OAuth2 using Google provider
 
-✅ GOOD (explicit uncertainty):
+GOOD (explicit uncertainty):
 Users authenticate via [OPEN QUESTION: OAuth2, password, or social login?]
 ```
 
@@ -784,14 +713,14 @@ D3 Core Skills (Tool-Agnostic)
     └── decompose    → Uses Spec Provider + Story Provider
 
 Spec Providers (Pluggable)
-    ├── atlassian-spec (Confluence) ✅ Built-in
-    ├── markdown-spec (Local files) ✅ Built-in
+    ├── atlassian-spec (Confluence) (built-in)
+    ├── markdown-spec (Local files) (built-in)
     ├── notion-spec (Notion databases) [Expandable]
     └── [Your custom provider] [Expandable]
 
 Story Providers (Pluggable)
-    ├── atlassian-story (Jira) ✅ Built-in
-    ├── markdown-story (Local markdown files) ✅ Built-in
+    ├── atlassian-story (Jira) (built-in)
+    ├── markdown-story (Local markdown files) (built-in)
     ├── linear-story (Linear) [Expandable]
     └── github-story (GitHub Issues) [Expandable]
 ```
@@ -822,7 +751,7 @@ To create a provider for a different tool (Notion, Linear, GitHub, etc.):
 2. **Create provider skill**: Implement operations as a new Claude Code plugin
 3. **Map operations to your tool's MCP/API**: Each operation should call the appropriate tool
 4. **Configure**: Update `CLAUDE.md` to reference your provider skill
-5. **Use D3 commands**: They work automatically with any provider!
+5. **Use D3 commands**: They work automatically with any provider
 
 ---
 
@@ -873,10 +802,8 @@ Thursday: Story Decomposition
 ├─ /d3:decompose
 └─ User stories created
 
-Next Sprint: Implementation (your development method)
+Next Sprint: Implementation
 ├─ Implement using your team's workflow
-├─ OR optionally use superpowers skills for AI assistance
-├─ (brainstorming, writing-plans, test-driven-development, etc.)
 └─ Commit, PR, and merge
 ```
 
@@ -885,17 +812,15 @@ Next Sprint: Implementation (your development method)
 ## Success Metrics
 
 ### Planning Phase
-- ✅ Specs completed before coding
-- ✅ All open questions resolved
-- ✅ Stories have clear acceptance criteria
-- ✅ Dependencies mapped in work tracker
+- Specs completed before coding
+- All open questions resolved
+- Stories have clear acceptance criteria
+- Dependencies mapped in work tracker
 
 ### Implementation Phase
-- ✅ All tests passing before PR
-- ✅ No skipped or disabled tests
-- ✅ All ACs covered by tests
-- ✅ Code follows architecture guidelines
-- ✅ PR feedback addressed systematically
+- All tests passing before PR
+- All acceptance criteria covered by tests
+- Code follows architecture guidelines
 
 ---
 
@@ -903,7 +828,7 @@ Next Sprint: Implementation (your development method)
 
 ### "I don't have meeting transcripts"
 
-No problem! All commands work conversationally:
+All commands work conversationally:
 - Select "Option B: Describe conversationally" or "Option C"
 - Answer the agent's questions
 - Same quality output, just more interactive
@@ -914,7 +839,7 @@ Use `/d3:refine-spec` to update the specification with learnings from implementa
 
 ### "My stories need to change during development"
 
-That's expected and normal! You can:
+That's expected. You can:
 - Update stories directly in your story provider using native editing
 - Split stories using your tool's split/clone features
 - Create new stories and link them to the Epic
@@ -923,7 +848,7 @@ That's expected and normal! You can:
 
 ### "Can I use this with other tools?"
 
-Yes! D3 is tool-agnostic through its provider architecture:
+Yes. D3 is tool-agnostic through its provider architecture:
 - Configure providers in `CLAUDE.md`
 - Use Confluence + Jira (default), Notion + Linear, Markdown + GitHub, or any combination
 - Create custom providers for your specific tools
@@ -931,12 +856,7 @@ Yes! D3 is tool-agnostic through its provider architecture:
 
 ### "How do I implement the stories?"
 
-After decomposition, implement using your preferred development method:
-- Use your team's existing workflow and practices
-- Optionally use superpowers skills for AI-assisted development
-- Mix and match approaches based on your needs
-
-D3 focuses on planning and decomposition - implementation is flexible.
+Use your team's existing development workflow. D3 focuses on the planning phase — turning conversations into structured context and implementable stories. How you write the code is up to you.
 
 ---
 
@@ -969,32 +889,15 @@ D3 focuses on planning and decomposition - implementation is flexible.
 - Refinement is an expected, separate step
 - Transcripts capture context and discussion
 
-### 5. Conversational & Engaging
+### 5. Conversational, Not Automated
 
-- Commands feel like collaboration, not automation
-- Agent asks questions and proposes options
-- Shows understanding before taking action
-- Confirms before creating artifacts
+Commands ask questions, propose options, and confirm before creating artifacts. This feels like collaboration, not automation.
 
-### 6. Flexible & Modular
+### 6. Team-Friendly
 
-- Use core workflow for documentation and decomposition
-- Optionally add dev automation
-- Refine specifications and stories as needed
-
-### 7. Quality Through Process
-
-- Complete acceptance criteria from the start
-- Technical specs follow codebase patterns
-- Smart section selection (only relevant sections)
-- Maps ACs to technical implementation
-
-### 8. Team-Friendly
-
-- Async-friendly (paste recorded meeting transcripts)
-- Supports iteration and learning
-- Clear traceability (spec → stories → tasks)
-- Preserves history of changes
+- Async-friendly — paste recorded meeting transcripts
+- Clear traceability — spec to stories to tasks
+- Supports iteration as the team learns
 
 ---
 
@@ -1079,18 +982,18 @@ D3 integrates with:
 
 ## License
 
-This methodology is open for use and adaptation. Modify to fit your team's needs.
+Open methodology, openly shared. Modify to fit your team's needs.
 
 ---
 
 ## Support
 
-For issues, questions, or contributions:
 - Review individual skill files for detailed documentation
-- Each skill has extensive examples and guidelines
-- Skills are designed to be self-explanatory
-- Agent prompts guide you through the process
+- [D3 Methodology](https://dialogdrivendelivery.com/) — principles and approach
+- [Report issues](https://github.com/cdiniz/dialog-driven-delivery/issues)
 
 ---
 
-*Built for real teams, refined through real projects.* 🚀
+*Built from real engagements. Designed for how teams actually work.*
+
+*[Learn more about the D3 methodology](https://dialogdrivendelivery.com/) | Developed with [Equal Experts](https://www.equalexperts.com/)*

@@ -131,6 +131,13 @@ mkdir -p .d3/templates
 # Copy default templates from the d3-templates skill
 cp -r ~/.claude/plugins/d3/skills/d3-templates/references/* .d3/templates/
 
+# Templates copied (5 total):
+# - feature-product-spec.md
+# - feature-tech-spec.md
+# - user-story.md
+# - meeting-transcript.md
+# - adr.md
+
 # Configure custom paths in CLAUDE.md (see Template Customization section)
 
 # Commit to your repo
@@ -143,6 +150,8 @@ git commit -m "Add customized D3 templates"
 - **Compliance requirements**: Add required sections for SOC2, HIPAA, GDPR, etc.
 - **Team conventions**: Reflect your team's established patterns and practices
 - **Tech stack specifics**: Add framework-specific sections (React patterns, API versioning, etc.)
+- **Meeting transcript sections**: Add Risks, Parking Lot, Next Meeting Agenda, etc.
+- **ADR customization**: Add custom metadata fields, alternative formats, team-specific decision criteria
 
 **Default behavior (no customization needed):**
 - D3 loads templates automatically from the `d3-templates` skill
@@ -191,7 +200,7 @@ For teams using Confluence (specs) and Jira (stories):
 - Cloud ID: your-cloud-id
 - Default Location: PROJ
 - spaceId: 1234567
-- Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789
+- Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456
 
 ### Story Provider
 **Skill:** d3-atlassian:atlassian-story-provider
@@ -205,7 +214,7 @@ For teams using Confluence (specs) and Jira (stories):
 - Cloud ID: your-cloud-id
 - Default Location: PROJ
 - spaceId: 1234567
-- Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789/Transcripts
+- Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456/Transcripts
 ```
 
 **Finding your values:**
@@ -231,19 +240,16 @@ For teams using local markdown files with git:
 **Skill:** d3-markdown:markdown-spec-provider
 **Configuration:**
 - Specs Directory: ./specs
-- Default Location: local
 
 ### Story Provider
 **Skill:** d3-markdown:markdown-story-provider
 **Configuration:**
-- Stories Directory: ./specs/stories
-- Default Project: local
+- Stories Directory: ./stories
 
 ### Transcript Provider
 **Skill:** d3-markdown:markdown-transcript-provider
 **Configuration:**
 - Transcripts Directory: ./transcripts
-- Default Location: .
 ```
 
 ---
@@ -263,7 +269,7 @@ By default, ADRs are stored using the same Spec Provider. To store ADRs in a sep
 - Cloud ID: your-cloud-id
 - Default Location: ADR
 - spaceId: 9876543
-- Default parent page: https://yoursite.atlassian.net/wiki/spaces/ADR/pages/123456789
+- Default parent page: https://yoursite.atlassian.net/wiki/spaces/ADR/pages/123456
 ```
 
 **Markdown (separate directory for ADRs):**
@@ -275,7 +281,6 @@ By default, ADRs are stored using the same Spec Provider. To store ADRs in a sep
 **Skill:** d3-markdown:markdown-spec-provider
 **Configuration:**
 - Specs Directory: ./docs/adrs
-- Default Location: local
 ```
 
 **No ADR Provider configured?** The `create-adr` command falls back to the Spec Provider automatically. ADRs are just documents — the same provider interface works for both.
@@ -310,6 +315,21 @@ D3 provides **default templates via the d3-templates skill** that work out of th
 - Acceptance criteria (Given-When-Then format)
 - Relevant documentation links
 
+**Meeting Transcript Template** (5 sections):
+1. **Summary** - 2-3 sentence overview of the meeting
+2. **Key Decisions** - Numbered decisions with bold titles
+3. **Action Items** - Numbered items with Owner and Due fields
+4. **Open Questions** - Numbered questions with context
+5. **Raw Transcript** - Full unedited transcript preserved
+
+**Architectural Decision Record (ADR) Template** (MADR v4 format):
+1. **Context and Problem Statement** - Situation and problem driving the decision
+2. **Decision Drivers** - Forces, concerns, and constraints
+3. **Considered Options** - List of options evaluated
+4. **Decision Outcome** - Chosen option with justification + Consequences + Confirmation
+5. **Pros and Cons of the Options** - Detailed per-option analysis
+6. **More Information** - Additional evidence, team agreements, links
+
 ---
 
 **How Template Loading Works:**
@@ -326,10 +346,12 @@ No configuration needed unless you want to customize.
 **When to Customize Templates:**
 
 Only customize if you need:
-- Domain-specific sections (healthcare, finance, legal, etc.)
-- Compliance requirements (SOC2, HIPAA, GDPR sections)
-- Team-specific conventions (your code review checklist, deployment steps, etc.)
-- Technology-specific sections (React patterns, API versioning, etc.)
+- **Domain-specific sections** (healthcare, finance, legal, etc.)
+- **Compliance requirements** (SOC2, HIPAA, GDPR sections)
+- **Team-specific conventions** (your code review checklist, deployment steps, etc.)
+- **Technology-specific sections** (React patterns, API versioning, etc.)
+- **Meeting transcript customization** (add sections for Risks, Parking Lot, Next Meeting Agenda, etc.)
+- **ADR customization** (add custom metadata fields, alternative formats, team-specific decision criteria)
 
 **Customization Workflow:**
 
@@ -337,16 +359,25 @@ Only customize if you need:
    ```bash
    mkdir -p .d3/templates
    cp -r ~/.claude/plugins/d3/skills/d3-templates/references/* .d3/templates/
+
+   # Templates copied:
+   # - feature-product-spec.md
+   # - feature-tech-spec.md
+   # - user-story.md
+   # - meeting-transcript.md
+   # - adr.md
    ```
 
 2. **Configure custom paths in CLAUDE.md:**
    ```markdown
    ## D3 Configuration
-   
-   ### Templates 
-     - Feature Product Spec: ./d3/templates/feature-product-spec.md
-     - Feature Technical Spec: ./d3/templates/feature-technical-spec.md
-     - User Story: ./d3/templates/user-story.md
+
+   ### Templates
+     - Feature Product Spec: ./.d3/templates/feature-product-spec.md
+     - Feature Technical Spec: ./.d3/templates/feature-tech-spec.md
+     - User Story: ./.d3/templates/user-story.md
+     - Meeting Transcript: ./.d3/templates/meeting-transcript.md
+     - ADR: ./.d3/templates/adr.md
    ```
 
 3. **Customize templates for your needs:**
@@ -828,7 +859,7 @@ Feature specs use a **streamlined 5-section template** (vs traditional 10+ secti
 - **Section 2: User Journey** — Primary workflow with edge cases
 - **Section 3: Requirements** — Must have, should have, out of scope, constraints
 - **Section 4: Open Questions & Assumptions** — All uncertainties in one place
-- **Section 5: Risks** — High/medium risks with mitigations
+- **Section 5: References** — Related docs, design links
 
 This produces 2-3 pages instead of 5-10. Faster to write, faster to review, still captures everything that matters.
 
@@ -1178,7 +1209,7 @@ dialog-driven-delivery/
 │   │   ├── atlassian-spec-provider/    # Confluence specs
 │   │   ├── atlassian-story-provider/   # Jira stories
 │   │   └── atlassian-transcript-provider/  # Confluence transcripts
-│   └── README.md             # Provider docs
+│   └── README.md             # → points to this file
 ├── d3-markdown/              # Markdown provider plugin (built-in)
 │   ├── .claude-plugin/
 │   │   └── plugin.json       # Plugin manifest
@@ -1186,7 +1217,7 @@ dialog-driven-delivery/
 │   │   ├── markdown-spec-provider/       # Local file specs
 │   │   ├── markdown-story-provider/      # Local file stories
 │   │   └── markdown-transcript-provider/ # Local file transcripts
-│   └── README.md             # Provider docs
+│   └── README.md             # → points to this file
 └── .claude/                  # Original structure (deprecated)
 ```
 

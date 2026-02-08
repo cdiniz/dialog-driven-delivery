@@ -6,26 +6,21 @@
 **Skill:** d3-markdown:markdown-spec-provider
 **Configuration:**
 - Specs Directory: ./specs
-- Default Location: .
 
 ### ADR Provider
 **Skill:** d3-markdown:markdown-spec-provider
 **Configuration:**
 - Specs Directory: ./adrs
-- Default Location: .
 
 ### Story Provider
 **Skill:** d3-markdown:markdown-story-provider
 **Configuration:**
 - Stories Directory: ./stories
-- Epic Prefix: epic-
-- Story Prefix: story-
 
 ### Transcript Provider
 **Skill:** d3-markdown:markdown-transcript-provider
 **Configuration:**
 - Transcripts Directory: ./transcripts
-- Default Location: .
 
 ---
 
@@ -67,7 +62,7 @@ npm run build
 - Commit specs and stories to git regularly
 - Update story status in frontmatter as you progress
 - Keep specs and code in sync via `/d3:refine-spec`
-- Review the `.d3/metadata.json` to see progress
+- Use `rg "^status:" stories/` to check progress
 
 ### File Locations
 - **Specs:** `./specs/*.md`

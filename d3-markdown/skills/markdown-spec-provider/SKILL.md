@@ -17,12 +17,10 @@ Reads from `CLAUDE.md`:
 **Skill:** d3-markdown:markdown-spec-provider
 **Configuration:**
 - Specs Directory: ./specs
-- Default Location: .
 ```
 
 **Defaults if not found:**
 - Specs Directory: `./specs`
-- Default Location: `.` (root)
 
 ---
 

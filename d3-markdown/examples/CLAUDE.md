@@ -8,6 +8,12 @@
 - Specs Directory: ./specs
 - Default Location: .
 
+### ADR Provider
+**Skill:** d3-markdown:markdown-spec-provider
+**Configuration:**
+- Specs Directory: ./docs/adrs
+- Default Location: .
+
 ### Story Provider
 **Skill:** d3-markdown:markdown-story-provider
 **Configuration:**

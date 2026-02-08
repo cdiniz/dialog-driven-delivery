@@ -30,7 +30,8 @@ claude plugin install d3-atlassian@d3-marketplace  # or d3-markdown
 ```bash
 # 1. Planning Phase
 /d3:create-spec                        # Create feature spec
-/d3:refine-spec PAGE-ID                # Refine based on discussions
+/d3:create-adr                         # Record architectural decisions
+/d3:refine-spec PAGE-ID                # Refine based on discussions + ADRs
 
 # 2. Decomposition Phase
 /d3:decompose PAGE-ID                  # Break into user stories
@@ -230,6 +231,40 @@ For teams using local markdown files with git:
 
 ---
 
+### ADR Provider Configuration (Optional)
+
+By default, ADRs are stored using the same Spec Provider. To store ADRs in a separate location, add an `### ADR Provider` section to your D3 configuration.
+
+**Atlassian (separate Confluence space for ADRs):**
+
+```markdown
+## D3 Configuration
+
+### ADR Provider
+**Skill:** d3-atlassian:atlassian-spec-provider
+**Configuration:**
+- Cloud ID: your-cloud-id
+- Default Location: ADR
+- spaceId: 9876543
+- Default parent page: https://yoursite.atlassian.net/wiki/spaces/ADR/pages/123456789
+```
+
+**Markdown (separate directory for ADRs):**
+
+```markdown
+## D3 Configuration
+
+### ADR Provider
+**Skill:** d3-markdown:markdown-spec-provider
+**Configuration:**
+- Specs Directory: ./docs/adrs
+- Default Location: local
+```
+
+**No ADR Provider configured?** The `create-adr` command falls back to the Spec Provider automatically. ADRs are just documents — the same provider interface works for both.
+
+---
+
 ### Template Customization (Optional)
 
 D3 provides **default templates via the d3-templates skill** that work out of the box. Teams can optionally customize templates for their specific needs.
@@ -346,6 +381,24 @@ Epic + User Stories (linked to specification with dependencies)
 Commit, Create PR, and Merge
 ```
 
+### Architectural Decision Workflow
+
+When architectural decisions arise (framework choices, database selections, event-driven vs synchronous, etc.), capture them as ADRs:
+
+```
+Architectural discussion (meeting/transcript)
+        ↓
+/d3:create-adr (paste transcript or describe decision)
+        ↓
+ADR created (Context, Decision, Alternatives, Consequences)
+        ↓
+/d3:refine-spec PAGE-ID (incorporate ADR into spec)
+        ↓
+Spec's "Architectural Context > Relevant ADRs" section updated
+```
+
+ADRs are immutable records. If a decision changes, create a new ADR that supersedes the old one.
+
 **Tool Selection:** Configure providers in `CLAUDE.md` to use your preferred tools:
 - **Specifications:** Confluence, Notion, Markdown files, etc.
 - **Stories:** Jira, Linear, GitHub Issues, etc.
@@ -360,12 +413,14 @@ Commit, Create PR, and Merge
 | Command | Phase | Purpose |
 |---------|-------|---------|
 | `/d3:create-spec` | Planning | Create feature specification from conversation |
+| `/d3:create-adr` | Planning | Record architectural decisions as immutable ADRs |
 | `/d3:refine-spec` | Planning | Update specifications with new information |
 | `/d3:decompose` | Planning | Break into implementable user stories |
 
 ### When to Use Each Command
 
 - **Starting a feature?** → `/d3:create-spec`
+- **Made an architectural decision?** → `/d3:create-adr`
 - **Got new information?** → `/d3:refine-spec`
 - **Ready to implement?** → `/d3:decompose`
 
@@ -431,7 +486,76 @@ Agent: Feature specification created.
 
 ---
 
-### 2. `/d3:refine-spec PAGE-ID`
+### 2. `/d3:create-adr`
+
+**Purpose**: Record an architectural decision as an immutable ADR following [MADR v4](https://adr.github.io/madr/) format
+
+**Workflow**:
+1. Command asks: "How would you like to provide the architectural decision information?"
+2. You provide: transcript, document, or conversational description
+3. Command asks: "Where would you like to create this ADR?"
+4. Agent auto-numbers the ADR based on existing ADRs
+5. Agent extracts: context/problem, decision drivers, considered options, decision outcome, consequences, and pros/cons per option
+6. Agent asks if this supersedes an existing ADR
+7. Shows ADR preview with uncertainty markers for any undecided aspects
+8. You confirm
+9. ADR created via provider
+10. Agent suggests using `/d3:refine-spec` to incorporate the decision into relevant specs
+
+**When to use**:
+- An architectural decision has been made (framework, database, messaging pattern, etc.)
+- A decision is being proposed and needs to be documented
+- A previous decision is being changed (superseding)
+
+**Example**:
+```
+You: /d3:create-adr
+
+Agent: How would you like to provide the architectural decision information?
+       Option A: Meeting Transcript
+       Option B: Document
+       Option C: Describe Conversationally
+
+You: Option A
+     [Paste transcript from architecture meeting about choosing PostgreSQL vs MongoDB]
+
+Agent: I found an architectural decision in this transcript.
+
+       Proposed ADR: ADR-003: Use PostgreSQL for primary data storage
+       Status: Accepted
+       Decision Drivers: ACID compliance, team expertise, query complexity
+
+       Does this supersede an existing ADR?
+
+You: No
+
+Agent: ADR ready:
+
+       ADR-003: Use PostgreSQL for primary data storage
+       Status: Accepted
+       Decision: Chosen option: "PostgreSQL", because it meets ACID requirements
+       Options analyzed: 2 (PostgreSQL, MongoDB)
+       Uncertainty markers: 1
+
+       Ready to create?
+
+You: Yes
+
+Agent: ✅ ADR created: ADR-003: Use PostgreSQL for primary data storage
+
+       Next: Use /d3:refine-spec to incorporate this decision
+       into relevant specifications' "Architectural Context > Relevant ADRs" section.
+```
+
+**Output**:
+- ADR in MADR v4 format with context, decision drivers, options analysis, and consequences
+- Auto-numbered sequentially
+- Cross-references if superseding another ADR
+- Clear next steps for spec integration
+
+---
+
+### 3. `/d3:refine-spec PAGE-ID`
 
 **Purpose**: Refine any part of existing specifications based on new information
 
@@ -497,7 +621,7 @@ Agent: Specifications refined.
 
 ---
 
-### 3. `/d3:decompose PAGE-ID`
+### 4. `/d3:decompose PAGE-ID`
 
 **Purpose**: Break feature into user stories through conversational planning
 
@@ -709,6 +833,7 @@ D3 uses a **provider-based architecture** to work with any tools:
 ```
 D3 Core Skills (Tool-Agnostic)
     ├── create-spec  → Uses Spec Provider
+    ├── create-adr   → Uses ADR Provider (falls back to Spec Provider)
     ├── refine-spec  → Uses Spec Provider
     └── decompose    → Uses Spec Provider + Story Provider
 
@@ -795,7 +920,8 @@ Monday: Feature Planning
 └─ Specification created
 
 Tuesday-Wednesday: Refinement
-├─ /d3:refine-spec (add technical details)
+├─ /d3:create-adr (record architectural decisions)
+├─ /d3:refine-spec (add technical details + ADR references)
 └─ Specifications complete
 
 Thursday: Story Decomposition
@@ -925,6 +1051,10 @@ dialog-driven-delivery/
 │   ├── .claude-plugin/
 │   │   └── plugin.json       # Plugin manifest
 │   ├── commands/             # Thin command triggers
+│   │   ├── create-spec.md   # Create feature specs
+│   │   ├── create-adr.md    # Create architectural decision records
+│   │   ├── refine-spec.md   # Refine existing specs
+│   │   └── decompose.md     # Decompose into user stories
 │   ├── skills/               # Main workflow skills
 │   ├── templates/            # Spec templates
 │   └── README.md             # Plugin-specific docs

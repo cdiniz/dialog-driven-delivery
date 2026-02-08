@@ -1,11 +1,11 @@
 ---
 name: d3-templates
-description: Provides standard templates for Dialog-Driven Delivery (D3) specifications and user stories. Use when creating or refining feature specifications (product or technical) or decomposing features into user stories. Contains templates for Product Specs, Technical Specs, and User Stories following D3 methodology.
+description: Provides standard templates for Dialog-Driven Delivery (D3) specifications, user stories, and architectural decision records. Use when creating or refining feature specifications (product or technical), decomposing features into user stories, or recording architectural decisions. Contains templates for Product Specs, Technical Specs, User Stories, and ADRs following D3 methodology.
 ---
 
 # D3 Standard Templates
 
-This skill provides canonical templates for D3 specification and story creation. These templates are used by d3:create-spec, d3:refine-spec, and d3:decompose commands.
+This skill provides canonical templates for D3 specification, story, and ADR creation. These templates are used by d3:create-spec, d3:refine-spec, d3:decompose, and d3:create-adr commands.
 
 ## Available Templates
 
@@ -43,6 +43,18 @@ Templates are located in this skill's `references/` directory:
   - Acceptance Criteria (Given-When-Then format with 2+ scenarios)
   - Relevant docs (Feature spec link, other references)
 
+### 4. Architectural Decision Record (ADR) Template
+- **File:** `references/adr.md`
+- **Purpose:** Capture architectural decisions as immutable records following [MADR v4](https://adr.github.io/madr/) format
+- **Sections:** (MADR v4 standard + D3 extension)
+  - Context and Problem Statement (Situation and problem driving the decision)
+  - Decision Drivers (Forces, concerns, and constraints)
+  - Considered Options (List of options evaluated)
+  - Decision Outcome (Chosen option with justification + Consequences + Confirmation)
+  - Pros and Cons of the Options (Detailed per-option analysis using "Good/Bad/Neutral, because..." format)
+  - More Information (Additional evidence, team agreements, links)
+- **Metadata:** Title with ADR number, Date, Status, Decision-makers, Consulted, Informed, Supersedes
+
 ## How D3 Commands Use These Templates
 
 ### d3:create-spec
@@ -61,6 +73,13 @@ Templates are located in this skill's `references/` directory:
 2. Creates stories following template structure
 3. Ensures consistent Given-When-Then acceptance criteria format
 
+### d3:create-adr
+1. Loads ADR template from CLAUDE.md config or this skill
+2. Extracts decision context, alternatives, rationale, and consequences from input
+3. Auto-numbers by searching existing ADRs
+4. Creates ADR using template structure
+5. Handles superseding (cross-references old and new ADRs)
+
 ## Template Loading Pattern
 
 D3 commands follow this loading pattern:
@@ -71,6 +90,7 @@ D3 commands follow this loading pattern:
    - feature_spec_template
    - technical_spec_template
    - user_story_template
+   - adr_template
 3. For each template:
    - If custom path specified → Read that file
    - If no custom path → Read from this skill's references/

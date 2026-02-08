@@ -11,7 +11,7 @@
 ### ADR Provider
 **Skill:** d3-markdown:markdown-spec-provider
 **Configuration:**
-- Specs Directory: ./docs/adrs
+- Specs Directory: ./adrs
 - Default Location: .
 
 ### Story Provider
@@ -20,6 +20,12 @@
 - Stories Directory: ./stories
 - Epic Prefix: epic-
 - Story Prefix: story-
+
+### Transcript Provider
+**Skill:** d3-markdown:markdown-transcript-provider
+**Configuration:**
+- Transcripts Directory: ./transcripts
+- Default Location: .
 
 ---
 
@@ -66,6 +72,7 @@ npm run build
 ### File Locations
 - **Specs:** `./specs/*.md`
 - **Stories:** `./stories/*/story-*.md`
+- **Transcripts:** `./transcripts/YYYY-MM/*.md`
 
 ---
 

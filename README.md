@@ -28,8 +28,11 @@ claude plugin install d3-atlassian@d3-marketplace  # or d3-markdown
 ### Complete Feature Development Flow
 
 ```bash
+# 0. Capture Phase (optional)
+/d3:capture-transcript                 # Capture and structure a meeting transcript
+
 # 1. Planning Phase
-/d3:create-spec                        # Create feature spec
+/d3:create-spec                        # Create feature spec (can reference transcripts)
 /d3:create-adr                         # Record architectural decisions
 /d3:refine-spec PAGE-ID                # Refine based on discussions + ADRs
 
@@ -195,6 +198,14 @@ For teams using Confluence (specs) and Jira (stories):
 **Configuration:**
 - Cloud ID: your-cloud-id
 - Default Project: PROJ
+
+### Transcript Provider
+**Skill:** d3-atlassian:atlassian-transcript-provider
+**Configuration:**
+- Cloud ID: your-cloud-id
+- Default Location: PROJ
+- spaceId: 1234567
+- Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789/Transcripts
 ```
 
 **Finding your values:**
@@ -227,6 +238,12 @@ For teams using local markdown files with git:
 **Configuration:**
 - Stories Directory: ./specs/stories
 - Default Project: local
+
+### Transcript Provider
+**Skill:** d3-markdown:markdown-transcript-provider
+**Configuration:**
+- Transcripts Directory: ./transcripts
+- Default Location: .
 ```
 
 ---
@@ -359,6 +376,8 @@ Only customize if you need:
 ```
 Cross-functional Meeting/Discussion
         ↓
+/d3:capture-transcript (optional — capture and structure the meeting)
+        ↓
 /d3:create-spec (paste transcript/document/description)
         ↓
 Specification with BOTH Product & Technical Specs
@@ -412,6 +431,7 @@ ADRs are immutable records. If a decision changes, create a new ADR that superse
 
 | Command | Phase | Purpose |
 |---------|-------|---------|
+| `/d3:capture-transcript` | Capture | Capture and structure a meeting transcript |
 | `/d3:create-spec` | Planning | Create feature specification from conversation |
 | `/d3:create-adr` | Planning | Record architectural decisions as immutable ADRs |
 | `/d3:refine-spec` | Planning | Update specifications with new information |
@@ -419,6 +439,7 @@ ADRs are immutable records. If a decision changes, create a new ADR that superse
 
 ### When to Use Each Command
 
+- **Had a meeting?** → `/d3:capture-transcript`
 - **Starting a feature?** → `/d3:create-spec`
 - **Made an architectural decision?** → `/d3:create-adr`
 - **Got new information?** → `/d3:refine-spec`
@@ -430,7 +451,84 @@ After decomposition, implement using your team's existing workflow.
 
 ## Detailed Command Reference
 
-### 1. `/d3:create-spec`
+### 1. `/d3:capture-transcript`
+
+**Purpose**: Capture and structure a meeting transcript as a referenceable artifact
+
+**Workflow**:
+1. Command asks you to paste the meeting transcript
+2. Command asks: "What type of meeting was this?" (Planning, Technical, Standup, Retro, Other)
+3. Agent extracts decisions, action items, and open questions in one pass
+4. Agent proposes a title and filename
+5. Agent shows structured summary for review
+6. You confirm
+7. Transcript stored via provider with full raw transcript preserved
+8. Shows next steps (create-spec, refine-spec)
+
+**When to use**: After any meeting where decisions were made, actions were assigned, or context was generated
+
+**Example**:
+```
+You: /d3:capture-transcript
+
+Agent: Please paste your meeting transcript below.
+
+You: [Paste transcript from planning meeting]
+
+Agent: What type of meeting was this?
+       A) Planning
+       B) Technical
+       C) Standup
+       D) Retro
+       E) Other
+
+You: A
+
+Agent: Here's the structured transcript:
+
+       Summary: The team discussed building a search feature...
+
+       Key Decisions: 3
+       1. Phased rollout approach — Start with basic text search...
+       2. Elasticsearch for search backend...
+       3. Search results page as separate route...
+
+       Action Items: 4
+       1. Create feature specification — Owner: Alice, Due: Feb 5
+       ...
+
+       Open Questions: 3
+       1. Should search include archived content?
+       ...
+
+       Proposed title: "Search Feature Kickoff"
+       File: transcripts/2026-02/planning-search-feature-kickoff.md
+
+       Ready to save?
+
+You: Yes
+
+Agent: ✅ Transcript captured: Search Feature Kickoff
+
+       Extracted:
+       - Decisions: 3
+       - Action Items: 4
+       - Open Questions: 3
+
+       Next steps:
+       - Create a spec: /d3:create-spec
+       - Refine an existing spec: /d3:refine-spec PAGE-ID
+```
+
+**Output**:
+- Structured transcript with summary, decisions, action items, open questions
+- Full raw transcript preserved
+- Stored as referenceable artifact
+- Clear next steps for spec creation or refinement
+
+---
+
+### 2. `/d3:create-spec`
 
 **Purpose**: Create a comprehensive feature specification from any input
 
@@ -486,7 +584,7 @@ Agent: Feature specification created.
 
 ---
 
-### 2. `/d3:create-adr`
+### 3. `/d3:create-adr`
 
 **Purpose**: Record an architectural decision as an immutable ADR following [MADR v4](https://adr.github.io/madr/) format
 
@@ -555,7 +653,7 @@ Agent: ✅ ADR created: ADR-003: Use PostgreSQL for primary data storage
 
 ---
 
-### 3. `/d3:refine-spec PAGE-ID`
+### 4. `/d3:refine-spec PAGE-ID`
 
 **Purpose**: Refine any part of existing specifications based on new information
 
@@ -621,7 +719,7 @@ Agent: Specifications refined.
 
 ---
 
-### 4. `/d3:decompose PAGE-ID`
+### 5. `/d3:decompose PAGE-ID`
 
 **Purpose**: Break feature into user stories through conversational planning
 
@@ -832,10 +930,11 @@ D3 uses a **provider-based architecture** to work with any tools:
 
 ```
 D3 Core Skills (Tool-Agnostic)
-    ├── create-spec  → Uses Spec Provider
-    ├── create-adr   → Uses ADR Provider (falls back to Spec Provider)
-    ├── refine-spec  → Uses Spec Provider
-    └── decompose    → Uses Spec Provider + Story Provider
+    ├── capture-transcript → Uses Transcript Provider
+    ├── create-spec        → Uses Spec Provider
+    ├── create-adr         → Uses ADR Provider (falls back to Spec Provider)
+    ├── refine-spec        → Uses Spec Provider
+    └── decompose          → Uses Spec Provider + Story Provider
 
 Spec Providers (Pluggable)
     ├── atlassian-spec (Confluence) (built-in)
@@ -848,6 +947,11 @@ Story Providers (Pluggable)
     ├── markdown-story (Local markdown files) (built-in)
     ├── linear-story (Linear) [Expandable]
     └── github-story (GitHub Issues) [Expandable]
+
+Transcript Providers (Pluggable)
+    ├── atlassian-transcript (Confluence) (built-in)
+    ├── markdown-transcript (Local files) (built-in)
+    └── [Your custom provider] [Expandable]
 ```
 
 **Expandability:** The provider architecture makes it easy to add support for any tool. Built-in providers (Atlassian and Markdown) serve as reference implementations. Create custom providers by implementing the standard interfaces below.
@@ -867,6 +971,13 @@ Story Providers (Pluggable)
 - `create_epic()` - Create epic/feature container
 - `create_story()` - Create user story
 - `link_issues()` - Create dependencies (optional)
+
+**Transcript Provider Operations:**
+- `list_locations()` - List available storage locations
+- `store_transcript()` - Store structured transcript
+- `get_transcript()` - Retrieve transcript
+- `list_transcripts()` - List transcripts (filter by type/month)
+- `search_transcripts()` - Search transcript content
 
 ### Creating Custom Providers
 
@@ -916,7 +1027,8 @@ To create a provider for a different tool (Notion, Linear, GitHub, etc.):
 
 ```
 Monday: Feature Planning
-├─ /d3:create-spec (paste meeting transcript)
+├─ /d3:capture-transcript (capture meeting transcript)
+├─ /d3:create-spec (create spec from transcript)
 └─ Specification created
 
 Tuesday-Wednesday: Refinement
@@ -1051,6 +1163,7 @@ dialog-driven-delivery/
 │   ├── .claude-plugin/
 │   │   └── plugin.json       # Plugin manifest
 │   ├── commands/             # Thin command triggers
+│   │   ├── capture-transcript.md  # Capture meeting transcripts
 │   │   ├── create-spec.md   # Create feature specs
 │   │   ├── create-adr.md    # Create architectural decision records
 │   │   ├── refine-spec.md   # Refine existing specs
@@ -1062,11 +1175,17 @@ dialog-driven-delivery/
 │   ├── .claude-plugin/
 │   │   └── plugin.json       # Plugin manifest
 │   ├── skills/               # Provider skills
+│   │   ├── atlassian-spec-provider/    # Confluence specs
+│   │   ├── atlassian-story-provider/   # Jira stories
+│   │   └── atlassian-transcript-provider/  # Confluence transcripts
 │   └── README.md             # Provider docs
 ├── d3-markdown/              # Markdown provider plugin (built-in)
 │   ├── .claude-plugin/
 │   │   └── plugin.json       # Plugin manifest
 │   ├── skills/               # Provider skills
+│   │   ├── markdown-spec-provider/       # Local file specs
+│   │   ├── markdown-story-provider/      # Local file stories
+│   │   └── markdown-transcript-provider/ # Local file transcripts
 │   └── README.md             # Provider docs
 └── .claude/                  # Original structure (deprecated)
 ```

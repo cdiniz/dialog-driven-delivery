@@ -1,11 +1,11 @@
 ---
 name: d3-templates
-description: Provides standard templates for Dialog-Driven Delivery (D3) specifications, user stories, and architectural decision records. Use when creating or refining feature specifications (product or technical), decomposing features into user stories, or recording architectural decisions. Contains templates for Product Specs, Technical Specs, User Stories, and ADRs following D3 methodology.
+description: Provides standard templates for Dialog-Driven Delivery (D3) specifications, user stories, architectural decision records, and meeting transcripts. Use when creating or refining feature specifications (product or technical), decomposing features into user stories, recording architectural decisions, or capturing meeting transcripts. Contains templates for Product Specs, Technical Specs, User Stories, ADRs, and Meeting Transcripts following D3 methodology.
 ---
 
 # D3 Standard Templates
 
-This skill provides canonical templates for D3 specification, story, and ADR creation. These templates are used by d3:create-spec, d3:refine-spec, d3:decompose, and d3:create-adr commands.
+This skill provides canonical templates for D3 specification, story, ADR, and transcript creation. These templates are used by d3:create-spec, d3:refine-spec, d3:decompose, d3:create-adr, and d3:capture-transcript commands.
 
 ## Available Templates
 
@@ -55,6 +55,17 @@ Templates are located in this skill's `references/` directory:
   - More Information (Additional evidence, team agreements, links)
 - **Metadata:** Title with ADR number, Date, Status, Decision-makers, Consulted, Informed, Supersedes
 
+### 5. Meeting Transcript Template
+- **File:** `references/meeting-transcript.md`
+- **Purpose:** Structured capture of meeting transcripts with extracted insights
+- **Sections:** 5 main sections
+  - Summary (2-3 sentence overview of the meeting)
+  - Key Decisions (Numbered decisions with bold titles)
+  - Action Items (Numbered items with Owner and Due fields)
+  - Open Questions (Numbered questions with context)
+  - Raw Transcript (Full unedited transcript)
+- **Metadata:** Title, Date, Type (Planning/Technical/Standup/Retro/Other), Participants
+
 ## How D3 Commands Use These Templates
 
 ### d3:create-spec
@@ -80,6 +91,13 @@ Templates are located in this skill's `references/` directory:
 4. Creates ADR using template structure
 5. Handles superseding (cross-references old and new ADRs)
 
+### d3:capture-transcript
+1. Loads meeting transcript template from CLAUDE.md config or this skill
+2. Asks user to paste raw transcript
+3. Extracts decisions, action items, and open questions
+4. Generates structured summary using template
+5. Stores via transcript provider
+
 ## Template Loading Pattern
 
 D3 commands follow this loading pattern:
@@ -91,6 +109,7 @@ D3 commands follow this loading pattern:
    - technical_spec_template
    - user_story_template
    - adr_template
+   - meeting_transcript_template
 3. For each template:
    - If custom path specified → Read that file
    - If no custom path → Read from this skill's references/

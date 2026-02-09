@@ -361,7 +361,7 @@ Only customize if you need:
 1. **Copy default templates to your repository:**
    ```bash
    mkdir -p .d3/templates
-   cp -r ~/.claude/plugins/d3/skills/d3-templates/references/* .d3/templates/
+   cp -r ~/.claude/plugins/marketplaces/d3-marketplace/d3/skills/d3-templates/references/* .d3/templates
 
    # Templates copied:
    # - feature-product-spec.md

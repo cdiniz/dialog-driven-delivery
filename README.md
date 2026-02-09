@@ -13,14 +13,17 @@ Works with your existing tools. Built-in providers for Atlassian (Confluence + J
 ### Initial Setup (One-Time)
 
 ```bash
-# 1. Install D3 (see Installation section)
+# 1. Add the D3 marketplace
+claude plugin marketplace add cdiniz/dialog-driven-delivery
+
+# 2. Install D3 (see Installation section)
 claude plugin install d3@d3-marketplace
 claude plugin install d3-atlassian@d3-marketplace  # or d3-markdown
 
-# 2. Configure provider in CLAUDE.md (see Configuration section)
+# 3. Configure provider in CLAUDE.md (see Configuration section)
 # Add provider config to CLAUDE.md
 
-# 3. (Optional) Customize templates for your team
+# 4. (Optional) Customize templates for your team
 # Copy default templates to your repo and configure custom paths
 # See Template Customization section below
 ```

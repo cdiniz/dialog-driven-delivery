@@ -6,8 +6,10 @@ import pytest
 from .claude_runner import run_claude
 from .validators import (
     extract_frontmatter,
+    extract_sections,
     has_placeholder,
     heading_texts_lower,
+    markers_tracked_in_open_questions,
     total_markers,
 )
 
@@ -75,12 +77,16 @@ Do not ask any questions. Use the information provided to make all decisions.
         assert "technical specification" in content.lower(), (
             "Missing top-level Technical Specification section"
         )
+        assert markers_tracked_in_open_questions(content), (
+            "Uncertainty markers exist but no Open Questions section found"
+        )
 
     @pytest.mark.timeout(360)
     def test_02_refine_spec(self, test_workspace, spec_state):
         refinement = _read_fixture("refinement_input.txt")
         spec_name = spec_state["name"]
         original_content = open(spec_state["path"]).read()
+        original_sections = extract_sections(original_content)
 
         prompt = f"""\
 /d3:refine-spec {spec_name}
@@ -112,6 +118,14 @@ Do not ask any questions. Do not show me a preview. Just update the spec file di
         assert "postgresql" in lower or "priority" in lower, (
             "Refinement content not found in updated spec"
         )
+
+        updated_sections = extract_sections(updated_content)
+        for heading in ["overview", "user journey"]:
+            orig = original_sections.get(heading)
+            if orig is not None:
+                assert heading in updated_sections, (
+                    f"Section '{heading}' removed during refinement"
+                )
 
     @pytest.mark.timeout(360)
     def test_03_decompose(self, test_workspace, spec_state):
@@ -149,6 +163,11 @@ Do not ask any questions. Use the information provided to make all decisions.
 
         assert len(stories) >= 1, (
             f"No story files found. Files: {all_files}. Output:\n{output[:1000]}"
+        )
+
+        spec_subdir = os.path.join(stories_dir, "task-dashboard")
+        assert os.path.isdir(spec_subdir), (
+            f"Stories not in spec-named subdirectory. Found: {all_files}"
         )
 
         for path, content, fm in stories:

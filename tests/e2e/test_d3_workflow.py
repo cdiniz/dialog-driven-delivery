@@ -66,6 +66,16 @@ Do not ask any questions. Use the information provided to make all decisions.
         assert has_placeholder(content), "No placeholder text for undiscussed sections"
         assert total_markers(content) > 0, "No uncertainty markers found"
 
+        assert "task-dashboard.md" == spec_state["name"], (
+            f"Unexpected spec filename: {spec_state['name']}"
+        )
+        assert "product specification" in content.lower(), (
+            "Missing top-level Product Specification section"
+        )
+        assert "technical specification" in content.lower(), (
+            "Missing top-level Technical Specification section"
+        )
+
     @pytest.mark.timeout(360)
     def test_02_refine_spec(self, test_workspace, spec_state):
         refinement = _read_fixture("refinement_input.txt")
@@ -144,6 +154,10 @@ Do not ask any questions. Use the information provided to make all decisions.
         for path, content, fm in stories:
             for field in STORY_FRONTMATTER_FIELDS:
                 assert field in fm, f"Missing frontmatter '{field}' in {path}"
+
+            assert "task-dashboard" in str(fm.get("spec", "")), (
+                f"Story doesn't reference parent spec in {path}"
+            )
 
             lower = content.lower()
             assert "given" in lower and "when" in lower and "then" in lower, (

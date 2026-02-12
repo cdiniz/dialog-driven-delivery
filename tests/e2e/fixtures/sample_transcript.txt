@@ -1,0 +1,14 @@
+Meeting: Task Dashboard Feature
+Attendees: PM, Dev Lead
+
+PM: We need a task dashboard where users can view and manage their tasks. Users should see tasks in a list, filter by status, and mark tasks complete.
+
+Dev Lead: We'll need a REST API. Should we use PostgreSQL or MongoDB?
+PM: Let's decide later. For now, focus on the user experience.
+
+PM: Tasks have a title, description, due date, and assignee. Target users are project managers and team members.
+
+Dev Lead: What about priority levels?
+PM: Good question - let's figure that out later.
+
+PM: Success metric: 80% of users check dashboard daily within first month.

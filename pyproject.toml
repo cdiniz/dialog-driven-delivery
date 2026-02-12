@@ -1,0 +1,14 @@
+[project]
+name = "dialog-driven-delivery"
+version = "0.1.0"
+description = "Dialog-Driven Delivery - D3 skills for Claude Code"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-dependency>=0.6.0",
+    "pytest-timeout>=2.4.0",
+    "pyyaml>=6.0.3",
+]

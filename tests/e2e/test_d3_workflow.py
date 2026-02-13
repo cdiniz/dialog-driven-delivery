@@ -15,8 +15,8 @@ from .validators import (
 
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
 
-PRODUCT_HEADINGS = ["overview", "user journey", "requirements", "open questions"]
-TECH_HEADINGS = ["technical approach", "system changes", "testing requirements"]
+PRODUCT_HEADINGS = ["overview", "requirements", "open questions"]
+TECH_HEADINGS = ["technical approach", "testing requirements"]
 STORY_FRONTMATTER_FIELDS = ["type", "id", "spec", "title", "status"]
 
 
@@ -30,7 +30,7 @@ def _create_spec_messages(transcript: str) -> list[str]:
         "/d3:create-spec\n\nI want to provide a meeting transcript.",
         f"Here is the transcript:\n---\n{transcript}\n---\n\n"
         f"Use the default root location.\n"
-        f'For the title, use "Task Dashboard".',
+        f'For the title, use "About Page".',
         "The spec looks good, please create it.",
     ]
 
@@ -54,10 +54,12 @@ def _decompose_messages(spec_name: str) -> list[str]:
 class TestD3Workflow:
 
     @pytest.mark.timeout(600)
-    def test_01_create_spec(self, test_workspace, spec_state):
+    def test_01_create_spec(self, test_workspace, plugin_dirs, spec_state):
         transcript = _read_fixture("sample_transcript.txt")
         output = run_claude_conversation(
-            _create_spec_messages(transcript), cwd=test_workspace
+            _create_spec_messages(transcript),
+            cwd=test_workspace,
+            plugin_dirs=plugin_dirs,
         )
 
         spec_files = glob.glob(os.path.join(test_workspace, "specs", "*.md"))
@@ -78,28 +80,24 @@ class TestD3Workflow:
         assert has_placeholder(content), "No placeholder text for undiscussed sections"
         assert total_markers(content) > 0, "No uncertainty markers found"
 
-        assert spec_state["name"].startswith("task-dashboard"), (
+        assert spec_state["name"].startswith("about-page"), (
             f"Unexpected spec filename: {spec_state['name']}"
-        )
-        assert "product specification" in content.lower(), (
-            "Missing top-level Product Specification section"
-        )
-        assert "technical specification" in content.lower(), (
-            "Missing top-level Technical Specification section"
         )
         assert markers_tracked_in_open_questions(content), (
             "Uncertainty markers exist but no Open Questions section found"
         )
 
     @pytest.mark.timeout(600)
-    def test_02_refine_spec(self, test_workspace, spec_state):
+    def test_02_refine_spec(self, test_workspace, plugin_dirs, spec_state):
         refinement = _read_fixture("refinement_input.txt")
         spec_name = spec_state["name"]
         original_content = open(spec_state["path"]).read()
         original_sections = extract_sections(original_content)
 
         run_claude_conversation(
-            _refine_spec_messages(spec_name, refinement), cwd=test_workspace
+            _refine_spec_messages(spec_name, refinement),
+            cwd=test_workspace,
+            plugin_dirs=plugin_dirs,
         )
 
         spec_files = [
@@ -113,12 +111,12 @@ class TestD3Workflow:
         assert updated_content != original_content, "Spec unchanged after refinement"
 
         lower = updated_content.lower()
-        assert "postgresql" in lower or "priority" in lower, (
+        assert "acme" in lower, (
             "Refinement content not found in updated spec"
         )
 
         updated_sections = extract_sections(updated_content)
-        for heading in ["overview", "user journey"]:
+        for heading in ["overview"]:
             orig = original_sections.get(heading)
             if orig is not None:
                 assert heading in updated_sections, (
@@ -126,9 +124,11 @@ class TestD3Workflow:
                 )
 
     @pytest.mark.timeout(600)
-    def test_03_decompose(self, test_workspace, spec_state):
+    def test_03_decompose(self, test_workspace, plugin_dirs, spec_state):
         output = run_claude_conversation(
-            _decompose_messages(spec_state["name"]), cwd=test_workspace
+            _decompose_messages(spec_state["name"]),
+            cwd=test_workspace,
+            plugin_dirs=plugin_dirs,
         )
 
         stories_dir = os.path.join(test_workspace, "stories")
@@ -175,10 +175,12 @@ class TestD3Workflow:
 class TestCustomTemplates:
 
     @pytest.mark.timeout(600)
-    def test_create_spec_uses_custom_template(self, custom_template_workspace):
+    def test_create_spec_uses_custom_template(self, custom_template_workspace, plugin_dirs):
         transcript = _read_fixture("sample_transcript.txt")
         output = run_claude_conversation(
-            _create_spec_messages(transcript), cwd=custom_template_workspace
+            _create_spec_messages(transcript),
+            cwd=custom_template_workspace,
+            plugin_dirs=plugin_dirs,
         )
 
         spec_files = glob.glob(

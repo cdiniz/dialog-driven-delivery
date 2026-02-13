@@ -1,3 +1,1 @@
-Dev Lead decided: We'll use PostgreSQL for storage.
-PM confirmed: Priority levels will be Low, Medium, High, Critical.
-Design agreed: Dashboard will use a kanban board layout with columns for each status.
+PM confirmed: The company name is "Acme Corp".

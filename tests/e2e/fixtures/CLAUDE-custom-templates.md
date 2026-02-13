@@ -17,8 +17,8 @@
 
 ### Templates
 - Product Spec: ./templates/custom-product-spec.md
-- Technical Spec: ./templates/feature-tech-spec.md
-- User Story: ./templates/user-story.md
+- Technical Spec: ./templates/custom-tech-spec.md
+- User Story: ./templates/custom-user-story.md
 
 ## Project Information
 **Project Name:** E2E Test Project

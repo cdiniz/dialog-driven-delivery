@@ -5,11 +5,6 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
-_PLUGIN_FLAGS = [
-    "--plugin-dir", str(REPO_ROOT / "d3"),
-    "--plugin-dir", str(REPO_ROOT / "d3-markdown"),
-]
-
 
 def _log_timing(label: str, wall_s: float, parsed: dict):
     api_ms = parsed.get("duration_api_ms", 0)
@@ -30,14 +25,19 @@ def _log_timing(label: str, wall_s: float, parsed: dict):
 def run_claude_conversation(
     messages: list[str],
     cwd: str,
+    plugin_dirs: list[str],
     timeout_per_turn: int = 300,
     model: str = "sonnet",
 ) -> str:
+    plugin_flags = []
+    for d in plugin_dirs:
+        plugin_flags.extend(["--plugin-dir", d])
+
     json_flags = [
         "--model", model,
         "--dangerously-skip-permissions",
         "--output-format", "json",
-        *_PLUGIN_FLAGS,
+        *plugin_flags,
     ]
 
     session_id = None

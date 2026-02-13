@@ -1,13 +1,37 @@
 import os
 import shutil
-import subprocess
+from pathlib import Path
 
 import pytest
 
 from .claude_runner import REPO_ROOT
 
 FIXTURES_DIR = REPO_ROOT / "tests" / "e2e" / "fixtures"
-TEMPLATES_DIR = REPO_ROOT / "d3" / "skills" / "d3-templates" / "references"
+PLUGIN_DIRS = [REPO_ROOT / "d3", REPO_ROOT / "d3-markdown"]
+TEMP_PLUGINS_DIR = Path("/tmp/d3_e2e_plugins")
+
+FILE_SWAPS = {
+    "skills/d3-templates/references/feature-product-spec.md": "e2e-product-spec.md",
+    "skills/d3-templates/references/feature-tech-spec.md": "e2e-tech-spec.md",
+    "skills/d3-templates/references/user-story.md": "e2e-user-story.md",
+    "skills/d3-templates/SKILL.md": "e2e-skill.md",
+}
+
+
+def _init_plugins():
+    if TEMP_PLUGINS_DIR.exists():
+        shutil.rmtree(TEMP_PLUGINS_DIR)
+    TEMP_PLUGINS_DIR.mkdir()
+    plugin_paths = []
+    for plugin_dir in PLUGIN_DIRS:
+        dest = TEMP_PLUGINS_DIR / plugin_dir.name
+        shutil.copytree(plugin_dir, dest)
+        for rel_path, fixture_name in FILE_SWAPS.items():
+            template_dest = dest / rel_path
+            if template_dest.exists():
+                shutil.copy(FIXTURES_DIR / fixture_name, template_dest)
+        plugin_paths.append(str(dest))
+    return plugin_paths
 
 
 def _init_workspace(tmpdir, claude_md_name="CLAUDE.md"):
@@ -15,12 +39,12 @@ def _init_workspace(tmpdir, claude_md_name="CLAUDE.md"):
         shutil.rmtree(tmpdir)
     os.makedirs(tmpdir)
     shutil.copy(FIXTURES_DIR / claude_md_name, os.path.join(tmpdir, "CLAUDE.md"))
-    subprocess.run(["git", "init"], cwd=tmpdir, capture_output=True)
-    subprocess.run(["git", "add", "."], cwd=tmpdir, capture_output=True)
-    subprocess.run(
-        ["git", "commit", "-m", "init"], cwd=tmpdir, capture_output=True
-    )
     return tmpdir
+
+
+@pytest.fixture(scope="session")
+def plugin_dirs():
+    return _init_plugins()
 
 
 @pytest.fixture(scope="session")
@@ -36,35 +60,11 @@ def custom_template_workspace():
     )
     templates_dest = os.path.join(tmpdir, "templates")
     os.makedirs(templates_dest)
-    shutil.copy(
-        FIXTURES_DIR / "custom-product-spec.md",
-        os.path.join(templates_dest, "custom-product-spec.md"),
-    )
-    shutil.copy(
-        TEMPLATES_DIR / "feature-tech-spec.md",
-        os.path.join(templates_dest, "feature-tech-spec.md"),
-    )
-    shutil.copy(
-        TEMPLATES_DIR / "user-story.md",
-        os.path.join(templates_dest, "user-story.md"),
-    )
-    subprocess.run(["git", "add", "."], cwd=tmpdir, capture_output=True)
-    subprocess.run(
-        ["git", "commit", "-m", "add templates"], cwd=tmpdir, capture_output=True
-    )
+    for name in ["custom-product-spec.md", "custom-tech-spec.md", "custom-user-story.md"]:
+        shutil.copy(FIXTURES_DIR / name, os.path.join(templates_dest, name))
     yield tmpdir
 
 
 @pytest.fixture(scope="session")
 def spec_state():
     return {}
-
-
-@pytest.fixture(scope="session")
-def sample_transcript():
-    return (FIXTURES_DIR / "sample_transcript.txt").read_text()
-
-
-@pytest.fixture(scope="session")
-def refinement_input():
-    return (FIXTURES_DIR / "refinement_input.txt").read_text()

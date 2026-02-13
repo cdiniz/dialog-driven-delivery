@@ -35,6 +35,7 @@ def run_claude_conversation(
     json_flags = [
         "--model", model,
         "--dangerously-skip-permissions",
+        "--setting-sources", "",
         "--output-format", "json",
         *plugin_flags,
     ]

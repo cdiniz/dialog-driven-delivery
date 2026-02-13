@@ -25,6 +25,10 @@ def _read_fixture(name: str) -> str:
         return f.read()
 
 
+def _find_specs(workspace):
+    return glob.glob(os.path.join(workspace, "specs", "*.md"))
+
+
 def _create_spec_messages(transcript: str) -> list[str]:
     return [
         "/d3:create-spec\n\nI want to provide a meeting transcript.",
@@ -54,7 +58,7 @@ def _decompose_messages(spec_name: str) -> list[str]:
 class TestSpecWorkflow:
 
     @pytest.mark.timeout(600)
-    def test_01_create_spec(self, test_workspace, plugin_dirs, spec_state):
+    def test_01_create_spec(self, test_workspace, plugin_dirs):
         transcript = _read_fixture("sample_transcript.txt")
         output = run_claude_conversation(
             _create_spec_messages(transcript),
@@ -62,12 +66,11 @@ class TestSpecWorkflow:
             plugin_dirs=plugin_dirs,
         )
 
-        spec_files = glob.glob(os.path.join(test_workspace, "specs", "*.md"))
-        assert len(spec_files) >= 1, f"No spec files created. Output:\n{output[:1000]}"
-
+        spec_files = _find_specs(test_workspace)
+        assert len(spec_files) >= 1, "No spec files found"
+        assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"
         spec_path = spec_files[0]
-        spec_state["path"] = spec_path
-        spec_state["name"] = os.path.basename(spec_path)
+        spec_name = os.path.basename(spec_path)
 
         content = open(spec_path).read()
         headings = heading_texts_lower(content)
@@ -80,18 +83,22 @@ class TestSpecWorkflow:
         assert has_placeholder(content), "No placeholder text for undiscussed sections"
         assert total_markers(content) > 0, "No uncertainty markers found"
 
-        assert spec_state["name"].startswith("about-page"), (
-            f"Unexpected spec filename: {spec_state['name']}"
+        assert spec_name.startswith("about-page"), (
+            f"Unexpected spec filename: {spec_name}"
         )
         assert markers_tracked_in_open_questions(content), (
             "Uncertainty markers exist but no Open Questions section found"
         )
 
     @pytest.mark.timeout(600)
-    def test_02_refine_spec(self, test_workspace, plugin_dirs, spec_state):
+    def test_02_refine_spec(self, test_workspace, plugin_dirs):
+        spec_files = _find_specs(test_workspace)
+        assert len(spec_files) >= 1, "No spec files found"
+        assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"
+        spec_path = spec_files[0]
+        spec_name = os.path.basename(spec_path)
         refinement = _read_fixture("refinement_input.txt")
-        spec_name = spec_state["name"]
-        original_content = open(spec_state["path"]).read()
+        original_content = open(spec_path).read()
         original_sections = extract_sections(original_content)
 
         run_claude_conversation(
@@ -100,14 +107,12 @@ class TestSpecWorkflow:
             plugin_dirs=plugin_dirs,
         )
 
-        spec_files = [
-            f
-            for f in glob.glob(os.path.join(test_workspace, "specs", "*.md"))
-            if not f.endswith(".backup")
-        ]
-        assert len(spec_files) == 1, f"Spec duplicated or missing: {spec_files}"
+        post_refine_specs = _find_specs(test_workspace)
+        assert len(post_refine_specs) == 2, f"Expected spec + backup, got: {post_refine_specs}"
+        backups = [f for f in post_refine_specs if f.endswith(".backup")]
+        assert len(backups) == 1, "Backup file not created during refinement"
 
-        updated_content = open(spec_state["path"]).read()
+        updated_content = open(spec_path).read()
         assert updated_content != original_content, "Spec unchanged after refinement"
 
         lower = updated_content.lower()
@@ -124,9 +129,14 @@ class TestSpecWorkflow:
                 )
 
     @pytest.mark.timeout(600)
-    def test_03_decompose(self, test_workspace, plugin_dirs, spec_state):
+    def test_03_decompose(self, test_workspace, plugin_dirs):
+        spec_files = _find_specs(test_workspace)
+        assert len(spec_files) >= 1, "No spec files found"
+        assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"
+        spec_path = spec_files[0]
+        spec_name = os.path.basename(spec_path)
         output = run_claude_conversation(
-            _decompose_messages(spec_state["name"]),
+            _decompose_messages(spec_name),
             cwd=test_workspace,
             plugin_dirs=plugin_dirs,
         )
@@ -152,7 +162,7 @@ class TestSpecWorkflow:
             f"No story files found. Files: {all_files}. Output:\n{output[:1000]}"
         )
 
-        spec_stem = os.path.splitext(spec_state["name"])[0]
+        spec_stem = os.path.splitext(spec_name)[0]
         spec_subdir = os.path.join(stories_dir, spec_stem)
         assert os.path.isdir(spec_subdir), (
             f"Stories not in spec-named subdirectory. Found: {all_files}"

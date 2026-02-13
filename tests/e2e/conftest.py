@@ -66,8 +66,3 @@ def custom_template_workspace(worker_id):
     for name in ["product-spec.md", "tech-spec.md", "user-story.md"]:
         shutil.copy(custom_dir / name, os.path.join(templates_dest, name))
     yield tmpdir
-
-
-@pytest.fixture(scope="session")
-def spec_state():
-    return {}

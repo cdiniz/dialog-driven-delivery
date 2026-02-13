@@ -51,7 +51,7 @@ def _decompose_messages(spec_name: str) -> list[str]:
     ]
 
 
-class TestD3Workflow:
+class TestSpecWorkflow:
 
     @pytest.mark.timeout(600)
     def test_01_create_spec(self, test_workspace, plugin_dirs, spec_state):

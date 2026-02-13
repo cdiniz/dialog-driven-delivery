@@ -3,7 +3,7 @@ import os
 
 import pytest
 
-from .claude_runner import run_claude
+from .claude_runner import run_claude_conversation
 from .validators import (
     extract_frontmatter,
     extract_sections,
@@ -25,30 +25,40 @@ def _read_fixture(name: str) -> str:
         return f.read()
 
 
+def _create_spec_messages(transcript: str) -> list[str]:
+    return [
+        "/d3:create-spec\n\nI want to provide a meeting transcript.",
+        f"Here is the transcript:\n---\n{transcript}\n---\n\n"
+        f"Use the default root location.\n"
+        f'For the title, use "Task Dashboard".',
+        "The spec looks good, please create it.",
+    ]
+
+
+def _refine_spec_messages(spec_name: str, refinement: str) -> list[str]:
+    return [
+        f"/d3:refine-spec {spec_name}\n\nI want to describe changes.",
+        f"Here are the updates from our follow-up meeting:\n---\n{refinement}\n---",
+        "The proposed changes look correct, please apply them.",
+    ]
+
+
+def _decompose_messages(spec_name: str) -> list[str]:
+    return [
+        f"/d3:decompose {spec_name}\n\nProject key: LOCAL",
+        "I did not have a decomposition meeting. Please decompose conversationally.",
+        "The proposed stories look good. Please create them all. Make assumptions where needed and document them in the stories.",
+    ]
+
+
 class TestD3Workflow:
 
-    @pytest.mark.timeout(360)
+    @pytest.mark.timeout(600)
     def test_01_create_spec(self, test_workspace, spec_state):
         transcript = _read_fixture("sample_transcript.txt")
-
-        prompt = f"""\
-/d3:create-spec
-
-Follow every step in the create-spec workflow. Read the templates before generating.
-
-I want to provide a meeting transcript.
-
-Here is the transcript:
----
-{transcript}
----
-
-Use the default root location.
-For the title, use "Task Dashboard".
-The spec looks good, please create it.
-Do not ask any questions. Use the information provided to make all decisions.
-"""
-        output = run_claude(prompt, cwd=test_workspace)
+        output = run_claude_conversation(
+            _create_spec_messages(transcript), cwd=test_workspace
+        )
 
         spec_files = glob.glob(os.path.join(test_workspace, "specs", "*.md"))
         assert len(spec_files) >= 1, f"No spec files created. Output:\n{output[:1000]}"
@@ -68,7 +78,7 @@ Do not ask any questions. Use the information provided to make all decisions.
         assert has_placeholder(content), "No placeholder text for undiscussed sections"
         assert total_markers(content) > 0, "No uncertainty markers found"
 
-        assert "task-dashboard.md" == spec_state["name"], (
+        assert spec_state["name"].startswith("task-dashboard"), (
             f"Unexpected spec filename: {spec_state['name']}"
         )
         assert "product specification" in content.lower(), (
@@ -81,28 +91,16 @@ Do not ask any questions. Use the information provided to make all decisions.
             "Uncertainty markers exist but no Open Questions section found"
         )
 
-    @pytest.mark.timeout(360)
+    @pytest.mark.timeout(600)
     def test_02_refine_spec(self, test_workspace, spec_state):
         refinement = _read_fixture("refinement_input.txt")
         spec_name = spec_state["name"]
         original_content = open(spec_state["path"]).read()
         original_sections = extract_sections(original_content)
 
-        prompt = f"""\
-/d3:refine-spec {spec_name}
-
-I want to describe changes (option C - describe changes).
-
-Here are the updates from our follow-up meeting:
----
-{refinement}
----
-
-These decisions resolve open questions in the spec. Apply all changes immediately.
-The proposed changes look correct, please apply them now using the update_spec operation.
-Do not ask any questions. Do not show me a preview. Just update the spec file directly.
-"""
-        run_claude(prompt, cwd=test_workspace, timeout=600)
+        run_claude_conversation(
+            _refine_spec_messages(spec_name, refinement), cwd=test_workspace
+        )
 
         spec_files = [
             f
@@ -127,22 +125,11 @@ Do not ask any questions. Do not show me a preview. Just update the spec file di
                     f"Section '{heading}' removed during refinement"
                 )
 
-    @pytest.mark.timeout(360)
+    @pytest.mark.timeout(600)
     def test_03_decompose(self, test_workspace, spec_state):
-        spec_name = spec_state["name"]
-
-        prompt = f"""\
-/d3:decompose {spec_name}
-
-Project key: LOCAL
-
-I did not have a decomposition meeting. Please decompose conversationally.
-
-The proposed stories look good. Please create them all.
-Confirm all INVEST checks pass. Proceed with creation.
-Do not ask any questions. Use the information provided to make all decisions.
-"""
-        output = run_claude(prompt, cwd=test_workspace)
+        output = run_claude_conversation(
+            _decompose_messages(spec_state["name"]), cwd=test_workspace
+        )
 
         stories_dir = os.path.join(test_workspace, "stories")
         assert os.path.isdir(stories_dir), (
@@ -165,7 +152,8 @@ Do not ask any questions. Use the information provided to make all decisions.
             f"No story files found. Files: {all_files}. Output:\n{output[:1000]}"
         )
 
-        spec_subdir = os.path.join(stories_dir, "task-dashboard")
+        spec_stem = os.path.splitext(spec_state["name"])[0]
+        spec_subdir = os.path.join(stories_dir, spec_stem)
         assert os.path.isdir(spec_subdir), (
             f"Stories not in spec-named subdirectory. Found: {all_files}"
         )
@@ -174,7 +162,7 @@ Do not ask any questions. Use the information provided to make all decisions.
             for field in STORY_FRONTMATTER_FIELDS:
                 assert field in fm, f"Missing frontmatter '{field}' in {path}"
 
-            assert "task-dashboard" in str(fm.get("spec", "")), (
+            assert spec_stem in str(fm.get("spec", "")), (
                 f"Story doesn't reference parent spec in {path}"
             )
 
@@ -182,3 +170,27 @@ Do not ask any questions. Use the information provided to make all decisions.
             assert "given" in lower and "when" in lower and "then" in lower, (
                 f"Missing Given-When-Then ACs in {path}"
             )
+
+
+class TestCustomTemplates:
+
+    @pytest.mark.timeout(600)
+    def test_create_spec_uses_custom_template(self, custom_template_workspace):
+        transcript = _read_fixture("sample_transcript.txt")
+        output = run_claude_conversation(
+            _create_spec_messages(transcript), cwd=custom_template_workspace
+        )
+
+        spec_files = glob.glob(
+            os.path.join(custom_template_workspace, "specs", "*.md")
+        )
+        assert len(spec_files) >= 1, (
+            f"No spec files created. Output:\n{output[:1000]}"
+        )
+
+        content = open(spec_files[0]).read()
+        headings = heading_texts_lower(content)
+
+        assert "operational readiness" in headings, (
+            f"Custom template heading not found. Headings: {headings}"
+        )

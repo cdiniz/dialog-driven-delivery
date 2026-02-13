@@ -1,0 +1,124 @@
+# Feature: [Feature Name]
+
+**Specification:** [Will be filled after creation]
+
+---
+
+## 1. Overview
+
+### What & Why
+
+[One clear paragraph: What this feature does and why it matters to the business. Include the core problem it solves and the value it delivers.]
+
+### Target Users & Success Metrics
+
+- **Users:** [Primary user persona/role who will use this]
+- **Success Metrics:**
+  - [Measurable outcome 1 - specific metric with target]
+  - [Measurable outcome 2 - specific metric with target]
+  - [Add more metrics only if truly distinct and valuable]
+
+---
+
+## 2. User Journey
+
+### Primary Workflow: [Descriptive Name]
+
+**When:** [Trigger - what initiates this workflow]
+
+**Steps:**
+
+1. User [specific action]
+2. System [specific response/behavior]
+3. User [specific action]
+4. System [specific response/behavior]
+   [Continue with essential steps only - aim for 5-8 steps max]
+
+**Success:** [What successful completion looks like for the user]
+
+**Edge Cases:**
+
+- [Key error scenario 1]: [How system handles it]
+- [Key error scenario 2]: [How system handles it]
+  [Only include significant edge cases that affect the core workflow]
+
+### [Extra Workflows - only if significantly different]
+
+[Follow same structure but more concise - only include if it's a truly distinct user journey, not a variation]
+
+---
+
+## 3. Requirements
+
+### Must Have (Core Features)
+
+- **[Feature/Capability Name]:** [What it does and key behavior]
+  - Input: [What user provides, format, validation rules]
+  - Validation: [Specific rules and exact error messages]
+  - Output: [What user sees as result]
+
+- **[Feature/Capability Name]:** [What it does and key behavior]
+  - [Include subsections only as needed - keep it flat when possible]
+
+- **[Feature/Capability Name]:** [What it does and key behavior]
+
+[Focus on 5-10 core requirements that define the feature's essence]
+
+### Out of Scope
+
+- [What we're explicitly NOT doing in this iteration]
+- [Commonly requested feature being deferred]
+- [Functionality that belongs elsewhere]
+  [Be clear to prevent scope creep]
+
+### Constraints & Dependencies
+
+- **Technical:** [Key technical limitation or requirement]
+- **Business:** [Timeline, budget, or resource constraint]
+- **Compliance:** [Any regulatory requirements - GDPR, HIPAA, etc.]
+- **Dependencies:** [What this feature depends on or blocks]
+  [Only include actual constraints that impact implementation]
+
+---
+
+## 4. Open Questions
+
+### Needs Answer Before Implementation
+
+**Q1:** [Specific question that needs resolution]?
+
+- Owner: [Who will decide - Product/Engineering/Design]
+- Needed by: [When - Before design/Before dev/Before launch]
+- Context: [Where this appears in requirements]
+
+**Q2:** [Specific question that needs resolution]?
+
+- Owner: [Who will decide]
+- Needed by: [When]
+
+[Every `[OPEN QUESTION]` or `[CLARIFICATION NEEDED]` marker in the spec must have an entry here]
+
+### Assumptions We're Making
+
+1. **[Topic/Area]:** [What we're assuming]. [Why this is reasonable]. [Impact if wrong].
+
+2. **[Topic/Area]:** [What we're assuming]. [Why this is reasonable]. [Impact if wrong].
+
+[Every `[ASSUMPTION]` marker in the spec must have an entry here]
+
+---
+
+## 5. Custom Marker Section
+
+### Operational Readiness
+
+- **Monitoring:** [What metrics and alerts are needed]
+- **Rollback Plan:** [How to revert if issues arise]
+- **Support Impact:** [Expected support ticket volume and training needs]
+
+---
+
+## References
+
+- **Related Docs:** [Essential links only]
+- **Design/Mockups:** [If available]

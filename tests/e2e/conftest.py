@@ -7,11 +7,12 @@ from .claude_runner import REPO_ROOT
 
 FIXTURES_DIR = REPO_ROOT / "tests" / "e2e" / "fixtures"
 PLUGIN_DIRS = [REPO_ROOT / "d3", REPO_ROOT / "d3-markdown"]
+TEMPLATES_DIR = FIXTURES_DIR / "templates"
 FILE_SWAPS = {
-    "skills/d3-templates/references/feature-product-spec.md": "e2e-product-spec.md",
-    "skills/d3-templates/references/feature-tech-spec.md": "e2e-tech-spec.md",
-    "skills/d3-templates/references/user-story.md": "e2e-user-story.md",
-    "skills/d3-templates/SKILL.md": "e2e-skill.md",
+    "skills/d3-templates/references/feature-product-spec.md": "product-spec.md",
+    "skills/d3-templates/references/feature-tech-spec.md": "tech-spec.md",
+    "skills/d3-templates/references/user-story.md": "user-story.md",
+    "skills/d3-templates/SKILL.md": "SKILL.md",
 }
 
 
@@ -30,7 +31,7 @@ def _init_plugins(worker_id: str):
         for rel_path, fixture_name in FILE_SWAPS.items():
             template_dest = dest / rel_path
             if template_dest.exists():
-                shutil.copy(FIXTURES_DIR / fixture_name, template_dest)
+                shutil.copy(TEMPLATES_DIR / fixture_name, template_dest)
         plugin_paths.append(str(dest))
     return plugin_paths
 
@@ -39,7 +40,7 @@ def _init_workspace(tmpdir, claude_md_name="CLAUDE.md"):
     if os.path.exists(tmpdir):
         shutil.rmtree(tmpdir)
     os.makedirs(tmpdir)
-    shutil.copy(FIXTURES_DIR / claude_md_name, os.path.join(tmpdir, "CLAUDE.md"))
+    shutil.copy(FIXTURES_DIR / "workspace" / claude_md_name, os.path.join(tmpdir, "CLAUDE.md"))
     return tmpdir
 
 
@@ -61,8 +62,9 @@ def custom_template_workspace(worker_id):
     )
     templates_dest = os.path.join(tmpdir, "templates")
     os.makedirs(templates_dest)
-    for name in ["custom-product-spec.md", "custom-tech-spec.md", "custom-user-story.md"]:
-        shutil.copy(FIXTURES_DIR / name, os.path.join(templates_dest, name))
+    custom_dir = FIXTURES_DIR / "custom-templates"
+    for name in ["product-spec.md", "tech-spec.md", "user-story.md"]:
+        shutil.copy(custom_dir / name, os.path.join(templates_dest, name))
     yield tmpdir
 
 

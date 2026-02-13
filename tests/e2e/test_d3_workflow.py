@@ -13,7 +13,7 @@ from .validators import (
     total_markers,
 )
 
-FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
+INPUTS_DIR = os.path.join(os.path.dirname(__file__), "fixtures", "inputs")
 
 PRODUCT_HEADINGS = ["overview", "requirements", "open questions"]
 TECH_HEADINGS = ["technical approach", "testing requirements"]
@@ -21,7 +21,7 @@ STORY_FRONTMATTER_FIELDS = ["type", "id", "spec", "title", "status"]
 
 
 def _read_fixture(name: str) -> str:
-    with open(os.path.join(FIXTURES_DIR, name)) as f:
+    with open(os.path.join(INPUTS_DIR, name)) as f:
         return f.read()
 
 

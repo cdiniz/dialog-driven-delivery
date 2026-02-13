@@ -29,8 +29,8 @@ uv run pytest tests/e2e -n0 -s -k test_01_create_spec
 
 ## How it works
 
-1. **Plugin isolation** — plugins (`d3`, `d3-markdown`) are copied to `/tmp/d3_e2e_plugins_<worker>/` with template files swapped for simplified e2e versions
-2. **Workspaces** — each test suite gets its own temp directory (`/tmp/d3_e2e_debug_<worker>/`, `/tmp/d3_e2e_custom_tpl_<worker>/`)
+1. **Plugin isolation** — plugins (`d3`, `d3-markdown`) are copied to `tests/e2e/.workspaces/plugins_<worker>/` with template files swapped for simplified e2e versions
+2. **Workspaces** — each test suite gets its own temp directory (`tests/e2e/.workspaces/debug_<worker>/`, `tests/e2e/.workspaces/custom_tpl_<worker>/`)
 3. **Parallelism** — `pytest-xdist` with `--dist loadscope` groups tests by class, so `TestD3Workflow` stays sequential while both suites run concurrently
 
 ## Inspecting failures
@@ -38,8 +38,8 @@ uv run pytest tests/e2e -n0 -s -k test_01_create_spec
 Workspaces persist after runs. Check the generated specs and stories in:
 
 ```
-/tmp/d3_e2e_debug_<worker>/specs/
-/tmp/d3_e2e_debug_<worker>/stories/
+tests/e2e/.workspaces/debug_<worker>/specs/
+tests/e2e/.workspaces/debug_<worker>/stories/
 ```
 
 When running with `-n0`, the worker suffix is `master`.

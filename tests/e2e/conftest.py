@@ -1,6 +1,5 @@
 import os
 import shutil
-from pathlib import Path
 
 import pytest
 
@@ -16,11 +15,14 @@ FILE_SWAPS = {
 }
 
 
+E2E_TMP = REPO_ROOT / "tests" / "e2e" / ".workspaces"
+
+
 def _init_plugins(worker_id: str):
-    base = Path(f"/tmp/d3_e2e_plugins_{worker_id}")
+    base = E2E_TMP / f"plugins_{worker_id}"
     if base.exists():
         shutil.rmtree(base)
-    base.mkdir()
+    base.mkdir(parents=True)
     plugin_paths = []
     for plugin_dir in PLUGIN_DIRS:
         dest = base / plugin_dir.name
@@ -48,13 +50,13 @@ def plugin_dirs(worker_id):
 
 @pytest.fixture(scope="session")
 def test_workspace(worker_id):
-    yield _init_workspace(f"/tmp/d3_e2e_debug_{worker_id}")
+    yield _init_workspace(str(E2E_TMP / f"debug_{worker_id}"))
 
 
 @pytest.fixture(scope="session")
 def custom_template_workspace(worker_id):
     tmpdir = _init_workspace(
-        f"/tmp/d3_e2e_custom_tpl_{worker_id}",
+        str(E2E_TMP / f"custom_tpl_{worker_id}"),
         claude_md_name="CLAUDE-custom-templates.md",
     )
     templates_dest = os.path.join(tmpdir, "templates")

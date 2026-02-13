@@ -5,7 +5,6 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
-
 def _log_timing(label: str, wall_s: float, parsed: dict):
     api_ms = parsed.get("duration_api_ms", 0)
     total_ms = parsed.get("duration_ms", 0)

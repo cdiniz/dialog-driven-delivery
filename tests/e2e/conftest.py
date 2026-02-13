@@ -8,8 +8,6 @@ from .claude_runner import REPO_ROOT
 
 FIXTURES_DIR = REPO_ROOT / "tests" / "e2e" / "fixtures"
 PLUGIN_DIRS = [REPO_ROOT / "d3", REPO_ROOT / "d3-markdown"]
-TEMP_PLUGINS_DIR = Path("/tmp/d3_e2e_plugins")
-
 FILE_SWAPS = {
     "skills/d3-templates/references/feature-product-spec.md": "e2e-product-spec.md",
     "skills/d3-templates/references/feature-tech-spec.md": "e2e-tech-spec.md",
@@ -18,13 +16,14 @@ FILE_SWAPS = {
 }
 
 
-def _init_plugins():
-    if TEMP_PLUGINS_DIR.exists():
-        shutil.rmtree(TEMP_PLUGINS_DIR)
-    TEMP_PLUGINS_DIR.mkdir()
+def _init_plugins(worker_id: str):
+    base = Path(f"/tmp/d3_e2e_plugins_{worker_id}")
+    if base.exists():
+        shutil.rmtree(base)
+    base.mkdir()
     plugin_paths = []
     for plugin_dir in PLUGIN_DIRS:
-        dest = TEMP_PLUGINS_DIR / plugin_dir.name
+        dest = base / plugin_dir.name
         shutil.copytree(plugin_dir, dest)
         for rel_path, fixture_name in FILE_SWAPS.items():
             template_dest = dest / rel_path
@@ -43,19 +42,19 @@ def _init_workspace(tmpdir, claude_md_name="CLAUDE.md"):
 
 
 @pytest.fixture(scope="session")
-def plugin_dirs():
-    return _init_plugins()
+def plugin_dirs(worker_id):
+    return _init_plugins(worker_id)
 
 
 @pytest.fixture(scope="session")
-def test_workspace():
-    yield _init_workspace("/tmp/d3_e2e_debug")
+def test_workspace(worker_id):
+    yield _init_workspace(f"/tmp/d3_e2e_debug_{worker_id}")
 
 
 @pytest.fixture(scope="session")
-def custom_template_workspace():
+def custom_template_workspace(worker_id):
     tmpdir = _init_workspace(
-        "/tmp/d3_e2e_custom_templates",
+        f"/tmp/d3_e2e_custom_tpl_{worker_id}",
         claude_md_name="CLAUDE-custom-templates.md",
     )
     templates_dest = os.path.join(tmpdir, "templates")

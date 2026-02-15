@@ -5,7 +5,7 @@
 ### Spec Provider
 **Skill:** d3-markdown:markdown-spec-provider
 **Configuration:**
-- Specs Directory: ./specs
+- Specs Directory: ./custom-specs
 - Default Location: .
 
 ### Story Provider

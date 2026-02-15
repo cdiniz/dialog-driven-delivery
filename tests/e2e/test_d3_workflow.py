@@ -195,6 +195,9 @@ class TestCustomTemplates:
 
     @pytest.mark.timeout(600)
     def test_create_spec_uses_custom_template(self, custom_template_workspace, plugin_dirs):
+        custom_specs_dir = os.path.join(custom_template_workspace, "custom-specs")
+        if os.path.exists(custom_specs_dir):
+            shutil.rmtree(custom_specs_dir)
         transcript = _read_fixture("sample_transcript.txt")
         output = run_claude_conversation(
             _create_spec_messages(transcript),
@@ -203,7 +206,7 @@ class TestCustomTemplates:
         )
 
         spec_files = glob.glob(
-            os.path.join(custom_template_workspace, "specs", "*.md")
+            os.path.join(custom_template_workspace, "custom-specs", "*.md")
         )
         assert len(spec_files) >= 1, (
             f"No spec files created. Output:\n{output[:1000]}"

@@ -1,5 +1,6 @@
 import glob
 import os
+import shutil
 
 import pytest
 
@@ -59,6 +60,9 @@ class TestSpecWorkflow:
 
     @pytest.mark.timeout(600)
     def test_01_create_spec(self, test_workspace, plugin_dirs):
+        specs_dir = os.path.join(test_workspace, "specs")
+        if os.path.exists(specs_dir):
+            shutil.rmtree(specs_dir)
         transcript = _read_fixture("sample_transcript.txt")
         output = run_claude_conversation(
             _create_spec_messages(transcript),
@@ -92,6 +96,8 @@ class TestSpecWorkflow:
 
     @pytest.mark.timeout(600)
     def test_02_refine_spec(self, test_workspace, plugin_dirs):
+        for backup in glob.glob(os.path.join(test_workspace, "specs", "*.backup")):
+            os.remove(backup)
         spec_files = _find_specs(test_workspace)
         assert len(spec_files) >= 1, "No spec files found"
         assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"
@@ -108,9 +114,9 @@ class TestSpecWorkflow:
         )
 
         post_refine_specs = _find_specs(test_workspace)
-        assert len(post_refine_specs) == 2, f"Expected spec + backup, got: {post_refine_specs}"
-        backups = [f for f in post_refine_specs if f.endswith(".backup")]
-        assert len(backups) == 1, "Backup file not created during refinement"
+        assert len(post_refine_specs) >= 1, "Spec file missing after refinement"
+        assert len(post_refine_specs) == 1, f"Spec duplicated after refinement: {post_refine_specs}"
+        assert os.path.exists(spec_path + ".backup"), "Backup file not created during refinement"
 
         updated_content = open(spec_path).read()
         assert updated_content != original_content, "Spec unchanged after refinement"
@@ -130,6 +136,9 @@ class TestSpecWorkflow:
 
     @pytest.mark.timeout(600)
     def test_03_decompose(self, test_workspace, plugin_dirs):
+        stories_dir = os.path.join(test_workspace, "stories")
+        if os.path.exists(stories_dir):
+            shutil.rmtree(stories_dir)
         spec_files = _find_specs(test_workspace)
         assert len(spec_files) >= 1, "No spec files found"
         assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"

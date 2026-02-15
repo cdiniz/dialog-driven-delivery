@@ -1,6 +1,7 @@
 import json
 import subprocess
 import time
+import uuid
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -27,12 +28,13 @@ def run_claude_conversation(
     plugin_dirs: list[str],
     timeout_per_turn: int = 300,
     model: str = "sonnet",
+    debug: bool = True,
 ) -> str:
     plugin_flags = []
     for d in plugin_dirs:
         plugin_flags.extend(["--plugin-dir", d])
 
-    json_flags = [
+    base_flags = [
         "--model", model,
         "--dangerously-skip-permissions",
         "--setting-sources", "",
@@ -44,27 +46,57 @@ def run_claude_conversation(
     output = ""
 
     for i, message in enumerate(messages):
-        flags = list(json_flags)
+        flags = list(base_flags)
         if session_id:
             flags.extend(["--resume", session_id])
+
+        input_message = message
 
         start = time.monotonic()
         result = subprocess.run(
             ["claude", "-p", *flags],
             cwd=cwd,
-            input=message,
+            input=input_message,
             capture_output=True,
             text=True,
             timeout=timeout_per_turn,
         )
         elapsed = time.monotonic() - start
 
+        if debug:
+            print(f"\n{'='*80}")
+            print(f"[DEBUG] Turn {i + 1}/{len(messages)}")
+            print(f"[DEBUG] Message: {message[:200]}{'...' if len(message) > 200 else ''}")
+            print(f"{'='*80}")
+            print(f"\n[DEBUG] Raw stdout ({len(result.stdout)} chars):")
+            print(result.stdout)
+            if result.stderr:
+                print(f"\n[DEBUG] stderr ({len(result.stderr)} chars):")
+                print(result.stderr)
+            print(f"{'='*80}\n")
+            print(flush=True)
+
         if result.returncode != 0 and result.stderr:
             raise RuntimeError(f"claude -p failed (turn {i + 1}): {result.stderr[:500]}")
 
         parsed = json.loads(result.stdout)
+
+        if debug:
+            print(f"[DEBUG] Parsed JSON response:")
+            print(json.dumps(parsed, indent=2))
+
+            if "tool_calls" in parsed:
+                print(f"\n[DEBUG] Tool calls detected:")
+                print(json.dumps(parsed["tool_calls"], indent=2))
+
+            print(flush=True)
+
         _log_timing(f"turn {i + 1}/{len(messages)}", elapsed, parsed)
-        session_id = parsed["session_id"]
+
         output = parsed.get("result", "")
+        if "authentication_error" in output.lower():
+            raise RuntimeError(f"Auth expired (turn {i + 1}). Run 'claude login' to re-authenticate.")
+
+        session_id = parsed["session_id"]
 
     return output

@@ -1,17 +1,19 @@
 ---
 name: markdown-spec-provider
-description: Create and manage specifications as local markdown files. Stores specs in ./specs/ directory as markdown files tracked by git.
+description: Create and manage specifications as local markdown files. Stores specs in a configurable directory (default ./specs/) as markdown files tracked by git.
 ---
 
 ## What This Does
 
-Manages specifications as markdown files in the filesystem. Specs are stored in `./specs/` directory with git version control.
+Manages specifications as markdown files in the filesystem. Specs are stored in `{specs_dir}` directory with git version control.
 
 ---
 
 ## Configuration
 
-Reads from `CLAUDE.md`:
+This skill reads configuration from CLAUDE.md in the current working directory.
+
+**Expected format in CLAUDE.md:**
 ```markdown
 ### Spec Provider
 **Skill:** d3-markdown:markdown-spec-provider
@@ -19,8 +21,11 @@ Reads from `CLAUDE.md`:
 - Specs Directory: ./specs
 ```
 
-**Defaults if not found:**
-- Specs Directory: `./specs`
+**Configuration values:**
+- **Specs Directory**: Path to the directory containing specification files (default: `./specs`)
+- **Default Location**: Default location ID for new specs (default: `.` meaning root)
+
+**Important:** All operations read this configuration at runtime. If CLAUDE.md is not found or doesn't contain the configuration section, defaults are used
 
 ---
 
@@ -39,8 +44,12 @@ Use Glob to find directories in specs/, or return root location.
 ```json
 {
   "locations": [
-    {"id": ".", "name": "Root", "path": "./specs"},
-    {"id": "subdirectory", "name": "Subdirectory", "path": "./specs/subdirectory"}
+    { "id": ".", "name": "Root", "path": "{specs_dir}" },
+    {
+      "id": "subdirectory",
+      "name": "Subdirectory",
+      "path": "{specs_dir}/subdirectory"
+    }
   ]
 }
 ```
@@ -55,7 +64,7 @@ Creates a specification markdown file.
 
 **Implementation:**
 1. Sanitize title to filename: lowercase, spaces to hyphens, remove special chars
-2. Determine filepath: `specs/{location_id}/{filename}.md`
+2. Determine filepath: `{specs_dir}/{location_id}/{filename}.md`
 3. Create directory if needed
 4. Write body to file using Write tool
 5. Return metadata
@@ -63,10 +72,10 @@ Creates a specification markdown file.
 **Returns:**
 ```json
 {
-  "id": "specs/user-authentication.md",
+  "id": "{specs_dir}/user-authentication.md",
   "title": "User Authentication",
-  "url": "file:///absolute/path/to/specs/user-authentication.md",
-  "path": "./specs/user-authentication.md"
+  "url": "file:///absolute/path/to/{specs_dir}/user-authentication.md",
+  "path": "./{specs_dir}/user-authentication.md"
 }
 ```
 
@@ -79,11 +88,11 @@ Retrieves a specification markdown file.
 **Parse args:** page_id (can be full path, partial path, or filename)
 
 **Implementation:**
-1. Find file using Read tool:
-   - Try exact path
-   - Try `specs/{page_id}`
-   - Try `specs/{page_id}.md`
-   - Use Glob pattern `specs/**/*{page_id}*.md` as fallback
+1. Find file using Read tool (always scope to specs directory):
+   - If page_id starts with `{specs_dir}/`: try exact path
+   - Try `{specs_dir}/{page_id}`
+   - Try `{specs_dir}/{page_id}.md`
+   - Use Glob pattern `{specs_dir}/**/*{page_id}*.md` as fallback
 2. Read file content
 3. Extract title from first `# ` heading
 4. Get last modified time from file stats
@@ -92,7 +101,7 @@ Retrieves a specification markdown file.
 **Returns:**
 ```json
 {
-  "id": "specs/user-authentication.md",
+  "id": "{specs_dir}/user-authentication.md",
   "title": "User Authentication",
   "body": "[full markdown content]",
   "url": "file:///absolute/path",
@@ -111,7 +120,12 @@ Updates a specification markdown file.
 
 **Implementation:**
 1. Find file (same logic as get_spec)
-2. Backup current version to `.backup` file
+2. Create backup — **you MUST do this before writing any changes:**
+   ```
+   Bash: cp {filepath} {filepath}.backup
+   ```
+   Example: `cp {specs_dir}/about-page.md {specs_dir}/about-page.md.backup`
+   **Do NOT skip this step. Do NOT proceed to step 3 without creating the backup.**
 3. Write updated body using Write tool
 4. If version_message provided and in git repo: commit with message
 5. Return metadata
@@ -119,7 +133,7 @@ Updates a specification markdown file.
 **Returns:**
 ```json
 {
-  "id": "specs/user-authentication.md",
+  "id": "{specs_dir}/user-authentication.md",
   "url": "file:///absolute/path",
   "version": "abc123f",
   "last_modified": "2026-01-27 12:00:00"
@@ -135,7 +149,7 @@ Searches specifications by content.
 **Parse args:** query, location_id (optional)
 
 **Implementation:**
-1. Use Grep to search markdown files in specs/ (or specified location)
+1. Use Grep to search markdown files in {specs_dir}/ (or specified location)
 2. For each match, extract title and excerpt
 3. Return list of results
 
@@ -144,7 +158,7 @@ Searches specifications by content.
 {
   "results": [
     {
-      "id": "specs/user-authentication.md",
+      "id": "{specs_dir}/user-authentication.md",
       "title": "User Authentication",
       "excerpt": "...OAuth2 authentication...",
       "url": "file:///absolute/path",
@@ -167,12 +181,23 @@ Searches specifications by content.
 
 ## Directory Structure
 
+Example with default `Specs Directory: ./specs`:
+
 ```
 specs/
 ├── feature-1.md
 ├── feature-2.md
 └── subdirectory/
     └── feature-3.md
+```
+
+Example with custom `Specs Directory: ./documentation/specs`:
+
+```
+documentation/
+└── specs/
+    ├── feature-1.md
+    └── feature-2.md
 ```
 
 ---

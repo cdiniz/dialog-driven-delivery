@@ -24,7 +24,7 @@ E2E_TMP = REPO_ROOT / "tests" / "e2e" / ".workspaces"
 
 
 def _init_plugins(worker_id: str):
-    base = E2E_TMP / f"plugins_{worker_id}"
+    base = E2E_TMP / f"plugin-fixtures_{worker_id}"
     if base.exists():
         shutil.rmtree(base)
     base.mkdir(parents=True)
@@ -55,13 +55,13 @@ def plugin_dirs(worker_id):
 
 @pytest.fixture(scope="session")
 def test_workspace(worker_id):
-    yield _init_workspace(str(E2E_TMP / f"debug_{worker_id}"))
+    yield _init_workspace(str(E2E_TMP / f"spec-workflow_{worker_id}"))
 
 
 @pytest.fixture(scope="session")
 def custom_template_workspace(worker_id):
     tmpdir = _init_workspace(
-        str(E2E_TMP / f"custom_tpl_{worker_id}"),
+        str(E2E_TMP / f"template-customisation_{worker_id}"),
         claude_md_name="CLAUDE-custom-templates.md",
     )
     templates_dest = os.path.join(tmpdir, "templates")

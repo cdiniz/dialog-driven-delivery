@@ -14,7 +14,11 @@ FILE_SWAPS = {
     "skills/d3-templates/references/user-story.md": "user-story.md",
     "skills/d3-templates/SKILL.md": "SKILL.md",
 }
-
+CUSTOM_TEMPLATE_FILES = [
+    "custom-product-spec.md",
+    "custom-tech-spec.md",
+    "custom-user-story.md",
+]
 
 E2E_TMP = REPO_ROOT / "tests" / "e2e" / ".workspaces"
 
@@ -37,10 +41,10 @@ def _init_plugins(worker_id: str):
 
 
 def _init_workspace(tmpdir, claude_md_name="CLAUDE.md"):
-    if os.path.exists(tmpdir):
-        shutil.rmtree(tmpdir)
-    os.makedirs(tmpdir)
-    shutil.copy(FIXTURES_DIR / "workspace" / claude_md_name, os.path.join(tmpdir, "CLAUDE.md"))
+    os.makedirs(tmpdir, exist_ok=True)
+    claude_md_dest = os.path.join(tmpdir, "CLAUDE.md")
+    if not os.path.exists(claude_md_dest):
+        shutil.copy(FIXTURES_DIR / "workspace" / claude_md_name, claude_md_dest)
     return tmpdir
 
 
@@ -61,8 +65,8 @@ def custom_template_workspace(worker_id):
         claude_md_name="CLAUDE-custom-templates.md",
     )
     templates_dest = os.path.join(tmpdir, "templates")
-    os.makedirs(templates_dest)
+    os.makedirs(templates_dest, exist_ok=True)
     custom_dir = FIXTURES_DIR / "custom-templates"
-    for name in ["product-spec.md", "tech-spec.md", "user-story.md"]:
+    for name in CUSTOM_TEMPLATE_FILES:
         shutil.copy(custom_dir / name, os.path.join(templates_dest, name))
     yield tmpdir

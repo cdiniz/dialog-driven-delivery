@@ -57,22 +57,26 @@ def _decompose_messages(spec_name: str) -> list[str]:
     ]
 
 
-class TestSpecWorkflow:
+class TestMarkdownWorkflow:
+    """
+    Sequential E2E workflow tests for markdown provider.
+    Tests complete lifecycle: create → refine → decompose.
+    """
 
     @pytest.mark.timeout(600)
     @pytest.mark.dependency()
-    def test_01_create_spec(self, test_workspace, plugin_dirs):
-        specs_dir = os.path.join(test_workspace, "specs")
+    def test_01_create_spec(self, markdown_workflow_workspace, plugin_dirs):
+        specs_dir = os.path.join(markdown_workflow_workspace, "specs")
         if os.path.exists(specs_dir):
             shutil.rmtree(specs_dir)
         transcript = _read_fixture("sample_transcript.txt")
         output = run_claude_conversation(
             _create_spec_messages(transcript),
-            cwd=test_workspace,
+            cwd=markdown_workflow_workspace,
             plugin_dirs=plugin_dirs,
         )
 
-        spec_files = _find_specs(test_workspace)
+        spec_files = _find_specs(markdown_workflow_workspace)
         assert len(spec_files) >= 1, "No spec files found"
         assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"
         spec_path = spec_files[0]
@@ -97,11 +101,11 @@ class TestSpecWorkflow:
         )
 
     @pytest.mark.timeout(600)
-    @pytest.mark.dependency(depends=["TestSpecWorkflow::test_01_create_spec"])
-    def test_02_refine_spec(self, test_workspace, plugin_dirs):
-        for backup in glob.glob(os.path.join(test_workspace, "specs", "*.backup")):
+    @pytest.mark.dependency(depends=["TestMarkdownWorkflow::test_01_create_spec"])
+    def test_02_refine_spec(self, markdown_workflow_workspace, plugin_dirs):
+        for backup in glob.glob(os.path.join(markdown_workflow_workspace, "specs", "*.backup")):
             os.remove(backup)
-        spec_files = _find_specs(test_workspace)
+        spec_files = _find_specs(markdown_workflow_workspace)
         assert len(spec_files) >= 1, "No spec files found"
         assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"
         spec_path = spec_files[0]
@@ -112,11 +116,11 @@ class TestSpecWorkflow:
 
         run_claude_conversation(
             _refine_spec_messages(spec_name, refinement),
-            cwd=test_workspace,
+            cwd=markdown_workflow_workspace,
             plugin_dirs=plugin_dirs,
         )
 
-        post_refine_specs = _find_specs(test_workspace)
+        post_refine_specs = _find_specs(markdown_workflow_workspace)
         assert len(post_refine_specs) >= 1, "Spec file missing after refinement"
         assert len(post_refine_specs) == 1, f"Spec duplicated after refinement: {post_refine_specs}"
         assert os.path.exists(spec_path + ".backup"), "Backup file not created during refinement"
@@ -138,23 +142,23 @@ class TestSpecWorkflow:
                 )
 
     @pytest.mark.timeout(600)
-    @pytest.mark.dependency(depends=["TestSpecWorkflow::test_02_refine_spec"])
-    def test_03_decompose(self, test_workspace, plugin_dirs):
-        stories_dir = os.path.join(test_workspace, "stories")
+    @pytest.mark.dependency(depends=["TestMarkdownWorkflow::test_02_refine_spec"])
+    def test_03_decompose(self, markdown_workflow_workspace, plugin_dirs):
+        stories_dir = os.path.join(markdown_workflow_workspace, "stories")
         if os.path.exists(stories_dir):
             shutil.rmtree(stories_dir)
-        spec_files = _find_specs(test_workspace)
+        spec_files = _find_specs(markdown_workflow_workspace)
         assert len(spec_files) >= 1, "No spec files found"
         assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"
         spec_path = spec_files[0]
         spec_name = os.path.basename(spec_path)
         output = run_claude_conversation(
             _decompose_messages(spec_name),
-            cwd=test_workspace,
+            cwd=markdown_workflow_workspace,
             plugin_dirs=plugin_dirs,
         )
 
-        stories_dir = os.path.join(test_workspace, "stories")
+        stories_dir = os.path.join(markdown_workflow_workspace, "stories")
         assert os.path.isdir(stories_dir), (
             f"Stories dir not created. Output:\n{output[:1000]}"
         )
@@ -195,22 +199,26 @@ class TestSpecWorkflow:
             )
 
 
-class TestCustomTemplates:
+class TestMarkdownConfiguration:
+    """
+    Configuration and customisation tests for markdown provider.
+    Tests run independently.
+    """
 
     @pytest.mark.timeout(600)
-    def test_create_spec_uses_custom_template(self, custom_template_workspace, plugin_dirs):
-        custom_specs_dir = os.path.join(custom_template_workspace, "custom-specs")
+    def test_create_spec_uses_custom_template(self, markdown_custom_template_workspace, plugin_dirs):
+        custom_specs_dir = os.path.join(markdown_custom_template_workspace, "custom-specs")
         if os.path.exists(custom_specs_dir):
             shutil.rmtree(custom_specs_dir)
         transcript = _read_fixture("sample_transcript.txt")
         output = run_claude_conversation(
             _create_spec_messages(transcript),
-            cwd=custom_template_workspace,
+            cwd=markdown_custom_template_workspace,
             plugin_dirs=plugin_dirs,
         )
 
         spec_files = glob.glob(
-            os.path.join(custom_template_workspace, "custom-specs", "*.md")
+            os.path.join(markdown_custom_template_workspace, "custom-specs", "*.md")
         )
         assert len(spec_files) >= 1, (
             f"No spec files created. Output:\n{output[:1000]}"

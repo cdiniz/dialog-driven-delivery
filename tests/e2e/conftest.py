@@ -54,14 +54,14 @@ def plugin_dirs(worker_id):
 
 
 @pytest.fixture(scope="session")
-def test_workspace(worker_id):
-    yield _init_workspace(str(E2E_TMP / f"spec-workflow_{worker_id}"))
+def markdown_workflow_workspace(worker_id):
+    yield _init_workspace(str(E2E_TMP / f"markdown-workflow_{worker_id}"))
 
 
 @pytest.fixture(scope="session")
-def custom_template_workspace(worker_id):
+def markdown_custom_template_workspace(worker_id):
     tmpdir = _init_workspace(
-        str(E2E_TMP / f"template-customisation_{worker_id}"),
+        str(E2E_TMP / f"markdown-custom-templates_{worker_id}"),
         claude_md_name="CLAUDE-custom-templates.md",
     )
     templates_dest = os.path.join(tmpdir, "templates")

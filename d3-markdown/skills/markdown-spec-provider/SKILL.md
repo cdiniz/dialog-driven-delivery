@@ -120,15 +120,9 @@ Updates a specification markdown file.
 
 **Implementation:**
 1. Find file (same logic as get_spec)
-2. Create backup — **you MUST do this before writing any changes:**
-   ```
-   Bash: cp {filepath} {filepath}.backup
-   ```
-   Example: `cp {specs_dir}/about-page.md {specs_dir}/about-page.md.backup`
-   **Do NOT skip this step. Do NOT proceed to step 3 without creating the backup.**
-3. Write updated body using Write tool
-4. If version_message provided and in git repo: commit with message
-5. Return metadata
+2. Write updated body using Write tool
+3. If version_message provided and in git repo: commit with message
+4. Return metadata
 
 **Returns:**
 ```json

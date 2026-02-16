@@ -115,8 +115,6 @@ class TestMarkdownWorkflow:
         post_refine_specs = _find_specs(markdown_workspace_with_spec)
         assert len(post_refine_specs) >= 1, "Spec file missing after refinement"
         assert len(post_refine_specs) == 1, f"Spec duplicated after refinement: {post_refine_specs}"
-        assert os.path.exists(spec_path + ".backup"), "Backup file not created during refinement"
-
         updated_content = open(spec_path).read()
         assert updated_content != original_content, "Spec unchanged after refinement"
 

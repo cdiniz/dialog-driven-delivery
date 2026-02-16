@@ -50,7 +50,8 @@ def _refine_spec_messages(spec_name: str, refinement: str) -> list[str]:
 
 def _decompose_messages(spec_name: str) -> list[str]:
     return [
-        f"/d3:decompose {spec_name}\n\nProject key: LOCAL",
+        f"/d3:decompose {spec_name}",
+        "LOCAL",
         "I did not have a decomposition meeting. Please decompose conversationally.",
         "The proposed stories look good. Please create them all. Make assumptions where needed and document them in the stories.",
     ]
@@ -59,6 +60,7 @@ def _decompose_messages(spec_name: str) -> list[str]:
 class TestSpecWorkflow:
 
     @pytest.mark.timeout(600)
+    @pytest.mark.dependency()
     def test_01_create_spec(self, test_workspace, plugin_dirs):
         specs_dir = os.path.join(test_workspace, "specs")
         if os.path.exists(specs_dir):
@@ -95,6 +97,7 @@ class TestSpecWorkflow:
         )
 
     @pytest.mark.timeout(600)
+    @pytest.mark.dependency(depends=["TestSpecWorkflow::test_01_create_spec"])
     def test_02_refine_spec(self, test_workspace, plugin_dirs):
         for backup in glob.glob(os.path.join(test_workspace, "specs", "*.backup")):
             os.remove(backup)
@@ -135,6 +138,7 @@ class TestSpecWorkflow:
                 )
 
     @pytest.mark.timeout(600)
+    @pytest.mark.dependency(depends=["TestSpecWorkflow::test_02_refine_spec"])
     def test_03_decompose(self, test_workspace, plugin_dirs):
         stories_dir = os.path.join(test_workspace, "stories")
         if os.path.exists(stories_dir):

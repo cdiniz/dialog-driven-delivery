@@ -15,4 +15,4 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-n auto --dist loadscope"
+addopts = "-n auto"

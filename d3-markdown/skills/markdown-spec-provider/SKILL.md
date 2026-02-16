@@ -38,7 +38,7 @@ When invoked with operation in `$ARGUMENTS`:
 Lists available directories for specifications.
 
 **Implementation:**
-Use Glob to find directories in specs/, or return root location.
+Use Glob to find directories in {specs_dir}/, or return root location.
 
 **Returns:**
 ```json

@@ -1,6 +1,5 @@
 import glob
 import os
-import shutil
 
 import pytest
 
@@ -64,13 +63,9 @@ class TestMarkdownWorkflow:
     """
 
     @pytest.mark.timeout(600)
-    @pytest.mark.dependency()
-    def test_01_create_spec(self, markdown_workflow_workspace, plugin_dirs):
-        specs_dir = os.path.join(markdown_workflow_workspace, "specs")
-        if os.path.exists(specs_dir):
-            shutil.rmtree(specs_dir)
+    def test_create_spec_from_transcript(self, markdown_workflow_workspace, plugin_dirs):
         transcript = _read_fixture("sample_transcript.txt")
-        output = run_claude_conversation(
+        run_claude_conversation(
             _create_spec_messages(transcript),
             cwd=markdown_workflow_workspace,
             plugin_dirs=plugin_dirs,
@@ -101,11 +96,8 @@ class TestMarkdownWorkflow:
         )
 
     @pytest.mark.timeout(600)
-    @pytest.mark.dependency(depends=["TestMarkdownWorkflow::test_01_create_spec"])
-    def test_02_refine_spec(self, markdown_workflow_workspace, plugin_dirs):
-        for backup in glob.glob(os.path.join(markdown_workflow_workspace, "specs", "*.backup")):
-            os.remove(backup)
-        spec_files = _find_specs(markdown_workflow_workspace)
+    def test_refine_existing_spec(self, markdown_workspace_with_spec, plugin_dirs):
+        spec_files = _find_specs(markdown_workspace_with_spec)
         assert len(spec_files) >= 1, "No spec files found"
         assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"
         spec_path = spec_files[0]
@@ -116,11 +108,11 @@ class TestMarkdownWorkflow:
 
         run_claude_conversation(
             _refine_spec_messages(spec_name, refinement),
-            cwd=markdown_workflow_workspace,
+            cwd=markdown_workspace_with_spec,
             plugin_dirs=plugin_dirs,
         )
 
-        post_refine_specs = _find_specs(markdown_workflow_workspace)
+        post_refine_specs = _find_specs(markdown_workspace_with_spec)
         assert len(post_refine_specs) >= 1, "Spec file missing after refinement"
         assert len(post_refine_specs) == 1, f"Spec duplicated after refinement: {post_refine_specs}"
         assert os.path.exists(spec_path + ".backup"), "Backup file not created during refinement"
@@ -142,23 +134,19 @@ class TestMarkdownWorkflow:
                 )
 
     @pytest.mark.timeout(600)
-    @pytest.mark.dependency(depends=["TestMarkdownWorkflow::test_02_refine_spec"])
-    def test_03_decompose(self, markdown_workflow_workspace, plugin_dirs):
-        stories_dir = os.path.join(markdown_workflow_workspace, "stories")
-        if os.path.exists(stories_dir):
-            shutil.rmtree(stories_dir)
-        spec_files = _find_specs(markdown_workflow_workspace)
+    def test_decompose_spec_into_stories(self, markdown_workspace_with_refined_spec, plugin_dirs):
+        spec_files = _find_specs(markdown_workspace_with_refined_spec)
         assert len(spec_files) >= 1, "No spec files found"
         assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"
         spec_path = spec_files[0]
         spec_name = os.path.basename(spec_path)
         output = run_claude_conversation(
             _decompose_messages(spec_name),
-            cwd=markdown_workflow_workspace,
+            cwd=markdown_workspace_with_refined_spec,
             plugin_dirs=plugin_dirs,
         )
 
-        stories_dir = os.path.join(markdown_workflow_workspace, "stories")
+        stories_dir = os.path.join(markdown_workspace_with_refined_spec, "stories")
         assert os.path.isdir(stories_dir), (
             f"Stories dir not created. Output:\n{output[:1000]}"
         )
@@ -207,9 +195,6 @@ class TestMarkdownConfiguration:
 
     @pytest.mark.timeout(600)
     def test_create_spec_uses_custom_template(self, markdown_custom_template_workspace, plugin_dirs):
-        custom_specs_dir = os.path.join(markdown_custom_template_workspace, "custom-specs")
-        if os.path.exists(custom_specs_dir):
-            shutil.rmtree(custom_specs_dir)
         transcript = _read_fixture("sample_transcript.txt")
         output = run_claude_conversation(
             _create_spec_messages(transcript),

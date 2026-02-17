@@ -29,10 +29,12 @@ Use provider's `get_spec`:
 - Title → Search, then get_spec
 
 ### 3. Detect Existing Stories
-Search for an epic linked to this spec using story provider:
-- Search for epic matching spec title
-- If epic found, fetch all child stories under it
+Use story provider to find stories linked to this spec:
+```
+Skill(skill="[story-provider]", args="list_stories spec_title=\"[Spec Title]\"")
+```
 - Store epic key and story list for later impact analysis
+- If no stories found, skip story impact steps later
 
 ### 4. Analyze Current State
 Display coverage:

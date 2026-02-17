@@ -121,6 +121,27 @@ Returns Story type only.
 
 ---
 
+### list_stories
+Lists all stories under a spec.
+
+**Parse args:** spec_title
+**Steps:**
+1. Derive spec directory from spec_title (slugify)
+2. Glob for `stories/{spec_dir}/story-*.md`
+3. Read frontmatter from each file
+**Returns:** list of stories with id, key, summary, status, spec_link
+
+### update_story
+Updates an existing story file.
+
+**Parse args:** story_key, description (optional), summary (optional)
+**Steps:**
+1. Find story file by key using Glob
+2. Read current content
+3. Update frontmatter and/or body as needed
+4. Write updated file
+**Returns:** key, url, summary
+
 ### link_issues (optional)
 
 **Parse args:** from_key, to_key, link_type (blocks, is_blocked_by, relates_to)

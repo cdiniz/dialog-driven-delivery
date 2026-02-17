@@ -40,6 +40,23 @@ Creates a user story in Jira.
 **Links to Epic:** Uses Epic Link field
 **Returns:** id, key, url, summary, epic_link
 
+### list_stories
+Lists all stories/tasks under an epic matching a spec title.
+
+**Parse args:** spec_title
+**Steps:**
+1. Search for epic: `mcp__atlassian__searchJiraIssuesUsingJql` with JQL `project = [PROJECT] AND issuetype = Epic AND summary ~ "[spec_title]"`
+2. If epic found, fetch all child issues: `mcp__atlassian__searchJiraIssuesUsingJql` with JQL `parent = [EPIC-KEY] ORDER BY key ASC` (no issuetype filter — children may be Story, Task, or other types)
+3. For each child issue, fetch full details including description
+**Returns:** epic key, list of child issues with key, summary, status, description
+
+### update_story
+Updates an existing story/task description and fields.
+
+**Parse args:** issue_key, description (optional), summary (optional)
+**MCP:** `mcp__atlassian__editJiraIssue` with fields to update
+**Returns:** key, url, summary
+
 ### link_issues (optional)
 Creates dependency links between issues.
 

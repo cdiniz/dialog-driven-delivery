@@ -312,4 +312,3 @@ This is CORRECT. Don't try to "complete" sections by guessing.
 | Spec not found | Verify identifier/URL, suggest search |
 | Epic not found | Skip story impact analysis, proceed with spec-only refinement |
 | Story provider unavailable | Warn, apply spec changes only, list story impacts for manual action |
-| Many stories affected (>5) | Summarize by impact type, confirm before applying |

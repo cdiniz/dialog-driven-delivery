@@ -21,7 +21,7 @@ Every story must follow INVEST:
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read CLAUDE.md for D3 config
+- Read {{config_file}} for D3 config
 - Search for ### D3 Config  ### Templates
 - If user story template are not configure use skill d3-templtes 
 - Store for later steps
@@ -116,7 +116,7 @@ INVEST Validation Checklist:
 
 Use story provider:
 ```
-Skill(skill="[story-provider]", args="create_epic project_key=\"[PROJECT]\" summary=\"[Feature name]\" description=\"[Epic description]\" labels=\"feature,epic\"")
+{{invoke_skill("[story-provider]", "create_epic project_key=\"[PROJECT]\" summary=\"[Feature name]\" description=\"[Epic description]\" labels=\"feature,epic\"")}}
 ```
 
 **Epic Description:**
@@ -159,7 +159,7 @@ Before creating, scan specs for uncertainty markers. If critical uncertainties:
 
 **Create each story:**
 ```
-Skill(skill="[story-provider]", args="create_story project_key=\"[PROJECT]\" epic_id=\"[EPIC-KEY]\" story_data=\"{summary: '...', description: '...', labels: [...]}\"")
+{{invoke_skill("[story-provider]", "create_story project_key=\"[PROJECT]\" epic_id=\"[EPIC-KEY]\" story_data=\"{summary: '...', description: '...', labels: [...]}\"")}}
 ```
 
 ### 10. Provide Summary

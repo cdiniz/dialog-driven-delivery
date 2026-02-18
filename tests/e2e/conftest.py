@@ -7,7 +7,8 @@ import pytest
 from .claude_runner import REPO_ROOT
 
 FIXTURES_DIR = REPO_ROOT / "tests" / "e2e" / "fixtures"
-PLUGIN_DIRS = [REPO_ROOT / "d3", REPO_ROOT / "d3-markdown"]
+DIST_CLAUDE = REPO_ROOT / "dist" / "claude"
+PLUGIN_DIRS = [DIST_CLAUDE / "d3", DIST_CLAUDE / "d3-markdown"]
 TEMPLATES_DIR = FIXTURES_DIR / "templates"
 FILE_SWAPS = {
     "skills/d3-templates/references/feature-product-spec.md": "product-spec.md",

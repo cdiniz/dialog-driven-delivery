@@ -15,7 +15,7 @@ Automatically detect which sections need updating - Product, Technical, or both.
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read CLAUDE.md for D3 config
+- Read {{config_file}} for D3 config
 - Search for ### D3 Config  ### Templates
 - If templates (tech and product spec templates) are not configure use skill d3-templates 
 - Store for later steps
@@ -177,19 +177,19 @@ Proceed with spec + story updates?
 
 **Apply spec updates:**
 ```
-Skill(skill="[spec-provider]", args="update_spec page_id=\"[spec-id]\" body=\"[UPDATED_SPEC]\" version_message=\"[description]\"")
+{{invoke_skill("[spec-provider]", "update_spec page_id=\"[spec-id]\" body=\"[UPDATED_SPEC]\" version_message=\"[description]\"")}}
 ```
 
 **Apply story updates (if stories are affected):**
 
 For each affected story:
 ```
-Skill(skill="[story-provider]", args="update_story issue_key=\"[STORY-KEY]\" description=\"[UPDATED_DESCRIPTION]\"")
+{{invoke_skill("[story-provider]", "update_story issue_key=\"[STORY-KEY]\" description=\"[UPDATED_DESCRIPTION]\"")}}
 ```
 
 For new stories needed:
 ```
-Skill(skill="[story-provider]", args="create_story project_key=\"[PROJECT]\" epic_id=\"[EPIC-KEY]\" story_data=\"{summary: '...', description: '...', labels: [...]}\"")
+{{invoke_skill("[story-provider]", "create_story project_key=\"[PROJECT]\" epic_id=\"[EPIC-KEY]\" story_data=\"{summary: '...', description: '...', labels: [...]}\"")}}
 ```
 
 For obsolete stories (after user confirmation):

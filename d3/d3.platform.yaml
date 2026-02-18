@@ -1,0 +1,81 @@
+platforms:
+  claude:
+    config_file: CLAUDE.md
+    invoke_skill: 'Skill(skill="{name}", args="{args}")'
+    tools:
+      read: Read
+      write: Write
+      search: Grep
+      glob: Glob
+      bash: Bash
+    output:
+      type: plugin
+      core_dir: d3
+      provider_dirs:
+        markdown: d3-markdown
+        atlassian: d3-atlassian
+      commands_subdir: commands
+      skills_subdir: skills
+      metadata_file: .claude-plugin/plugin.json
+      marketplace_file: .claude-plugin/marketplace.json
+    frontmatter:
+      command:
+        fields: [description]
+      skill:
+        fields: [name, description]
+
+  codex:
+    config_file: AGENTS.md
+    invoke_skill: '${name} {args}'
+    tools:
+      read: read
+      write: write
+      search: search
+      glob: glob
+      bash: execute
+    output:
+      type: agents
+      commands_dir: .agents/skills
+      skills_dir: .agents/skills
+      config_output: AGENTS.md
+    frontmatter:
+      command:
+        fields: [name, description]
+      skill:
+        fields: [name, description]
+
+  copilot:
+    config_file: .github/copilot-instructions.md
+    invoke_skill: '/{name} {args}'
+    tools:
+      read: read
+      write: edit
+      search: search
+      glob: search
+      bash: execute
+    output:
+      type: skills
+      skills_dir: .github/skills
+      config_output: .github/copilot-instructions.md
+    frontmatter:
+      skill:
+        fields: [name, description]
+
+  cursor:
+    config_file: .cursor/rules/d3-config/RULE.md
+    invoke_skill: '@{name} {args}'
+    tools:
+      read: read
+      write: edit
+      search: search
+      glob: search
+      bash: execute
+    output:
+      type: rules
+      rules_dir: .cursor/rules
+      config_output: .cursor/rules/d3-config/RULE.md
+    frontmatter:
+      rule:
+        fields: [description, alwaysApply]
+        defaults:
+          alwaysApply: false

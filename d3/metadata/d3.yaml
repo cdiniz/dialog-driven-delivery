@@ -1,0 +1,10 @@
+name: d3
+version: 0.0.1
+description: Dialog Driven Delivery - A pragmatic workflow for building software through conversational, transcript-first documentation and development. Create specs, refine them, and decompose into user stories.
+author:
+  name: D3 Team
+homepage: https://github.com/cdiniz/dialog-driven-delivery
+repository: https://github.com/cdiniz/dialog-driven-delivery
+keywords: [documentation, planning, specifications, user-stories, workflow, agile, transcripts, d3]
+license: MIT
+category: productivity

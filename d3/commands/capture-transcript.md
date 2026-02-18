@@ -13,9 +13,9 @@ Transcripts are standalone artifacts. Their relationship to specs is established
 ## Workflow
 
 ### 1. Detect Provider and Template
-- Read CLAUDE.md for D3 config
+- Read {{config_file}} for D3 config
 - Search for `### Transcript Provider` section
-- If no Transcript Provider configured, guide user to add one to CLAUDE.md:
+- If no Transcript Provider configured, guide user to add one to {{config_file}}:
   ```markdown
   ### Transcript Provider
   **Skill:** d3-markdown:markdown-transcript-provider
@@ -120,9 +120,9 @@ Ready to save? Or would you like to adjust anything?
 
 ### 8. Store via Provider
 
-Use Skill tool:
+Use provider:
 ```
-Skill(skill="[provider-name]", args="store_transcript title=\"[Title]\" meeting_type=\"[type]\" meeting_date=\"[YYYY-MM-DD]\" participants=\"[comma-separated list]\" body=\"[FULL_CONTENT]\"")
+{{invoke_skill("[provider-name]", "store_transcript title=\"[Title]\" meeting_type=\"[type]\" meeting_date=\"[YYYY-MM-DD]\" participants=\"[comma-separated list]\" body=\"[FULL_CONTENT]\"")}}
 ```
 
 The body includes:
@@ -155,7 +155,7 @@ Next steps:
 
 | Issue | Action |
 |-------|--------|
-| No provider configured | Guide user to add Transcript Provider to CLAUDE.md |
+| No provider configured | Guide user to add Transcript Provider to {{config_file}} |
 | Empty transcript | Ask user to paste the transcript content |
 | No date in transcript | Ask user for the meeting date, default to today |
 | Very short transcript (<100 words) | Warn that the transcript is very short and extracted content may be minimal. Confirm before proceeding |

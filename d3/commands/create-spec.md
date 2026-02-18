@@ -13,7 +13,7 @@ Create a single unified spec with BOTH Product and Technical sections. Specs gro
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read CLAUDE.md for D3 config
+- Read {{config_file}} for D3 config
 - Search for ### D3 Config  ### Templates
 - If templates (tech and product spec templates) are not configure use skill d3-templates 
 - Store for later steps
@@ -90,9 +90,9 @@ Resolve now, leave marked, or review first?
 
 ### 7. Create Specification
 
-Use Skill tool:
+Use provider:
 ```
-Skill(skill="[provider-name]", args="create_spec location_id=\"[LOCATION]\" title=\"[Title]\" body=\"[FULL_SPEC]\"")
+{{invoke_skill("[provider-name]", "create_spec location_id=\"[LOCATION]\" title=\"[Title]\" body=\"[FULL_SPEC]\"")}}
 ```
 
 ### 8. Provide Summary

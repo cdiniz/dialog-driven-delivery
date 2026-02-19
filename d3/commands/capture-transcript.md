@@ -13,7 +13,7 @@ Transcripts are standalone artifacts. Their relationship to specs is established
 
 ## Workflow
 
-### 1. Detect Provider and Template 123
+### 1. Detect Provider and Template
 - Read CLAUDE.md for D3 config
 - Search for `### Transcript Provider` section
 - If no Transcript Provider configured, guide user to add one to CLAUDE.md:

@@ -16,6 +16,7 @@ PLATFORM_FILE = CANONICAL / "d3.platform.yaml"
 PLATFORMS = ["claude", "codex", "copilot", "cursor"]
 
 TEMPLATE_VAR_PATTERN = re.compile(r"\{\{[a-z_]+(?:\([^)]*\))?\}\}")
+GENERATED_HEADER = "<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->\n\n"
 
 
 def load_platforms():
@@ -82,7 +83,7 @@ def transform_frontmatter(fm, body, file_type, platform_cfg):
         if k not in new_fm:
             new_fm[k] = v
 
-    return build_frontmatter(new_fm) + "\n" + body
+    return build_frontmatter(new_fm) + "\n" + GENERATED_HEADER + body
 
 
 def write_output(path, content):

@@ -1,6 +1,8 @@
 ---
 description: Create an Architectural Decision Record (ADR) from any input context (meeting transcripts, documents, or conversational discussion). Captures architectural decisions — framework choices, database selections, event-driven vs synchronous, etc. — as immutable records following MADR v4 format. Use when a technical or architectural decision has been made or is being proposed. If a decision changes, create a new ADR that supersedes the old one.
 ---
+<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
+
 ## Core Principle
 
 **Capture the decision AND the reasoning. An ADR without rationale is just a changelog entry.**

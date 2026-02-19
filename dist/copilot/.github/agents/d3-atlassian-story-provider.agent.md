@@ -2,6 +2,8 @@
 name: d3-atlassian-story-provider
 description: Create and manage user stories in Jira using Atlassian MCP tools.
 ---
+<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
+
 ## What This Does
 
 Handles all Jira operations for D3 user stories. Uses Atlassian MCP server to create epics, stories, and manage issues.

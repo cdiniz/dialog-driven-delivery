@@ -2,6 +2,8 @@
 description: Decompose feature specifications into INVEST-compliant user stories through conversational planning. Creates workflow-based stories that are Independent, Negotiable, Valuable, Estimable, Small, and Testable.
 alwaysApply: false
 ---
+<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
+
 ## Core Principle: INVEST-Driven Decomposition
 
 Every story must follow INVEST:

@@ -2,6 +2,8 @@
 description: Store and manage meeting transcripts as local markdown files. Stores transcripts in ./transcripts/ directory organized by month as markdown files tracked by git.
 alwaysApply: false
 ---
+<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
+
 ## What This Does
 
 Manages meeting transcripts as markdown files in the filesystem. Transcripts are stored in `./transcripts/` directory organized by year-month subdirectories with git version control.

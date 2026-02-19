@@ -2,6 +2,8 @@
 description: Provides standard templates for Dialog-Driven Delivery (D3) specifications, user stories, architectural decision records, and meeting transcripts. Use when creating or refining feature specifications (product or technical), decomposing features into user stories, recording architectural decisions, or capturing meeting transcripts. Contains templates for Product Specs, Technical Specs, User Stories, ADRs, and Meeting Transcripts following D3 methodology.
 alwaysApply: false
 ---
+<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
+
 # D3 Standard Templates
 
 This skill provides canonical templates for D3 specification, story, ADR, and transcript creation. These templates are used by d3:create-spec, d3:refine-spec, d3:decompose, d3:create-adr, and d3:capture-transcript commands.

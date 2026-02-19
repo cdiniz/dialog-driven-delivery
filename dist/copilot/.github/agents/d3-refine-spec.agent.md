@@ -2,6 +2,8 @@
 description: Refine existing feature specifications based on new information (meeting transcripts, technical decisions, feedback, or discussions). Automatically detects whether changes are product-focused, technical, or both. Updates only affected sections while preserving existing content. Use when updating specs, adding details to existing documentation, incorporating meeting notes into specs, or when user mentions refining/updating/improving an existing specification.
 name: d3-refine-spec
 ---
+<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
+
 ## Core Principle
 
 **Update only what has new information. Preserve everything else.**

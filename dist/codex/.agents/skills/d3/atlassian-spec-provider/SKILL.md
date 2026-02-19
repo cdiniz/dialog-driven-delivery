@@ -2,6 +2,8 @@
 name: atlassian-spec-provider
 description: Create and manage specifications in Confluence using Atlassian MCP tools.
 ---
+<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
+
 ## What This Does
 
 Handles all Confluence operations for D3 specifications. Uses Atlassian MCP server to create, read, update, and search Confluence pages.

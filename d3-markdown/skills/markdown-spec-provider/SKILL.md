@@ -2,6 +2,8 @@
 name: markdown-spec-provider
 description: Create and manage specifications as local markdown files. Stores specs in a configurable directory (default ./specs/) as markdown files tracked by git.
 ---
+<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
+
 ## What This Does
 
 Manages specifications as markdown files in the filesystem. Specs are stored in `{specs_dir}` directory with git version control.

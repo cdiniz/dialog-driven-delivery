@@ -2,6 +2,8 @@
 name: d3-markdown-story-provider
 description: Create and manage user stories as local markdown files organized by feature/spec.
 ---
+<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
+
 ## What This Does
 
 Manages user stories as markdown files with YAML frontmatter. Stories are organized in subdirectories by their related feature/spec.

@@ -18,7 +18,7 @@ Automatically detect which sections need updating - Product, Technical, or both.
 ### 1. Detect Provider and Templates
 - Read CLAUDE.md for D3 config
 - Search for ### D3 Config  ### Templates
-- If templates (tech and product spec templates) are not configure use skill d3-templates 
+- If templates (tech and product spec templates) are not configure use skill d3-templates
 - Store for later steps
 
 ### 2. Fetch Specification

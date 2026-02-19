@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).parent
-CANONICAL = ROOT / "d3"
+CANONICAL = ROOT / "canonical"
 DIST = ROOT / "dist"
 PLATFORM_FILE = CANONICAL / "d3.platform.yaml"
 
@@ -105,24 +105,35 @@ def copy_references(skill_dir, dest_dir):
             shutil.copy2(ref_file, dest_dir / ref_file.name)
 
 
+def _clear_dir(path):
+    if path.exists():
+        shutil.rmtree(path)
+
+
 def generate_claude(platforms):
     cfg = platforms["claude"]
-    out = DIST / "claude"
+    d3_dir = ROOT / "d3"
+    plugin_dirs = {
+        "d3": d3_dir,
+        "d3-markdown": ROOT / "d3-markdown",
+        "d3-atlassian": ROOT / "d3-atlassian",
+    }
 
-    if out.exists():
-        shutil.rmtree(out)
+    _clear_dir(d3_dir / "commands")
+    _clear_dir(d3_dir / "skills")
+    for plugin_name in ("d3-markdown", "d3-atlassian"):
+        _clear_dir(plugin_dirs[plugin_name] / "skills")
 
     metadata_dir = CANONICAL / "metadata"
-    plugin_names = ["d3", "d3-markdown", "d3-atlassian"]
     metas = {
         name: yaml.safe_load((metadata_dir / f"{name}.yaml").read_text())
-        for name in plugin_names
+        for name in plugin_dirs
     }
 
     for name, meta in metas.items():
         plugin_json = {k: meta[k] for k in ("name", "version", "description", "author", "homepage", "repository", "keywords", "license")}
         write_output(
-            out / name / ".claude-plugin" / "plugin.json",
+            plugin_dirs[name] / ".claude-plugin" / "plugin.json",
             json.dumps(plugin_json, indent=2) + "\n",
         )
 
@@ -146,13 +157,13 @@ def generate_claude(platforms):
             k: meta[k] for k in ("name", "description", "version", "author", "homepage", "repository", "license", "keywords")
         } | {"source": source_dir, "category": category})
     write_output(
-        out / ".claude-plugin" / "marketplace.json",
+        ROOT / ".claude-plugin" / "marketplace.json",
         json.dumps(marketplace, indent=2) + "\n",
     )
 
     for cmd_file in (CANONICAL / "commands").glob("*.md"):
         _, _, final = process_file(cmd_file, cfg, "command")
-        write_output(out / "d3" / "commands" / cmd_file.name, final)
+        write_output(d3_dir / "commands" / cmd_file.name, final)
 
     for skill_dir in (CANONICAL / "skills").iterdir():
         if not skill_dir.is_dir():
@@ -160,8 +171,8 @@ def generate_claude(platforms):
         skill_file = skill_dir / "SKILL.md"
         if skill_file.exists():
             _, _, final = process_file(skill_file, cfg, "skill")
-            write_output(out / "d3" / "skills" / skill_dir.name / "SKILL.md", final)
-        copy_references(skill_dir, out / "d3" / "skills" / skill_dir.name / "references")
+            write_output(d3_dir / "skills" / skill_dir.name / "SKILL.md", final)
+        copy_references(skill_dir, d3_dir / "skills" / skill_dir.name / "references")
 
     provider_map = {
         "markdown": ("d3-markdown", "markdown"),
@@ -174,7 +185,7 @@ def generate_claude(platforms):
         for provider_file in provider_dir.glob("*.md"):
             _, _, final = process_file(provider_file, cfg, "skill")
             skill_name = f"{prefix}-{provider_file.stem}"
-            write_output(out / plugin_name / "skills" / skill_name / "SKILL.md", final)
+            write_output(plugin_dirs[plugin_name] / "skills" / skill_name / "SKILL.md", final)
 
 
 def generate_codex(platforms):
@@ -317,17 +328,24 @@ def validate_canonical():
     return unresolved
 
 
+def _output_dirs(platform_name):
+    if platform_name == "claude":
+        return [ROOT / "d3", ROOT / "d3-markdown", ROOT / "d3-atlassian"]
+    return [DIST / platform_name]
+
+
 def validate_output(platform_name):
-    out_dir = DIST / platform_name
-    if not out_dir.exists():
+    dirs = _output_dirs(platform_name)
+    if not any(d.exists() for d in dirs):
         return [("(not generated)", ["directory does not exist"])]
 
     issues = []
-    for md_file in out_dir.rglob("*.md"):
-        content = md_file.read_text(encoding="utf-8")
-        matches = TEMPLATE_VAR_PATTERN.findall(content)
-        if matches:
-            issues.append((md_file.relative_to(DIST), matches))
+    for out_dir in dirs:
+        for md_file in out_dir.rglob("*.md"):
+            content = md_file.read_text(encoding="utf-8")
+            matches = TEMPLATE_VAR_PATTERN.findall(content)
+            if matches:
+                issues.append((md_file.relative_to(ROOT), matches))
     return issues
 
 
@@ -378,7 +396,10 @@ def main():
     for target in targets:
         print(f"Generating {target}...")
         GENERATORS[target](platforms)
-        print(f"  Output: dist/{target}/")
+        if target == "claude":
+            print("  Output: d3/, d3-markdown/, d3-atlassian/")
+        else:
+            print(f"  Output: dist/{target}/")
 
     if args.validate or targets:
         check_targets = targets or PLATFORMS

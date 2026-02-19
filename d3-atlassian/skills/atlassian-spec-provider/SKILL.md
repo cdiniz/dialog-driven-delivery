@@ -2,7 +2,6 @@
 name: atlassian-spec-provider
 description: Create and manage specifications in Confluence using Atlassian MCP tools.
 ---
-
 ## What This Does
 
 Handles all Confluence operations for D3 specifications. Uses Atlassian MCP server to create, read, update, and search Confluence pages.
@@ -24,7 +23,7 @@ Creates a Confluence page.
 **Preprocessing:**
 - Remove empty checkbox markers `[ ]` from task lists (Confluence doesn't support them)
 - **CRITICAL:** Preserve uncertainty markers: `[OPEN QUESTION: ...]`, `[DECISION PENDING: ...]`, `[ASSUMPTION: ...]`, `[CLARIFICATION NEEDED: ...]`
-- Only strip: `- [ ]` → `- ` and `- [x]` → `- ` in list contexts
+- Only strip: `- [ ]` -> `- ` and `- [x]` -> `- ` in list contexts
 **MCP:** `mcp__atlassian__createConfluencePage` with contentFormat: "markdown"
 **Returns:** id, url, title, version
 
@@ -42,7 +41,7 @@ Updates a Confluence page.
 **Preprocessing:**
 - Remove empty checkbox markers `[ ]` from task lists (Confluence doesn't support them)
 - **CRITICAL:** Preserve uncertainty markers: `[OPEN QUESTION: ...]`, `[DECISION PENDING: ...]`, `[ASSUMPTION: ...]`, `[CLARIFICATION NEEDED: ...]`
-- Only strip: `- [ ]` → `- ` and `- [x]` → `- ` in list contexts
+- Only strip: `- [ ]` -> `- ` and `- [x]` -> `- ` in list contexts
 **MCP:** `mcp__atlassian__updateConfluencePage` with contentFormat: "markdown"
 **Returns:** id, url, version, last_modified
 
@@ -55,7 +54,7 @@ Searches Confluence pages.
 
 ## Configuration
 
-Reads from `CLAUDE.md`:
+Reads from CLAUDE.md:
 - Cloud ID
 - Default Location (space key)
 

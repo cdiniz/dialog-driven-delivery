@@ -2,7 +2,6 @@
 name: markdown-story-provider
 description: Create and manage user stories as local markdown files organized by feature/spec.
 ---
-
 ## What This Does
 
 Manages user stories as markdown files with YAML frontmatter. Stories are organized in subdirectories by their related feature/spec.
@@ -71,7 +70,7 @@ Returns Story type only.
 
 **Implementation:**
 
-1. Determine spec directory from spec_id (e.g., "specs/user-authentication.md" → "user-authentication")
+1. Determine spec directory from spec_id (e.g., "specs/user-authentication.md" -> "user-authentication")
 2. Use Glob to find existing stories in that directory to determine next ID
 3. Sanitize summary to filename
 
@@ -150,13 +149,13 @@ Stories are organized by their related feature/spec:
 
 ```
 stories/
-├── user-authentication/
-│   ├── story-1-login.md
-│   ├── story-2-signup.md
-│   └── story-3-password-reset.md
-└── search-feature/
-    ├── story-1-basic-search.md
-    └── story-2-filters.md
+  user-authentication/
+    story-1-login.md
+    story-2-signup.md
+    story-3-password-reset.md
+  search-feature/
+    story-1-basic-search.md
+    story-2-filters.md
 ```
 
 ---
@@ -217,7 +216,7 @@ created: 2026-01-27
 
 - No metadata file needed - all data lives in markdown frontmatter
 - Use Glob to find stories: `stories/**/story-*.md`
-- Use Grep to search by status: `rg "^status: todo"`
+- Use Grep to search by status, labels, dependencies
 - Story IDs determined by counting existing files in directory
 - Users update status by editing frontmatter directly
 - Dependencies tracked in frontmatter arrays

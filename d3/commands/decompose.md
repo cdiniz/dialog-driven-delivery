@@ -1,7 +1,6 @@
 ---
 description: Decompose feature specifications into INVEST-compliant user stories through conversational planning. Creates workflow-based stories that are Independent, Negotiable, Valuable, Estimable, Small, and Testable.
 ---
-
 ## Core Principle: INVEST-Driven Decomposition
 
 Every story must follow INVEST:
@@ -21,7 +20,7 @@ Every story must follow INVEST:
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read {{config_file}} for D3 config
+- Read CLAUDE.md for D3 config
 - Search for ### D3 Config  ### Templates
 - If user story template are not configure use skill d3-templtes 
 - Store for later steps
@@ -116,7 +115,7 @@ INVEST Validation Checklist:
 
 Use story provider:
 ```
-{{invoke_skill("[story-provider]", "create_epic project_key=\"[PROJECT]\" summary=\"[Feature name]\" description=\"[Epic description]\" labels=\"feature,epic\"")}}
+Skill(skill="[story-provider]", args="create_epic project_key=\"[PROJECT]\" summary=\"[Feature name]\" description=\"[Epic description]\" labels=\"feature,epic\"")
 ```
 
 **Epic Description:**
@@ -159,7 +158,7 @@ Before creating, scan specs for uncertainty markers. If critical uncertainties:
 
 **Create each story:**
 ```
-{{invoke_skill("[story-provider]", "create_story project_key=\"[PROJECT]\" epic_id=\"[EPIC-KEY]\" story_data=\"{summary: '...', description: '...', labels: [...]}\"")}}
+Skill(skill="[story-provider]", args="create_story project_key=\"[PROJECT]\" epic_id=\"[EPIC-KEY]\" story_data=\"{summary: '...', description: '...', labels: [...]}\"")
 ```
 
 ### 10. Provide Summary

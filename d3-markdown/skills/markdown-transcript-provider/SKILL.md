@@ -2,7 +2,6 @@
 name: markdown-transcript-provider
 description: Store and manage meeting transcripts as local markdown files. Stores transcripts in ./transcripts/ directory organized by month as markdown files tracked by git.
 ---
-
 ## What This Does
 
 Manages meeting transcripts as markdown files in the filesystem. Transcripts are stored in `./transcripts/` directory organized by year-month subdirectories with git version control.
@@ -11,7 +10,7 @@ Manages meeting transcripts as markdown files in the filesystem. Transcripts are
 
 ## Configuration
 
-Reads from `CLAUDE.md`:
+Reads from CLAUDE.md:
 ```markdown
 ### Transcript Provider
 **Skill:** d3-markdown:markdown-transcript-provider
@@ -196,7 +195,7 @@ Searches transcript content.
 
 - Date prefix: `YYYY-MM-DD-` (from meeting_date)
 - Meeting type: `planning-`, `technical-`, `standup-`, `retro-`, `other-`
-- Title converted to slug: "Sprint Kickoff" → `sprint-kickoff`
+- Title converted to slug: "Sprint Kickoff" -> `sprint-kickoff`
 - Full filename: `{YYYY-MM-DD}-{meeting_type}-{slug}.md`
 - Lowercase with hyphens
 - Remove special characters (except hyphens)
@@ -209,13 +208,13 @@ Searches transcript content.
 
 ```
 transcripts/
-├── 2026-01/
-│   ├── 2026-01-15-planning-sprint-review.md
-│   └── 2026-01-20-technical-database-migration.md
-├── 2026-02/
-│   ├── 2026-02-03-planning-sprint-kickoff.md
-│   ├── 2026-02-04-standup-monday-sync.md
-│   └── 2026-02-07-retro-sprint-retrospective.md
+  2026-01/
+    2026-01-15-planning-sprint-review.md
+    2026-01-20-technical-database-migration.md
+  2026-02/
+    2026-02-03-planning-sprint-kickoff.md
+    2026-02-04-standup-monday-sync.md
+    2026-02-07-retro-sprint-retrospective.md
 ```
 
 ---

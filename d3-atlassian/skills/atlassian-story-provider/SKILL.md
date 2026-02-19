@@ -2,7 +2,6 @@
 name: atlassian-story-provider
 description: Create and manage user stories in Jira using Atlassian MCP tools.
 ---
-
 ## What This Does
 
 Handles all Jira operations for D3 user stories. Uses Atlassian MCP server to create epics, stories, and manage issues.
@@ -49,7 +48,7 @@ Creates dependency links between issues.
 
 ## Configuration
 
-Reads from `CLAUDE.md`:
+Reads from CLAUDE.md:
 - Cloud ID
 - Default Project (project key)
 

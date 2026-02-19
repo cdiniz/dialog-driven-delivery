@@ -2,7 +2,6 @@
 name: d3-templates
 description: Provides standard templates for Dialog-Driven Delivery (D3) specifications, user stories, architectural decision records, and meeting transcripts. Use when creating or refining feature specifications (product or technical), decomposing features into user stories, recording architectural decisions, or capturing meeting transcripts. Contains templates for Product Specs, Technical Specs, User Stories, ADRs, and Meeting Transcripts following D3 methodology.
 ---
-
 # D3 Standard Templates
 
 This skill provides canonical templates for D3 specification, story, ADR, and transcript creation. These templates are used by d3:create-spec, d3:refine-spec, d3:decompose, d3:create-adr, and d3:capture-transcript commands.
@@ -69,30 +68,30 @@ Templates are located in this skill's `references/` directory:
 ## How D3 Commands Use These Templates
 
 ### d3:create-spec
-1. Loads user spec templates feature-product-spec and feature-tech-spec from {{config_file}} config or this skill
+1. Loads user spec templates feature-product-spec and feature-tech-spec from CLAUDE.md config or this skill
 2. Creates unified spec with both Product and Technical sections
 3. Uses template structure to ensure all sections present
 
 ### d3:refine-spec
-1. Loads user spec templates feature-product-spec and feature-tech-spec from {{config_file}} config or this skill
+1. Loads user spec templates feature-product-spec and feature-tech-spec from CLAUDE.md config or this skill
 2. Loads existing spec
 3. Uses templates to validate structure
 4. Ensures all required sections present when updating
 
 ### d3:decompose
-1. Loads user story template from {{config_file}} config or this skill
+1. Loads user story template from CLAUDE.md config or this skill
 2. Creates stories following template structure
 3. Ensures consistent Given-When-Then acceptance criteria format
 
 ### d3:create-adr
-1. Loads ADR template from {{config_file}} config or this skill
+1. Loads ADR template from CLAUDE.md config or this skill
 2. Extracts decision context, alternatives, rationale, and consequences from input
 3. Auto-numbers by searching existing ADRs
 4. Creates ADR using template structure
 5. Handles superseding (cross-references old and new ADRs)
 
 ### d3:capture-transcript
-1. Loads meeting transcript template from {{config_file}} config or this skill
+1. Loads meeting transcript template from CLAUDE.md config or this skill
 2. Asks user to paste raw transcript
 3. Extracts decisions, action items, and open questions
 4. Generates structured summary using template
@@ -103,7 +102,7 @@ Templates are located in this skill's `references/` directory:
 D3 commands follow this loading pattern:
 
 ```
-1. Read {{config_file}} for D3 Configuration section
+1. Read CLAUDE.md for D3 Configuration section
 2. Extract template paths:
    - feature_spec_template
    - technical_spec_template

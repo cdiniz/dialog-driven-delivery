@@ -7,6 +7,15 @@
   },
   "homepage": "https://github.com/cdiniz/dialog-driven-delivery",
   "repository": "https://github.com/cdiniz/dialog-driven-delivery",
-  "keywords": ["documentation", "planning", "specifications", "user-stories", "workflow", "agile", "transcripts"],
+  "keywords": [
+    "documentation",
+    "planning",
+    "specifications",
+    "user-stories",
+    "workflow",
+    "agile",
+    "transcripts",
+    "d3"
+  ],
   "license": "MIT"
 }

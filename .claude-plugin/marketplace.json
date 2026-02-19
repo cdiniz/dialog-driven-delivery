@@ -5,14 +5,13 @@
     "email": "claudio@cdiniz.com"
   },
   "metadata": {
-    "description": "Dialog Driven Delivery (D3) - Conversational, transcript-first methodology for building software products",
+    "description": "Dialog Driven Delivery - A pragmatic workflow for building software through conversational, transcript-first documentation and development. Create specs, refine them, and decompose into user stories.",
     "version": "0.0.1"
   },
   "plugins": [
     {
       "name": "d3",
-      "source": "./d3",
-      "description": "Dialog Driven Delivery - Create specs, refine them, and decompose into user stories through conversational workflows",
+      "description": "Dialog Driven Delivery - A pragmatic workflow for building software through conversational, transcript-first documentation and development. Create specs, refine them, and decompose into user stories.",
       "version": "0.0.1",
       "author": {
         "name": "D3 Team"
@@ -20,13 +19,22 @@
       "homepage": "https://github.com/cdiniz/dialog-driven-delivery",
       "repository": "https://github.com/cdiniz/dialog-driven-delivery",
       "license": "MIT",
-      "keywords": ["documentation", "planning", "specifications", "user-stories", "workflow", "agile", "d3"],
+      "keywords": [
+        "documentation",
+        "planning",
+        "specifications",
+        "user-stories",
+        "workflow",
+        "agile",
+        "transcripts",
+        "d3"
+      ],
+      "source": "./d3",
       "category": "productivity"
     },
     {
       "name": "d3-atlassian",
-      "source": "./d3-atlassian",
-      "description": "Atlassian provider for D3 - Enables D3 to work with Confluence for specifications and Jira for user stories",
+      "description": "Atlassian provider for D3 (Dialog Driven Delivery). Enables D3 to work with Confluence for specifications and Jira for user stories.",
       "version": "0.0.1",
       "author": {
         "name": "D3 Team"
@@ -34,13 +42,19 @@
       "homepage": "https://github.com/cdiniz/dialog-driven-delivery",
       "repository": "https://github.com/cdiniz/dialog-driven-delivery",
       "license": "MIT",
-      "keywords": ["d3", "atlassian", "confluence", "jira", "provider"],
+      "keywords": [
+        "d3",
+        "atlassian",
+        "confluence",
+        "jira",
+        "provider"
+      ],
+      "source": "./d3-atlassian",
       "category": "integrations"
     },
     {
       "name": "d3-markdown",
-      "source": "./d3-markdown",
-      "description": "Markdown provider for D3 - Local-first provider using markdown files for specs and stories. Perfect for solo developers and small teams. No SaaS required.",
+      "description": "Markdown provider for D3 (Dialog Driven Delivery). Enables D3 to work with local markdown files for specifications and user stories. Perfect for solo developers and small teams.",
       "version": "0.0.1",
       "author": {
         "name": "D3 Team"
@@ -48,7 +62,15 @@
       "homepage": "https://github.com/cdiniz/dialog-driven-delivery",
       "repository": "https://github.com/cdiniz/dialog-driven-delivery",
       "license": "MIT",
-      "keywords": ["d3", "markdown", "local", "git-based", "solo-developer", "provider"],
+      "keywords": [
+        "d3",
+        "markdown",
+        "local",
+        "provider",
+        "solo-developer",
+        "git-based"
+      ],
+      "source": "./d3-markdown",
       "category": "productivity"
     }
   ]

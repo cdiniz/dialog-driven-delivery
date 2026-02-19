@@ -2,7 +2,6 @@
 name: markdown-spec-provider
 description: Create and manage specifications as local markdown files. Stores specs in a configurable directory (default ./specs/) as markdown files tracked by git.
 ---
-
 ## What This Does
 
 Manages specifications as markdown files in the filesystem. Specs are stored in `{specs_dir}` directory with git version control.
@@ -166,7 +165,7 @@ Searches specifications by content.
 
 ## File Naming
 
-- Titles converted to filenames: "User Auth" → `user-auth.md`
+- Titles converted to filenames: "User Auth" -> `user-auth.md`
 - Lowercase with hyphens
 - Remove special characters (except hyphens)
 - All files have `.md` extension
@@ -179,19 +178,19 @@ Example with default `Specs Directory: ./specs`:
 
 ```
 specs/
-├── feature-1.md
-├── feature-2.md
-└── subdirectory/
-    └── feature-3.md
+  feature-1.md
+  feature-2.md
+  subdirectory/
+    feature-3.md
 ```
 
 Example with custom `Specs Directory: ./documentation/specs`:
 
 ```
 documentation/
-└── specs/
-    ├── feature-1.md
-    └── feature-2.md
+  specs/
+    feature-1.md
+    feature-2.md
 ```
 
 ---
@@ -203,4 +202,3 @@ documentation/
 - Use Grep for searching content
 - Git operations via Bash (optional, only if version_message provided)
 - Always create parent directories as needed
-- Backup files before updates

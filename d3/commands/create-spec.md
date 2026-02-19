@@ -1,7 +1,6 @@
 ---
 description: Create comprehensive feature specification from any input context (meeting transcripts, documents, or conversational discussion). Creates a unified specification containing both Product and Technical specifications. Use when starting a new feature, documenting a planning meeting, or when user asks to create/write a spec, specification, or feature documentation. Fills only known information and marks uncertainties.
 ---
-
 ## Core Principle
 
 **Fill only what you know. Empty sections are better than hallucinated content.**
@@ -13,7 +12,7 @@ Create a single unified spec with BOTH Product and Technical sections. Specs gro
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read {{config_file}} for D3 config
+- Read CLAUDE.md for D3 config
 - Search for ### D3 Config  ### Templates
 - If templates (tech and product spec templates) are not configure use skill d3-templates 
 - Store for later steps
@@ -92,7 +91,7 @@ Resolve now, leave marked, or review first?
 
 Use provider:
 ```
-{{invoke_skill("[provider-name]", "create_spec location_id=\"[LOCATION]\" title=\"[Title]\" body=\"[FULL_SPEC]\"")}}
+Skill(skill="[provider-name]", args="create_spec location_id=\"[LOCATION]\" title=\"[Title]\" body=\"[FULL_SPEC]\"")
 ```
 
 ### 8. Provide Summary

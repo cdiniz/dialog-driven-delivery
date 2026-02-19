@@ -2,6 +2,7 @@
 name: uncertainty-markers
 description: Standards for marking uncertainties in specifications to prevent AI hallucination. Use when creating or refining specifications to ensure unknowns, assumptions, and pending decisions are explicitly marked rather than silently assumed. Provides four marker types (OPEN QUESTION, DECISION PENDING, ASSUMPTION, CLARIFICATION NEEDED) with usage guidelines and validation checklist.
 ---
+
 # Uncertainty Marker Standards
 
 **Version:** 1.0

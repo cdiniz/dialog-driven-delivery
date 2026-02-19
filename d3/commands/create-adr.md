@@ -1,7 +1,6 @@
 ---
 description: Create an Architectural Decision Record (ADR) from any input context (meeting transcripts, documents, or conversational discussion). Captures architectural decisions — framework choices, database selections, event-driven vs synchronous, etc. — as immutable records following MADR v4 format. Use when a technical or architectural decision has been made or is being proposed. If a decision changes, create a new ADR that supersedes the old one.
 ---
-
 ## Core Principle
 
 **Capture the decision AND the reasoning. An ADR without rationale is just a changelog entry.**
@@ -13,7 +12,7 @@ ADRs are immutable records following [MADR v4](https://adr.github.io/madr/) form
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read {{config_file}} for D3 config
+- Read CLAUDE.md for D3 config
 - Search for `### ADR Provider` section first
 - If no ADR Provider configured, fall back to `### Spec Provider`
 - Load ADR template from d3-templates skill (or custom path if configured)
@@ -129,7 +128,7 @@ Ready to create? Or would you like to adjust anything?
 
 Use provider:
 ```
-{{invoke_skill("[provider-name]", "create_spec location_id=\"[LOCATION]\" title=\"ADR-[NUMBER]: [Title]\" body=\"[FULL_ADR]\"")}}
+Skill(skill="[provider-name]", args="create_spec location_id=\"[LOCATION]\" title=\"ADR-[NUMBER]: [Title]\" body=\"[FULL_ADR]\"")
 ```
 
 ### 11. Provide Summary & Next Steps
@@ -152,7 +151,7 @@ into relevant specifications' "Architectural Context > Relevant ADRs" section.
 
 | Issue | Action |
 |-------|--------|
-| No provider configured | Guide user to add ADR Provider or Spec Provider to {{config_file}} |
+| No provider configured | Guide user to add ADR Provider or Spec Provider to CLAUDE.md |
 | No decision found in input | Ask clarifying questions to identify the decision |
 | Minimal context | Warn ADR will be sparse, confirm before creating |
 | Conflicting information | Mark `[DECISION PENDING]` with conflicting options listed |

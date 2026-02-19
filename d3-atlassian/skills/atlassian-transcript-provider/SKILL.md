@@ -2,14 +2,13 @@
 name: atlassian-transcript-provider
 description: Store and manage meeting transcripts in Confluence using Atlassian MCP tools. Stores transcripts as child pages under a designated Transcripts parent page with labels for filtering.
 ---
-
 ## What This Does
 
 Manages meeting transcripts as Confluence child pages under a designated "Transcripts" parent page. Uses Atlassian MCP server to create, read, and search transcript pages. Transcripts are organized by labels for month and meeting type filtering.
 
 ## Configuration
 
-Reads from `CLAUDE.md`:
+Reads from CLAUDE.md:
 ```markdown
 ### Transcript Provider
 **Skill:** d3-atlassian:atlassian-transcript-provider
@@ -37,7 +36,7 @@ Creates a Confluence child page under the Transcripts parent page.
 
 **Implementation:**
 1. Create page title: `[YYYY-MM-DD] [Meeting Type] - [Title]`
-   - Capitalize meeting type (e.g., "planning" → "Planning")
+   - Capitalize meeting type (e.g., "planning" -> "Planning")
 2. Extract parent page ID from configured Default parent page URL
 3. Create page as child of parent using spaceId
 4. Apply labels: `transcript`, `{meeting_type}`, `{YYYY-MM}`
@@ -45,7 +44,7 @@ Creates a Confluence child page under the Transcripts parent page.
 
 **Preprocessing:**
 - Remove empty checkbox markers `[ ]` from task lists (Confluence doesn't support them)
-- Only strip: `- [ ]` → `- ` and `- [x]` → `- ` in list contexts
+- Only strip: `- [ ]` -> `- ` and `- [x]` -> `- ` in list contexts
 
 **MCP:** `mcp__atlassian__createConfluencePage` with contentFormat: "markdown", parentPageId from config
 **Post-create:** Apply labels using `mcp__atlassian__addConfluencePageLabel` for each label: `transcript`, `{meeting_type}`, `{YYYY-MM}`
@@ -88,10 +87,10 @@ Searches transcript content using CQL.
 
 ```
 Transcripts (parent page)
-├── [2026-02-03] Planning - Search Feature Kickoff
-├── [2026-02-04] Technical - Database Migration Review
-├── [2026-02-05] Standup - Monday Sync
-└── [2026-02-07] Retro - Sprint Retrospective
+  [2026-02-03] Planning - Search Feature Kickoff
+  [2026-02-04] Technical - Database Migration Review
+  [2026-02-05] Standup - Monday Sync
+  [2026-02-07] Retro - Sprint Retrospective
 ```
 
 **Labels per page:**

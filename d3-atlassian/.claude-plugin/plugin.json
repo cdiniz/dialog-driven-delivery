@@ -7,6 +7,12 @@
   },
   "homepage": "https://github.com/cdiniz/dialog-driven-delivery",
   "repository": "https://github.com/cdiniz/dialog-driven-delivery",
-  "keywords": ["d3", "atlassian", "confluence", "jira", "provider"],
+  "keywords": [
+    "d3",
+    "atlassian",
+    "confluence",
+    "jira",
+    "provider"
+  ],
   "license": "MIT"
 }

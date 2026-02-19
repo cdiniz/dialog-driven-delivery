@@ -1,5 +1,5 @@
 ---
-name: atlassian-transcript-provider
+name: d3-atlassian-transcript-provider
 description: Store and manage meeting transcripts in Confluence using Atlassian MCP tools. Stores transcripts as child pages under a designated Transcripts parent page with labels for filtering.
 ---
 ## What This Does

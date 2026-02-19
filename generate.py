@@ -180,15 +180,16 @@ def generate_claude(platforms):
 def generate_codex(platforms):
     cfg = platforms["codex"]
     out = DIST / "codex"
+    d3_dir = out / ".agents" / "skills" / "d3"
 
     if out.exists():
         shutil.rmtree(out)
 
     for cmd_file in (CANONICAL / "commands").glob("*.md"):
         fm, body, final = process_file(cmd_file, cfg, "command")
-        fm["name"] = f"d3-{cmd_file.stem}"
+        fm["name"] = cmd_file.stem
         final = transform_frontmatter(fm, body, "command", cfg)
-        write_output(out / ".agents" / "skills" / f"d3-{cmd_file.stem}" / "SKILL.md", final)
+        write_output(d3_dir / cmd_file.stem / "SKILL.md", final)
 
     for skill_dir in (CANONICAL / "skills").iterdir():
         if not skill_dir.is_dir():
@@ -196,8 +197,8 @@ def generate_codex(platforms):
         skill_file = skill_dir / "SKILL.md"
         if skill_file.exists():
             _, _, final = process_file(skill_file, cfg, "skill")
-            write_output(out / ".agents" / "skills" / skill_dir.name / "SKILL.md", final)
-        copy_references(skill_dir, out / ".agents" / "skills" / skill_dir.name / "references")
+            write_output(d3_dir / skill_dir.name / "SKILL.md", final)
+        copy_references(skill_dir, d3_dir / skill_dir.name / "references")
 
     for provider_dir in (CANONICAL / "providers").iterdir():
         if not provider_dir.is_dir():
@@ -206,42 +207,52 @@ def generate_codex(platforms):
             fm, body, _ = process_file(provider_file, cfg, "skill")
             skill_name = fm.get("name", f"{provider_dir.name}-{provider_file.stem}")
             final = transform_frontmatter(fm, body, "skill", cfg)
-            write_output(out / ".agents" / "skills" / skill_name / "SKILL.md", final)
+            write_output(d3_dir / skill_name / "SKILL.md", final)
 
     config_content = (CANONICAL / "config" / "example-config.md").read_text(encoding="utf-8")
     write_output(out / "AGENTS.md", config_content)
 
 
+def _copilot_name(name):
+    return name if name.startswith("d3-") else f"d3-{name}"
+
+
 def generate_copilot(platforms):
     cfg = platforms["copilot"]
     out = DIST / "copilot"
+    agents_dir = out / ".github" / "agents"
 
     if out.exists():
         shutil.rmtree(out)
 
     for cmd_file in (CANONICAL / "commands").glob("*.md"):
         fm, body, _ = process_file(cmd_file, cfg, "command")
-        fm["name"] = f"d3-{cmd_file.stem}"
+        agent_name = f"d3-{cmd_file.stem}"
+        fm["name"] = agent_name
         final = transform_frontmatter(fm, body, "command", cfg)
-        write_output(out / ".github" / "skills" / f"d3-{cmd_file.stem}" / "SKILL.md", final)
+        write_output(agents_dir / f"{agent_name}.agent.md", final)
 
     for skill_dir in (CANONICAL / "skills").iterdir():
         if not skill_dir.is_dir():
             continue
         skill_file = skill_dir / "SKILL.md"
         if skill_file.exists():
-            _, _, final = process_file(skill_file, cfg, "skill")
-            write_output(out / ".github" / "skills" / skill_dir.name / "SKILL.md", final)
-        copy_references(skill_dir, out / ".github" / "skills" / skill_dir.name / "references")
+            fm, body, _ = process_file(skill_file, cfg, "skill")
+            agent_name = _copilot_name(skill_dir.name)
+            fm["name"] = agent_name
+            final = transform_frontmatter(fm, body, "skill", cfg)
+            write_output(agents_dir / f"{agent_name}.agent.md", final)
 
     for provider_dir in (CANONICAL / "providers").iterdir():
         if not provider_dir.is_dir():
             continue
         for provider_file in provider_dir.glob("*.md"):
             fm, body, _ = process_file(provider_file, cfg, "skill")
-            skill_name = fm.get("name", f"{provider_dir.name}-{provider_file.stem}")
+            base_name = fm.get("name", f"{provider_dir.name}-{provider_file.stem}")
+            agent_name = _copilot_name(base_name)
+            fm["name"] = agent_name
             final = transform_frontmatter(fm, body, "skill", cfg)
-            write_output(out / ".github" / "skills" / skill_name / "SKILL.md", final)
+            write_output(agents_dir / f"{agent_name}.agent.md", final)
 
     config_content = (CANONICAL / "config" / "example-config.md").read_text(encoding="utf-8")
     write_output(out / ".github" / "copilot-instructions.md", config_content)
@@ -250,13 +261,14 @@ def generate_copilot(platforms):
 def generate_cursor(platforms):
     cfg = platforms["cursor"]
     out = DIST / "cursor"
+    d3_dir = out / ".cursor" / "rules" / "d3"
 
     if out.exists():
         shutil.rmtree(out)
 
     for cmd_file in (CANONICAL / "commands").glob("*.md"):
         _, _, final = process_file(cmd_file, cfg, "command")
-        write_output(out / ".cursor" / "rules" / f"d3-{cmd_file.stem}" / "RULE.md", final)
+        write_output(d3_dir / cmd_file.stem / "RULE.md", final)
 
     for skill_dir in (CANONICAL / "skills").iterdir():
         if not skill_dir.is_dir():
@@ -264,8 +276,8 @@ def generate_cursor(platforms):
         skill_file = skill_dir / "SKILL.md"
         if skill_file.exists():
             _, _, final = process_file(skill_file, cfg, "rule")
-            write_output(out / ".cursor" / "rules" / skill_dir.name / "RULE.md", final)
-        copy_references(skill_dir, out / ".cursor" / "rules" / skill_dir.name / "references")
+            write_output(d3_dir / skill_dir.name / "RULE.md", final)
+        copy_references(skill_dir, d3_dir / skill_dir.name / "references")
 
     for provider_dir in (CANONICAL / "providers").iterdir():
         if not provider_dir.is_dir():
@@ -274,7 +286,7 @@ def generate_cursor(platforms):
             fm, body, _ = process_file(provider_file, cfg, "rule")
             rule_name = fm.get("name", f"{provider_dir.name}-{provider_file.stem}")
             final = transform_frontmatter(fm, body, "rule", cfg)
-            write_output(out / ".cursor" / "rules" / rule_name / "RULE.md", final)
+            write_output(d3_dir / rule_name / "RULE.md", final)
 
     config_content = (CANONICAL / "config" / "example-config.md").read_text(encoding="utf-8")
     config_fm = {
@@ -282,7 +294,7 @@ def generate_cursor(platforms):
         "alwaysApply": True,
     }
     final = build_frontmatter(config_fm) + "\n" + config_content
-    write_output(out / ".cursor" / "rules" / "d3-config" / "RULE.md", final)
+    write_output(d3_dir / "config" / "RULE.md", final)
 
 
 GENERATORS = {

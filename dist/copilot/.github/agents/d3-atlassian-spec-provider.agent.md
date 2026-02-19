@@ -1,5 +1,5 @@
 ---
-name: atlassian-spec-provider
+name: d3-atlassian-spec-provider
 description: Create and manage specifications in Confluence using Atlassian MCP tools.
 ---
 ## What This Does

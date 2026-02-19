@@ -1,5 +1,5 @@
 ---
-name: markdown-transcript-provider
+name: d3-markdown-transcript-provider
 description: Store and manage meeting transcripts as local markdown files. Stores transcripts in ./transcripts/ directory organized by month as markdown files tracked by git.
 ---
 ## What This Does

@@ -1,5 +1,5 @@
 ---
-name: atlassian-story-provider
+name: d3-atlassian-story-provider
 description: Create and manage user stories in Jira using Atlassian MCP tools.
 ---
 ## What This Does

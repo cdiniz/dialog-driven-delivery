@@ -1,5 +1,5 @@
 ---
-name: markdown-story-provider
+name: d3-markdown-story-provider
 description: Create and manage user stories as local markdown files organized by feature/spec.
 ---
 ## What This Does

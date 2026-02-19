@@ -1,5 +1,5 @@
 ---
-name: markdown-spec-provider
+name: d3-markdown-spec-provider
 description: Create and manage specifications as local markdown files. Stores specs in a configurable directory (default ./specs/) as markdown files tracked by git.
 ---
 ## What This Does

@@ -367,7 +367,7 @@ Providers (Pluggable)
 
 ### Creating Custom Providers
 
-1. Review an existing provider (e.g. `d3/providers/markdown/spec-provider.md`)
+1. Review an existing provider (e.g. `canonical/providers/markdown/spec-provider.md`)
 2. Implement the provider operations for your tool
 3. Configure your config file to reference the new provider
 4. D3 commands work automatically with any provider
@@ -381,40 +381,24 @@ Providers (Pluggable)
 
 ## Repository Structure
 
-D3 uses a **single canonical source** with template variables that generates platform-specific output for each supported platform.
+D3 uses a **single canonical source** (`canonical/`) with template variables that generates platform-specific output. Claude Code output is written to the repo root (`d3/`, `d3-markdown/`, `d3-atlassian/`), other platforms to `dist/`.
 
 ```
 dialog-driven-delivery/
-├── d3/                              # Canonical source (single source of truth)
+├── canonical/                       # Canonical source (single source of truth)
 │   ├── d3.platform.yaml             # Platform variable mappings
 │   ├── metadata/                    # Plugin metadata (d3.yaml, d3-markdown.yaml, d3-atlassian.yaml)
 │   ├── commands/                    # Command workflows (with {{template_variables}})
-│   │   ├── create-spec.md
-│   │   ├── refine-spec.md
-│   │   ├── decompose.md
-│   │   ├── capture-transcript.md
-│   │   └── create-adr.md
 │   ├── skills/                      # Platform-agnostic skills
-│   │   ├── d3-templates/
-│   │   │   ├── SKILL.md
-│   │   │   └── references/          # Pure markdown templates (no variables)
-│   │   └── uncertainty-markers/
-│   │       └── SKILL.md
 │   ├── providers/                   # Provider skills (with {{template_variables}})
-│   │   ├── markdown/
-│   │   │   ├── spec-provider.md
-│   │   │   ├── story-provider.md
-│   │   │   └── transcript-provider.md
-│   │   └── atlassian/
-│   │       ├── spec-provider.md
-│   │       ├── story-provider.md
-│   │       └── transcript-provider.md
 │   └── config/
 │       └── example-config.md        # Default provider configuration
+├── d3/                              # Generated — Claude Code plugin (do not edit)
+├── d3-markdown/                     # Generated — Markdown provider plugin (do not edit)
+├── d3-atlassian/                    # Generated — Atlassian provider plugin (do not edit)
 ├── generate.py                      # Generator script
 ├── install.sh                       # Install script for non-Claude platforms
-└── dist/                            # Generated output (gitignored)
-    ├── claude/                      # Claude Code plugin structure
+└── dist/                            # Generated — other platforms
     ├── codex/                       # .agents/skills/ + AGENTS.md
     ├── copilot/                     # .github/agents/*.agent.md + copilot-instructions.md
     └── cursor/                      # .cursor/rules/ + d3-config
@@ -422,7 +406,7 @@ dialog-driven-delivery/
 
 ### How It Works
 
-The canonical source files in `d3/` use template variables like `{{config_file}}`, `{{read_tool}}`, and `{{invoke_skill("name", "args")}}` for the few platform-specific references. The generator substitutes these with platform-native values, transforms frontmatter, and outputs the correct directory structure for each platform.
+The canonical source files in `canonical/` use template variables like `{{config_file}}`, `{{read_tool}}`, and `{{invoke_skill("name", "args")}}` for platform-specific references. The generator substitutes these with platform-native values, transforms frontmatter, and outputs the correct directory structure for each platform. Generated files include a `<!-- DO NOT EDIT -->` header.
 
 **Template variables:**
 
@@ -446,13 +430,16 @@ The `generate.py` script produces platform-specific output from the canonical so
 
 ```bash
 # Generate for a specific platform
-python generate.py --platform claude
-python generate.py --platform codex
-python generate.py --platform copilot
-python generate.py --platform cursor
+python generate.py --platform claude    # Output: d3/, d3-markdown/, d3-atlassian/
+python generate.py --platform codex     # Output: dist/codex/
+python generate.py --platform copilot   # Output: dist/copilot/
+python generate.py --platform cursor    # Output: dist/cursor/
 
 # Generate all platforms
 python generate.py --all
+
+# Check generated files are in sync (no working tree changes)
+python generate.py --check
 
 # Validate no unresolved template variables in output
 python generate.py --validate
@@ -461,9 +448,21 @@ python generate.py --validate
 python generate.py --validate-canonical
 ```
 
-Output goes to `dist/<platform>/`. The generator reads `d3/d3.platform.yaml` for platform mappings.
+Claude output goes to the repo root (these are the installable plugins). Other platforms go to `dist/<platform>/`.
 
 **Requirements:** Python 3 with PyYAML (`pip install pyyaml`).
+
+### Generated File Protection
+
+A pre-commit hook and CI workflow prevent direct edits to generated files (`d3/`, `d3-markdown/`, `d3-atlassian/`).
+
+```bash
+# Setup (once after cloning)
+pip install pre-commit
+pre-commit install
+```
+
+The hook runs `python generate.py --check` when you commit changes to `canonical/` or generated directories. If files are out of sync, it fails with instructions to regenerate. CI runs the same check on push and pull requests.
 
 ### Install Script
 
@@ -486,11 +485,10 @@ The script creates config files with sensible defaults if they don't already exi
 **Claude Code** (using plugin directories):
 
 ```bash
-# Generate Claude output first
-python generate.py --platform claude
-
-# Test with generated plugins
-claude --plugin-dir ./dist/claude/d3 --plugin-dir ./dist/claude/d3-markdown
+# Test in another project using local plugins
+cd /path/to/test-project
+claude --plugin-dir /path/to/dialog-driven-delivery/d3 \
+       --plugin-dir /path/to/dialog-driven-delivery/d3-markdown
 ```
 
 **Other platforms** (copy to test project):
@@ -506,9 +504,9 @@ cp dist/codex/AGENTS.md /path/to/your-project/
 
 ### Making Changes
 
-1. Edit canonical files in `d3/` (commands, skills, providers)
+1. Edit canonical files in `canonical/` (commands, skills, providers)
 2. Run `python generate.py --all` to regenerate all platforms
-3. Run `python generate.py --validate` to verify no unresolved variables
+3. Run `python generate.py --check` to verify generated files are in sync
 4. Test with your target platform
 
 ---

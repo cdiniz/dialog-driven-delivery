@@ -3,7 +3,7 @@ repos:
     hooks:
       - id: check-generated-files
         name: check generated files are up to date
-        entry: bash -c 'python generate.py --platform claude && git diff --exit-code d3/ d3-markdown/ d3-atlassian/ || (echo "Generated files are out of sync. Edit canonical/ then run: python generate.py --platform claude" && exit 1)'
+        entry: .venv/bin/python generate.py --check
         language: system
         pass_filenames: false
         files: ^(canonical/|d3/|d3-markdown/|d3-atlassian/)

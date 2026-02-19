@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import argparse
+import filecmp
 import json
 import re
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 import yaml
@@ -111,13 +113,14 @@ def _clear_dir(path):
         shutil.rmtree(path)
 
 
-def generate_claude(platforms):
+def generate_claude(platforms, output_root=None):
     cfg = platforms["claude"]
-    d3_dir = ROOT / "d3"
+    base = output_root or ROOT
+    d3_dir = base / "d3"
     plugin_dirs = {
         "d3": d3_dir,
-        "d3-markdown": ROOT / "d3-markdown",
-        "d3-atlassian": ROOT / "d3-atlassian",
+        "d3-markdown": base / "d3-markdown",
+        "d3-atlassian": base / "d3-atlassian",
     }
 
     _clear_dir(d3_dir / "commands")
@@ -158,7 +161,7 @@ def generate_claude(platforms):
             k: meta[k] for k in ("name", "description", "version", "author", "homepage", "repository", "license", "keywords")
         } | {"source": source_dir, "category": category})
     write_output(
-        ROOT / ".claude-plugin" / "marketplace.json",
+        base / ".claude-plugin" / "marketplace.json",
         json.dumps(marketplace, indent=2) + "\n",
     )
 
@@ -350,6 +353,30 @@ def validate_output(platform_name):
     return issues
 
 
+def _check_claude_sync(platforms):
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        generate_claude(platforms, output_root=tmp_path)
+
+        diffs = []
+        for dir_name in ("d3", "d3-markdown", "d3-atlassian"):
+            actual = ROOT / dir_name
+            expected = tmp_path / dir_name
+            if not expected.exists():
+                continue
+            for expected_file in expected.rglob("*"):
+                if not expected_file.is_file():
+                    continue
+                rel = expected_file.relative_to(expected)
+                actual_file = actual / rel
+                if not actual_file.exists():
+                    diffs.append(f"  missing: {dir_name}/{rel}")
+                elif not filecmp.cmp(actual_file, expected_file, shallow=False):
+                    diffs.append(f"  differs: {dir_name}/{rel}")
+
+    return diffs
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate D3 platform-specific output")
     parser.add_argument(
@@ -368,14 +395,30 @@ def main():
         action="store_true",
         help="List template variables in canonical source",
     )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Check Claude generated files are up to date (no working tree changes)",
+    )
 
     args = parser.parse_args()
 
-    if not any([args.platform, args.all, args.validate, args.validate_canonical]):
+    if not any([args.platform, args.all, args.validate, args.validate_canonical, args.check]):
         parser.print_help()
         sys.exit(1)
 
     platforms = load_platforms()
+
+    if args.check:
+        diffs = _check_claude_sync(platforms)
+        if diffs:
+            print("Generated files are out of sync with canonical/:")
+            for d in diffs:
+                print(d)
+            print("\nRun: python generate.py --platform claude")
+            sys.exit(1)
+        print("Generated files are up to date.")
+        return
 
     if args.validate_canonical:
         unresolved = validate_canonical()

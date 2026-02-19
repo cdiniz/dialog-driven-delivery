@@ -412,10 +412,11 @@ def main():
     if args.check:
         diffs = _check_claude_sync(platforms)
         if diffs:
-            print("Generated files are out of sync with canonical/:")
+            print("Do not edit generated files directly. Edit canonical/ instead.")
+            print()
             for d in diffs:
                 print(d)
-            print("\nRun: python generate.py --platform claude")
+            print("\nThen run: python generate.py --platform claude")
             sys.exit(1)
         print("Generated files are up to date.")
         return

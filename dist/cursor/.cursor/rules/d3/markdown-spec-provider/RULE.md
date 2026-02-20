@@ -63,8 +63,8 @@ Creates a specification markdown file.
 
 **Implementation:**
 1. Sanitize title to filename: lowercase, spaces to hyphens, remove special chars
-2. Determine filepath: `{specs_dir}/{location_id}/{filename}.md`
-3. Create directory if needed
+2. Determine filepath: `{specs_dir}/{location_id}/{filename}.md` — the spec is a single file, NOT a directory
+3. Ensure parent directory exists (e.g. `{specs_dir}/`)
 4. Write body to file using the write tool
 5. Return metadata
 

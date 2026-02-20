@@ -55,6 +55,7 @@ case "$platform" in
     mkdir -p .github
     cp -r "$tmpdir/.github/prompts" .github/
     cp -r "$tmpdir/.github/agents" .github/
+    cp -r "$tmpdir/.github/instructions" .github/
     echo ""
     echo "D3 installed for GitHub Copilot."
     echo ""

@@ -1,6 +1,5 @@
 ---
-name: d3-platform
-description: D3 platform-specific tool and configuration mappings for Copilot. Read this before executing D3 commands or skills.
+applyTo: "**"
 ---
 # D3 Platform Reference
 

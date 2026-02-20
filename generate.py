@@ -302,8 +302,10 @@ def generate_copilot(platforms):
         final = transform_frontmatter(fm, body, "skill", cfg)
         write_output(agents_dir / f"{agent_name}.agent.md", final)
 
-    platform_md = _platform_md_with_frontmatter("Copilot", cfg, "skill")
-    write_output(agents_dir / "d3-platform.agent.md", platform_md)
+    instructions_dir = out / ".github" / "instructions"
+    platform_body = generate_platform_md(cfg)
+    platform_fm = build_frontmatter({"applyTo": '"**"'})
+    write_output(instructions_dir / "d3-platform.instructions.md", platform_fm + "\n" + platform_body)
 
     config_content = (CONFIG_DIR / "example-config.md").read_text(encoding="utf-8")
     write_output(out / "d3.config.md", config_content)

@@ -42,7 +42,7 @@ platforms:
         fields: [name, description]
 
   copilot:
-    invoke_skill: '/{name} {args}'
+    invoke_skill: '@{name} {args}'
     tools:
       read: read
       write: edit

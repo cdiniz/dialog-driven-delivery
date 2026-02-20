@@ -121,6 +121,17 @@ def generate_platform_md(platform_cfg):
         "```",
     ])
 
+    refs_path = platform_cfg.get("references_path")
+    if refs_path:
+        lines.extend([
+            "",
+            "## Template References",
+            "D3 template files are located at:",
+            "```",
+            refs_path,
+            "```",
+        ])
+
     return "\n".join(lines) + "\n"
 
 
@@ -288,12 +299,13 @@ def generate_copilot(platforms):
         final = transform_frontmatter(fm, body, "command", cfg)
         write_output(prompts_dir / f"{prompt_name}.prompt.md", final)
 
-    for name, skill_file, _skill_dir in iter_skills():
+    for name, skill_file, skill_dir in iter_skills():
         fm, body, _ = read_source(skill_file, "skill", cfg)
         agent_name = _copilot_name(name)
         fm["name"] = agent_name
         final = transform_frontmatter(fm, body, "skill", cfg)
         write_output(agents_dir / f"{agent_name}.agent.md", final)
+        copy_references(skill_dir, out / ".github" / agent_name / "references")
 
     for name, provider_file in iter_providers():
         fm, body, _ = read_source(provider_file, "skill", cfg)

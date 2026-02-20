@@ -23,7 +23,7 @@ Every story must follow INVEST:
 ### 1. Detect Provider and Templates
 - Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
-- If user story template are not configure use skill d3-templtes
+- If user story template are not configure use skill d3-templates
 - Store for later steps
 
 ### 2. Fetch Specification

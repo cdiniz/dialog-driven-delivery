@@ -17,3 +17,9 @@ To invoke a skill, use this syntax:
 ```
 @<skill-name> <arguments>
 ```
+
+## Template References
+D3 template files are located at:
+```
+.github/d3-templates/references
+```

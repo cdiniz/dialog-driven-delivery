@@ -276,8 +276,9 @@ def generate_codex(platforms):
     platform_md = _platform_md_with_frontmatter("Codex", cfg, "skill")
     write_output(d3_dir / "d3-platform" / "SKILL.md", platform_md)
 
-    config_content = (CONFIG_DIR / "example-config.md").read_text(encoding="utf-8")
-    write_output(out / "d3.config.md", config_content)
+    for variant in ("markdown", "atlassian"):
+        content = (CONFIG_DIR / f"example-config-{variant}.md").read_text(encoding="utf-8")
+        write_output(out / f"d3.config.{variant}.md", content)
 
 
 def _copilot_name(name):
@@ -320,8 +321,9 @@ def generate_copilot(platforms):
     platform_fm = build_frontmatter({"applyTo": '"**"'})
     write_output(instructions_dir / "d3-platform.instructions.md", platform_fm + "\n" + platform_body)
 
-    config_content = (CONFIG_DIR / "example-config.md").read_text(encoding="utf-8")
-    write_output(out / "d3.config.md", config_content)
+    for variant in ("markdown", "atlassian"):
+        content = (CONFIG_DIR / f"example-config-{variant}.md").read_text(encoding="utf-8")
+        write_output(out / f"d3.config.{variant}.md", content)
 
 
 def generate_cursor(platforms):
@@ -350,8 +352,9 @@ def generate_cursor(platforms):
     platform_md = _platform_md_with_frontmatter("Cursor", cfg, "rule")
     write_output(d3_dir / "d3-platform" / "RULE.md", platform_md)
 
-    config_content = (CONFIG_DIR / "example-config.md").read_text(encoding="utf-8")
-    write_output(out / "d3.config.md", config_content)
+    for variant in ("markdown", "atlassian"):
+        content = (CONFIG_DIR / f"example-config-{variant}.md").read_text(encoding="utf-8")
+        write_output(out / f"d3.config.{variant}.md", content)
 
 
 GENERATORS = {

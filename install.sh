@@ -7,15 +7,20 @@ REPO_NAME="dialog-driven-delivery"
 ARCHIVE_PREFIX="${REPO_NAME}-${BRANCH}"
 
 usage() {
-  echo "Usage: $0 <platform>"
+  echo "Usage: $0 <platform> [--provider <markdown|atlassian>]"
   echo ""
   echo "Platforms:"
   echo "  codex    - Install D3 for OpenAI Codex (.agents/skills/)"
   echo "  copilot  - Install D3 for GitHub Copilot (.github/prompts/ + .github/agents/)"
   echo "  cursor   - Install D3 for Cursor (.cursor/rules/)"
   echo ""
+  echo "Providers:"
+  echo "  markdown   - Store specs, stories, and transcripts as local markdown files (default)"
+  echo "  atlassian  - Store specs and transcripts in Confluence, stories in Jira"
+  echo ""
   echo "Example:"
   echo "  curl -sSL https://raw.githubusercontent.com/${REPO}/${BRANCH}/install.sh | bash -s -- copilot"
+  echo "  curl -sSL https://raw.githubusercontent.com/${REPO}/${BRANCH}/install.sh | bash -s -- copilot --provider atlassian"
   exit 1
 }
 
@@ -23,6 +28,26 @@ platform="${1:-}"
 if [ -z "$platform" ]; then
   usage
 fi
+shift
+
+provider="markdown"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --provider)
+      provider="${2:-}"
+      if [ -z "$provider" ] || { [ "$provider" != "markdown" ] && [ "$provider" != "atlassian" ]; }; then
+        echo "Error: --provider must be 'markdown' or 'atlassian'"
+        exit 1
+      fi
+      shift 2
+      ;;
+    *)
+      echo "Error: Unknown option '$1'"
+      echo ""
+      usage
+      ;;
+  esac
+done
 
 tmpdir=$(mktemp -d)
 trap "rm -rf $tmpdir" EXIT
@@ -32,8 +57,8 @@ curl -sL "https://github.com/${REPO}/archive/${BRANCH}.tar.gz" \
   | tar xz -C "$tmpdir" --strip-components=3 "${ARCHIVE_PREFIX}/dist/${platform}/"
 
 if [ ! -f "d3.config.md" ]; then
-  cp "$tmpdir/d3.config.md" .
-  echo "Created d3.config.md with default D3 configuration."
+  cp "$tmpdir/d3.config.${provider}.md" d3.config.md
+  echo "Created d3.config.md with ${provider} provider configuration."
 else
   echo "d3.config.md already exists, skipping."
 fi
@@ -47,6 +72,10 @@ case "$platform" in
     echo ""
     echo "Next steps:"
     echo "  1. Review d3.config.md and adjust provider configuration"
+    if [ "$provider" = "atlassian" ]; then
+      echo "     - Set your Cloud ID, space keys, and project keys"
+      echo "     - Set the Transcripts parent page URL"
+    fi
     echo "  2. Start using D3: \$d3-create-spec"
     ;;
 
@@ -62,6 +91,10 @@ case "$platform" in
     echo ""
     echo "Next steps:"
     echo "  1. Review d3.config.md and adjust provider configuration"
+    if [ "$provider" = "atlassian" ]; then
+      echo "     - Set your Cloud ID, space keys, and project keys"
+      echo "     - Set the Transcripts parent page URL"
+    fi
     echo "  2. Start using D3: /d3-create-spec in Copilot chat"
     ;;
 
@@ -73,6 +106,10 @@ case "$platform" in
     echo ""
     echo "Next steps:"
     echo "  1. Review d3.config.md and adjust provider configuration"
+    if [ "$provider" = "atlassian" ]; then
+      echo "     - Set your Cloud ID, space keys, and project keys"
+      echo "     - Set the Transcripts parent page URL"
+    fi
     echo "  2. Start using D3: /d3-create-spec in Cursor agent mode"
     ;;
 

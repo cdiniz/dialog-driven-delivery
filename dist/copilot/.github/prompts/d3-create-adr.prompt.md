@@ -13,14 +13,19 @@ ADRs are immutable records following [MADR v4](https://adr.github.io/madr/) form
 
 ## Workflow
 
-### 1. Detect Provider and Templates
+### 1. Detect Provider, Templates, and Settings
 - Read `d3.config.md` for D3 config
 - Search for `### ADR Provider` section first
 - If no ADR Provider configured, fall back to `### Spec Provider`
+- Read `Quiet Mode` from Settings (default: `false` when absent)
 - Load ADR template from d3-templates skill (or custom path if configured)
-- Store provider and template for later steps
+- Store provider, template, and quiet mode for later steps
 
 ### 2. Get Input Context
+
+**If quiet mode and input text provided in `$ARGUMENTS`:** Use the provided text directly as input context. Skip the question below.
+
+**Otherwise:**
 Ask user:
 ```
 How would you like to provide the architectural decision information?
@@ -30,6 +35,10 @@ C) Describe conversationally
 ```
 
 ### 3. Get Location
+
+**If quiet mode:** Use Default Location from ADR Provider (or Spec Provider) configuration in `d3.config.md`. If no default is configured, use the provider's root location (`.`).
+
+**Otherwise:**
 Ask where to create the ADR. If needed, use provider's `list_locations`.
 
 Use the location from ADR Provider config if available, otherwise Spec Provider's location.
@@ -51,18 +60,26 @@ Extract from context (following MADR v4 structure):
 - **Confirmation:** How compliance with the decision will be verified
 - **Pros and Cons of each Option:** Detailed analysis per option
 
-Propose title (short, representative of solved problem and found solution), wait for confirmation.
+**If quiet mode:** Propose title and accept it immediately.
+
+**Otherwise:** Propose title (short, representative of solved problem and found solution), wait for confirmation.
 
 ### 6. Determine Status & Metadata
 
 - If a clear decision was made → Status: **Accepted**
 - If still under discussion or pending approval → Status: **Proposed** with `[DECISION PENDING: ...]` markers
-- Ask user to confirm the status
+
+**If quiet mode:** Use the auto-detected status without confirmation.
+
+**Otherwise:** Ask user to confirm the status.
+
 - Identify decision-makers, consulted, and informed parties from context
 
 ### 7. Handle Superseding
 
-Ask: "Does this ADR supersede an existing one?"
+**If quiet mode:** Assume this ADR does not supersede an existing one. Skip to Step 8.
+
+**Otherwise:** Ask: "Does this ADR supersede an existing one?"
 
 If yes:
 - Fetch the old ADR using provider's `get_spec`
@@ -116,7 +133,9 @@ Invoke uncertainty-markers skill for detailed guidance.
 - [ ] If status is "Accepted", no `[DECISION PENDING]` markers should remain in Decision Outcome section
 - [ ] If status is "Proposed", `[DECISION PENDING]` markers are expected
 
-**Present to user:**
+**If quiet mode:** Skip presenting to user. Proceed to creation.
+
+**Otherwise — present to user:**
 ```
 ADR-[NUMBER]: [Title]
 Status: [Proposed/Accepted]

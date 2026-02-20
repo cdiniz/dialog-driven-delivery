@@ -21,10 +21,11 @@ Every story must follow INVEST:
 
 ## Workflow
 
-### 1. Detect Provider, Templates, and Spec Mode
+### 1. Detect Provider, Templates, Spec Mode, and Settings
 - Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
 - Read `Spec Mode` from Spec Provider configuration (default: `combined` when absent)
+- Read `Quiet Mode` from Settings (default: `false` when absent)
 - If user story template are not configure use skill d3-templates
 - Store for later steps
 
@@ -48,11 +49,19 @@ If no Product Spec: Warn but continue.
 ### 3. Detect Project and Capabilities
 Use story provider's `list_projects`:
 - If single project returned → use it automatically (no prompt needed)
-- If multiple projects → ask user to choose
+- If multiple projects:
+
+  **If quiet mode:** Use Default Project from Story Provider configuration in `d3.config.md`. If no default is configured, ask the user.
+
+  **Otherwise:** Ask user to choose.
 
 Call `get_issue_types` for the chosen project. Store whether Epic type is available (used in step 8).
 
 ### 4. Request Decomposition Input
+
+**If quiet mode:** Default to conversational decomposition (Option B below). Skip the question.
+
+**Otherwise:**
 Ask user:
 ```
 Did you have a story decomposition meeting?
@@ -85,6 +94,10 @@ Story 1: [Workflow Name]
 ```
 
 ### 6. Ask Clarifying Questions (Only When Needed)
+
+**If quiet mode:** Skip clarifying questions. Proceed with reasonable assumptions and mark any uncertainties using uncertainty markers.
+
+**Otherwise:**
 
 **Only ask about genuine uncertainties affecting story boundaries.**
 

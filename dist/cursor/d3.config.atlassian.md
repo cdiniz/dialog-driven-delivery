@@ -1,5 +1,8 @@
 ## D3 Configuration
 
+### Settings
+- Quiet Mode: false
+
 <!-- Cloud ID: visit https://yoursite.atlassian.net/_edge/tenant_info -->
 <!-- Space key: the short code in Confluence URLs, e.g. PROJ from /wiki/spaces/PROJ/... -->
 <!-- Project key: the prefix in Jira issue keys, e.g. PROJ from PROJ-123 -->

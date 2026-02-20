@@ -10,10 +10,11 @@ Automatically detect which sections need updating - Product, Technical, or both.
 
 ## Workflow
 
-### 1. Detect Provider, Templates, and Spec Mode
+### 1. Detect Provider, Templates, Spec Mode, and Settings
 - Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
 - Read `Spec Mode` from Spec Provider configuration (default: `combined` when absent)
+- Read `Quiet Mode` from Settings (default: `false` when absent)
 - If templates (tech and product spec templates) are not configure use skill d3-templates
 - Store for later steps
 
@@ -50,6 +51,10 @@ Linked Stories: [None / Epic KEY-123 with N stories]
 ```
 
 ### 5. Request Refinement Input
+
+**If quiet mode and new content provided in `$ARGUMENTS`:** Use the provided text directly as refinement input. Skip the question below.
+
+**Otherwise:**
 Ask user:
 ```
 How would you like to provide new information?
@@ -122,6 +127,8 @@ Summary:
 Does this look correct?
 ```
 
+**If quiet mode:** Skip presenting proposed changes. Accept all changes and proceed.
+
 ### 8. Analyze Story Impact (if stories exist)
 
 **Skip this step if no epic/stories were found in Step 3.**
@@ -162,6 +169,8 @@ For each spec change, determine if it affects existing stories:
 
 Proceed with spec + story updates?
 ```
+
+**If quiet mode:** Skip presenting story impact. Proceed with all updates.
 
 ### 9. Validate Changes
 

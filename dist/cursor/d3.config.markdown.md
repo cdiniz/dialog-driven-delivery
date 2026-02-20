@@ -1,5 +1,8 @@
 ## D3 Configuration
 
+### Settings
+- Quiet Mode: false
+
 ### Spec Provider
 **Skill:** d3-markdown:markdown-spec-provider
 **Configuration:**

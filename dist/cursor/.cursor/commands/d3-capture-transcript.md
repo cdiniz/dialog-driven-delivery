@@ -8,7 +8,7 @@ Transcripts are standalone artifacts. Their relationship to specs is established
 
 ## Workflow
 
-### 1. Detect Provider and Template
+### 1. Detect Provider, Template, and Settings
 - Read `d3.config.md` for D3 config
 - Search for `### Transcript Provider` section
 - If no Transcript Provider configured, guide user to add one to `d3.config.md`:
@@ -19,10 +19,15 @@ Transcripts are standalone artifacts. Their relationship to specs is established
   - Transcripts Directory: ./transcripts
   - Default Location: .
   ```
+- Read `Quiet Mode` from Settings (default: `false` when absent)
 - Load meeting transcript template from d3-templates skill (or custom path if configured)
-- Store provider and template for later steps
+- Store provider, template, and quiet mode for later steps
 
 ### 2. Get Transcript Input
+
+**If quiet mode and transcript text provided in `$ARGUMENTS`:** Use the provided text directly as the transcript. Skip the question below.
+
+**Otherwise:**
 Ask user:
 ```
 Please paste your meeting transcript below.
@@ -36,6 +41,10 @@ This can be:
 Wait for user to paste the transcript content.
 
 ### 3. Ask Meeting Type
+
+**If quiet mode:** Auto-detect meeting type from transcript content keywords (e.g., "sprint"/"planning"/"kickoff" → Planning, "architecture"/"design review" → Technical, "standup"/"sync" → Standup, "retro"/"post-mortem" → Retro). If no clear match, default to Other.
+
+**Otherwise:**
 Ask user:
 ```
 What type of meeting was this?
@@ -48,6 +57,10 @@ E) Other
 
 ### 4. Determine Meeting Date
 - Look for an explicit date in the transcript (e.g., timestamps, "January 15th meeting", date headers)
+
+**If quiet mode:** Accept the detected date. If no date found, use today's date.
+
+**Otherwise:**
 - If a date is found, confirm with user: `I found the meeting date: YYYY-MM-DD. Is that correct?`
 - If no date is found, ask the user: `I couldn't find a date in the transcript. When did this meeting take place? (default: today, YYYY-MM-DD)`
 - Use today's date if the user confirms the default
@@ -85,7 +98,10 @@ Analyze the transcript in a single pass and extract:
 ### 6. Propose Title
 - Generate a descriptive slug from the transcript content (e.g., "search-feature-kickoff", "database-migration-review")
 - Format: lowercase, hyphens, no special characters
-- Present to user for confirmation:
+
+**If quiet mode:** Accept the proposed title immediately.
+
+**Otherwise — present to user for confirmation:**
 ```
 Proposed title: "Search Feature Kickoff"
 File will be saved as: transcripts/2026-02/planning-search-feature-kickoff.md
@@ -94,6 +110,10 @@ Is this title good, or would you like to change it?
 ```
 
 ### 7. Show Summary for Review
+
+**If quiet mode:** Skip review. Proceed to storage.
+
+**Otherwise:**
 Present the full structured summary to the user before storing:
 ```
 Here's the structured transcript:

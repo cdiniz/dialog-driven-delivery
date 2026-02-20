@@ -12,14 +12,19 @@ Create a specification with BOTH Product and Technical sections. In `combined` m
 
 ## Workflow
 
-### 1. Detect Provider, Templates, and Spec Mode
+### 1. Detect Provider, Templates, Spec Mode, and Settings
 - Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
 - Read `Spec Mode` from Spec Provider configuration (default: `combined` when absent)
+- Read `Quiet Mode` from Settings (default: `false` when absent)
 - If templates (tech and product spec templates) are not configure use skill d3-templates
 - Store for later steps
 
 ### 2. Get Input Context
+
+**If quiet mode and input text provided in `$ARGUMENTS`:** Use the provided text directly as input context. Skip the question below.
+
+**Otherwise:**
 Ask user:
 ```
 How would you like to provide the feature information?
@@ -29,6 +34,10 @@ C) Describe conversationally
 ```
 
 ### 3. Get Location
+
+**If quiet mode:** Use Default Location from provider configuration in `d3.config.md`. If no default is configured, use the provider's root location (`.`).
+
+**Otherwise:**
 Ask where to create spec. If needed, use provider's `list_locations`.
 
 ### 4. Analyze & Propose Title
@@ -37,7 +46,9 @@ Extract from context:
 - Technical: Architecture, APIs, data models, integrations
 - Uncertainties: Questions, decisions, assumptions
 
-Propose title, wait for confirmation.
+**If quiet mode:** Propose title and accept it immediately.
+
+**Otherwise:** Propose title, wait for confirmation.
 
 ### 5. Generate Specification
 
@@ -79,7 +90,9 @@ Invoke uncertainty-markers skill for detailed guidance.
 - [ ] Each marker has entry in Open Questions & Assumptions section
 - [ ] Warn if >10 open questions or critical requirements blocked
 
-**Present to user:**
+**If quiet mode:** Skip presenting to user. Leave all markers in place and proceed to creation.
+
+**Otherwise — present to user:**
 ```
 Specification ready with [N] uncertainty markers:
 - Open Questions: [X]

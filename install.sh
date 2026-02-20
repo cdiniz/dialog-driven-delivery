@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO="cdiniz/dialog-driven-delivery"
-BRANCH="cross-platform-support"
+BRANCH="${D3_BRANCH:-main}"
 REPO_NAME="dialog-driven-delivery"
 ARCHIVE_PREFIX="${REPO_NAME}-${BRANCH}"
 

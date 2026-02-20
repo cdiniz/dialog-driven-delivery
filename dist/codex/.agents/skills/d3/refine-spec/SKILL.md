@@ -15,7 +15,7 @@ Automatically detect which sections need updating - Product, Technical, or both.
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read the D3 config file for D3 config
+- Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
 - If templates (tech and product spec templates) are not configure use skill d3-templates
 - Store for later steps

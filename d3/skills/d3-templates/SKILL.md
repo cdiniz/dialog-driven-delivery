@@ -69,30 +69,30 @@ Templates are located in this skill's `references/` directory:
 ## How D3 Commands Use These Templates
 
 ### d3:create-spec
-1. Loads user spec templates feature-product-spec and feature-tech-spec from the D3 config file or this skill
+1. Loads user spec templates feature-product-spec and feature-tech-spec from `d3.config.md` or this skill
 2. Creates unified spec with both Product and Technical sections
 3. Uses template structure to ensure all sections present
 
 ### d3:refine-spec
-1. Loads user spec templates feature-product-spec and feature-tech-spec from the D3 config file or this skill
+1. Loads user spec templates feature-product-spec and feature-tech-spec from `d3.config.md` or this skill
 2. Loads existing spec
 3. Uses templates to validate structure
 4. Ensures all required sections present when updating
 
 ### d3:decompose
-1. Loads user story template from the D3 config file or this skill
+1. Loads user story template from `d3.config.md` or this skill
 2. Creates stories following template structure
 3. Ensures consistent Given-When-Then acceptance criteria format
 
 ### d3:create-adr
-1. Loads ADR template from the D3 config file or this skill
+1. Loads ADR template from `d3.config.md` or this skill
 2. Extracts decision context, alternatives, rationale, and consequences from input
 3. Auto-numbers by searching existing ADRs
 4. Creates ADR using template structure
 5. Handles superseding (cross-references old and new ADRs)
 
 ### d3:capture-transcript
-1. Loads meeting transcript template from the D3 config file or this skill
+1. Loads meeting transcript template from `d3.config.md` or this skill
 2. Asks user to paste raw transcript
 3. Extracts decisions, action items, and open questions
 4. Generates structured summary using template
@@ -103,7 +103,7 @@ Templates are located in this skill's `references/` directory:
 D3 commands follow this loading pattern:
 
 ```
-1. Read the D3 config file for D3 Configuration section
+1. Read `d3.config.md` for D3 Configuration section
 2. Extract template paths:
    - feature_spec_template
    - technical_spec_template

@@ -48,7 +48,7 @@ Creates dependency links between issues.
 
 ## Configuration
 
-Reads from the D3 config file:
+Reads from `d3.config.md`:
 - Cloud ID
 - Default Project (project key)
 

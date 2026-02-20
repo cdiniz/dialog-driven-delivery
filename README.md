@@ -41,14 +41,7 @@ Or copy files manually from `dist/<platform>/` into your project.
 
 ### 2. Configure Your Provider
 
-Add D3 configuration to your project's config file. The config file location varies by platform:
-
-| Platform | Config File |
-|----------|------------|
-| Claude Code | `CLAUDE.md` |
-| Codex | `AGENTS.md` |
-| Copilot | `.github/copilot-instructions.md` |
-| Cursor | `.cursor/rules/d3-config/RULE.md` |
+Edit `d3.config.md` in your project root to configure providers. This file is the same across all platforms.
 
 See the [Configuration](#configuration) section for provider setup.
 
@@ -164,7 +157,7 @@ cp -r dist/cursor/.cursor your-project/
 
 ## Configuration
 
-D3 configuration tells the agent which providers to use and how to connect to your tools. Add it to your platform's config file.
+D3 configuration tells the agent which providers to use and how to connect to your tools. Edit `d3.config.md` in your project root.
 
 ### Markdown Provider (Lightweight)
 
@@ -381,7 +374,7 @@ Providers (Pluggable)
 
 ## Repository Structure
 
-The Claude Code plugin files (`d3/`, `d3-markdown/`, `d3-atlassian/`) are the source of truth. They use platform-agnostic natural language (e.g. "the read tool", "the D3 config file"). The generator copies these to other platforms, transforming frontmatter and directory structure. Each platform gets a `d3-platform` reference that maps generic terms to platform-specific tools.
+The Claude Code plugin files (`d3/`, `d3-markdown/`, `d3-atlassian/`) are the source of truth. They use platform-agnostic natural language (e.g. "the read tool") and reference `d3.config.md` directly. The generator copies these to other platforms, transforming frontmatter and directory structure. Each platform gets a `d3-platform` reference that maps generic tool terms to platform-specific values.
 
 ```
 dialog-driven-delivery/
@@ -395,9 +388,9 @@ dialog-driven-delivery/
 ├── generate.py                      # Generator — copies source to other platforms
 ├── install.sh                       # Install script for non-Claude platforms
 └── dist/                            # Generated — other platforms
-    ├── codex/                       # .agents/skills/ + AGENTS.md
-    ├── copilot/                     # .github/agents/*.agent.md + copilot-instructions.md
-    └── cursor/                      # .cursor/rules/ + d3-config
+    ├── codex/                       # .agents/skills/ + d3.config.md
+    ├── copilot/                     # .github/prompts/ + .github/agents/ + d3.config.md
+    └── cursor/                      # .cursor/rules/ + d3.config.md
 ```
 
 ### How It Works
@@ -408,7 +401,6 @@ Source files use natural language for tool references and configuration. The gen
 
 | Reference | Claude Code | Codex | Copilot | Cursor |
 |----------|------------|-------|---------|--------|
-| "the D3 config file" | `CLAUDE.md` | `AGENTS.md` | `.github/copilot-instructions.md` | `.cursor/rules/d3-config/RULE.md` |
 | "the read tool" | `Read` | `read` | `read` | `read` |
 | "the write tool" | `Write` | `write` | `edit` | `edit` |
 | "the search tool" | `Grep` | `search` | `search` | `search` |

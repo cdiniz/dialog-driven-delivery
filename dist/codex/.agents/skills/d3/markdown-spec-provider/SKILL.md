@@ -10,9 +10,9 @@ Manages specifications as markdown files in the filesystem. Specs are stored in 
 
 ## Configuration
 
-This skill reads configuration from the D3 config file in the current working directory.
+This skill reads configuration from `d3.config.md` in the current working directory.
 
-**Expected format in the D3 config file:**
+**Expected format in `d3.config.md`:**
 ```markdown
 ### Spec Provider
 **Skill:** d3-markdown:markdown-spec-provider
@@ -24,7 +24,7 @@ This skill reads configuration from the D3 config file in the current working di
 - **Specs Directory**: Path to the directory containing specification files (default: `./specs`)
 - **Default Location**: Default location ID for new specs (default: `.` meaning root)
 
-**Important:** All operations read this configuration at runtime. If the D3 config file is not found or doesn't contain the configuration section, defaults are used
+**Important:** All operations read this configuration at runtime. If `d3.config.md` is not found or doesn't contain the configuration section, defaults are used
 
 ---
 

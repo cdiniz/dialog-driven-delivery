@@ -1,6 +1,5 @@
 platforms:
   claude:
-    config_file: CLAUDE.md
     invoke_skill: 'Skill(skill="{name}", args="{args}")'
     tools:
       read: Read
@@ -25,7 +24,6 @@ platforms:
         fields: [name, description]
 
   codex:
-    config_file: AGENTS.md
     invoke_skill: '${name} {args}'
     tools:
       read: read
@@ -37,7 +35,6 @@ platforms:
       type: agents
       commands_dir: .agents/skills
       skills_dir: .agents/skills
-      config_output: AGENTS.md
     frontmatter:
       command:
         fields: [name, description]
@@ -45,7 +42,6 @@ platforms:
         fields: [name, description]
 
   copilot:
-    config_file: .github/copilot-instructions.md
     invoke_skill: '/{name} {args}'
     tools:
       read: read
@@ -56,13 +52,15 @@ platforms:
     output:
       type: skills
       skills_dir: .github/skills
-      config_output: .github/copilot-instructions.md
     frontmatter:
+      command:
+        fields: [name, description, agent]
+        defaults:
+          agent: agent
       skill:
         fields: [name, description]
 
   cursor:
-    config_file: .cursor/rules/d3-config/RULE.md
     invoke_skill: '@{name} {args}'
     tools:
       read: read
@@ -73,7 +71,6 @@ platforms:
     output:
       type: rules
       rules_dir: .cursor/rules
-      config_output: .cursor/rules/d3-config/RULE.md
     frontmatter:
       rule:
         fields: [description, alwaysApply]

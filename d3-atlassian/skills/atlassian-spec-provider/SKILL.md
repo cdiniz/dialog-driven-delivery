@@ -55,7 +55,7 @@ Searches Confluence pages.
 
 ## Configuration
 
-Reads from the D3 config file:
+Reads from `d3.config.md`:
 - Cloud ID
 - Default Location (space key)
 

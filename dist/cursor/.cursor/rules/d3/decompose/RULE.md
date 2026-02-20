@@ -21,7 +21,7 @@ Every story must follow INVEST:
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read the D3 config file for D3 config
+- Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
 - If user story template are not configure use skill d3-templtes
 - Store for later steps

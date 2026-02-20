@@ -1,6 +1,7 @@
 ---
 description: Refine existing feature specifications based on new information (meeting transcripts, technical decisions, feedback, or discussions). Automatically detects whether changes are product-focused, technical, or both. Updates only affected sections while preserving existing content. When stories already exist for the spec, analyzes impact and proposes story updates. Use when updating specs, adding details to existing documentation, incorporating meeting notes into specs, or when user mentions refining/updating/improving an existing specification.
 name: d3-refine-spec
+agent: agent
 ---
 ## Core Principle
 
@@ -15,7 +16,7 @@ Automatically detect which sections need updating - Product, Technical, or both.
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read the D3 config file for D3 config
+- Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
 - If templates (tech and product spec templates) are not configure use skill d3-templates
 - Store for later steps

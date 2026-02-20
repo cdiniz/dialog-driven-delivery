@@ -9,7 +9,7 @@ Manages meeting transcripts as Confluence child pages under a designated "Transc
 
 ## Configuration
 
-Reads from the D3 config file:
+Reads from `d3.config.md`:
 ```markdown
 ### Transcript Provider
 **Skill:** d3-atlassian:atlassian-transcript-provider

@@ -102,7 +102,7 @@ Returns Story type only.
 
    **Key responsibilities:**
    - **Frontmatter:** Provider-specific metadata wrapper
-   - **Body structure:** From template (configurable via the D3 config file)
+   - **Body structure:** From template (configurable via `d3.config.md`)
    - **Content:** From story_data parameter
 
 5. Write story file to `stories/{spec_dir}/{story_id}-{filename}.md`

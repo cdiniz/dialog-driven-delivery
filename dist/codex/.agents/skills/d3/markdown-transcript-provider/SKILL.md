@@ -10,7 +10,7 @@ Manages meeting transcripts as markdown files in the filesystem. Transcripts are
 
 ## Configuration
 
-Reads from the D3 config file:
+Reads from `d3.config.md`:
 ```markdown
 ### Transcript Provider
 **Skill:** d3-markdown:markdown-transcript-provider

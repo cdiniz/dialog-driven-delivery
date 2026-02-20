@@ -13,9 +13,9 @@ Transcripts are standalone artifacts. Their relationship to specs is established
 ## Workflow
 
 ### 1. Detect Provider and Template
-- Read the D3 config file for D3 config
+- Read `d3.config.md` for D3 config
 - Search for `### Transcript Provider` section
-- If no Transcript Provider configured, guide user to add one to the D3 config file:
+- If no Transcript Provider configured, guide user to add one to `d3.config.md`:
   ```markdown
   ### Transcript Provider
   **Skill:** d3-markdown:markdown-transcript-provider
@@ -155,7 +155,7 @@ Next steps:
 
 | Issue | Action |
 |-------|--------|
-| No provider configured | Guide user to add Transcript Provider to the D3 config file |
+| No provider configured | Guide user to add Transcript Provider to `d3.config.md` |
 | Empty transcript | Ask user to paste the transcript content |
 | No date in transcript | Ask user for the meeting date, default to today |
 | Very short transcript (<100 words) | Warn that the transcript is very short and extracted content may be minimal. Confirm before proceeding |

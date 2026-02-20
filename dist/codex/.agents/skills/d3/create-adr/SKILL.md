@@ -13,7 +13,7 @@ ADRs are immutable records following [MADR v4](https://adr.github.io/madr/) form
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read the D3 config file for D3 config
+- Read `d3.config.md` for D3 config
 - Search for `### ADR Provider` section first
 - If no ADR Provider configured, fall back to `### Spec Provider`
 - Load ADR template from d3-templates skill (or custom path if configured)
@@ -152,7 +152,7 @@ into relevant specifications' "Architectural Context > Relevant ADRs" section.
 
 | Issue | Action |
 |-------|--------|
-| No provider configured | Guide user to add ADR Provider or Spec Provider to the D3 config file |
+| No provider configured | Guide user to add ADR Provider or Spec Provider to `d3.config.md` |
 | No decision found in input | Ask clarifying questions to identify the decision |
 | Minimal context | Warn ADR will be sparse, confirm before creating |
 | Conflicting information | Mark `[DECISION PENDING]` with conflicting options listed |

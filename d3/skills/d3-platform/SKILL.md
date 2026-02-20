@@ -4,9 +4,6 @@ description: D3 platform-specific tool and configuration mappings for Claude Cod
 ---
 # D3 Platform Reference
 
-## Config File
-The D3 config file is `CLAUDE.md`.
-
 ## Tool Mapping
 | Reference | Tool |
 |---|---|

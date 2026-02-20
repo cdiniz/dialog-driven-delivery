@@ -4,9 +4,6 @@ alwaysApply: false
 ---
 # D3 Platform Reference
 
-## Config File
-The D3 config file is `.cursor/rules/d3-config/RULE.md`.
-
 ## Tool Mapping
 | Reference | Tool |
 |---|---|

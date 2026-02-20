@@ -10,8 +10,8 @@ usage() {
   echo "Usage: $0 <platform>"
   echo ""
   echo "Platforms:"
-  echo "  codex    - Install D3 for OpenAI Codex (.agents/skills/ + AGENTS.md)"
-  echo "  copilot  - Install D3 for GitHub Copilot (.github/agents/ + copilot-instructions.md)"
+  echo "  codex    - Install D3 for OpenAI Codex (.agents/skills/)"
+  echo "  copilot  - Install D3 for GitHub Copilot (.github/prompts/ + .github/agents/)"
   echo "  cursor   - Install D3 for Cursor (.cursor/rules/)"
   echo ""
   echo "Example:"
@@ -31,62 +31,47 @@ echo "Downloading D3..."
 curl -sL "https://github.com/${REPO}/archive/${BRANCH}.tar.gz" \
   | tar xz -C "$tmpdir" --strip-components=3 "${ARCHIVE_PREFIX}/dist/${platform}/"
 
+if [ ! -f "d3.config.md" ]; then
+  cp "$tmpdir/d3.config.md" .
+  echo "Created d3.config.md with default D3 configuration."
+else
+  echo "d3.config.md already exists, skipping."
+fi
+
 case "$platform" in
   codex)
     echo "Installing D3 for OpenAI Codex..."
-
     cp -r "$tmpdir/.agents" .
-
-    if [ ! -f "AGENTS.md" ]; then
-      cp "$tmpdir/AGENTS.md" .
-      echo "Created AGENTS.md with D3 configuration."
-    else
-      echo "AGENTS.md already exists. Add D3 configuration manually."
-    fi
-
     echo ""
     echo "D3 installed for Codex."
     echo ""
     echo "Next steps:"
-    echo "  1. Review AGENTS.md and adjust D3 provider configuration"
+    echo "  1. Review d3.config.md and adjust provider configuration"
     echo "  2. Start using D3: \$d3-create-spec"
     ;;
 
   copilot)
     echo "Installing D3 for GitHub Copilot..."
-
-    existing_config=""
-    if [ -f ".github/copilot-instructions.md" ]; then
-      existing_config=$(cat ".github/copilot-instructions.md")
-    fi
-
-    cp -r "$tmpdir/.github" .
-
-    if [ -n "$existing_config" ]; then
-      echo "$existing_config" > ".github/copilot-instructions.md"
-      echo ".github/copilot-instructions.md already exists. Add D3 configuration manually."
-    else
-      echo "Created .github/copilot-instructions.md with D3 configuration."
-    fi
-
+    mkdir -p .github
+    cp -r "$tmpdir/.github/prompts" .github/
+    cp -r "$tmpdir/.github/agents" .github/
+    cp "$tmpdir/.github/d3-platform.md" .github/
     echo ""
     echo "D3 installed for GitHub Copilot."
     echo ""
     echo "Next steps:"
-    echo "  1. Review .github/copilot-instructions.md and adjust D3 provider configuration"
-    echo "  2. Start using D3: @d3-create-spec in Copilot agent mode"
+    echo "  1. Review d3.config.md and adjust provider configuration"
+    echo "  2. Start using D3: /d3-create-spec in Copilot chat"
     ;;
 
   cursor)
     echo "Installing D3 for Cursor..."
-
     cp -r "$tmpdir/.cursor" .
-
     echo ""
     echo "D3 installed for Cursor."
     echo ""
     echo "Next steps:"
-    echo "  1. Review .cursor/rules/d3-config/RULE.md and adjust D3 provider configuration"
+    echo "  1. Review d3.config.md and adjust provider configuration"
     echo "  2. Start using D3: @d3-create-spec in Cursor agent mode"
     ;;
 

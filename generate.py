@@ -105,9 +105,6 @@ def generate_platform_md(platform_cfg):
     lines = [
         "# D3 Platform Reference",
         "",
-        "## Config File",
-        f"The D3 config file is `{platform_cfg['config_file']}`.",
-        "",
         "## Tool Mapping",
         "| Reference | Tool |",
         "|---|---|",
@@ -268,7 +265,7 @@ def generate_codex(platforms):
     write_output(d3_dir / "d3-platform" / "SKILL.md", platform_md)
 
     config_content = (CONFIG_DIR / "example-config.md").read_text(encoding="utf-8")
-    write_output(out / "AGENTS.md", config_content)
+    write_output(out / "d3.config.md", config_content)
 
 
 def _copilot_name(name):
@@ -278,6 +275,7 @@ def _copilot_name(name):
 def generate_copilot(platforms):
     cfg = platforms["copilot"]
     out = DIST / "copilot"
+    prompts_dir = out / ".github" / "prompts"
     agents_dir = out / ".github" / "agents"
 
     if out.exists():
@@ -285,10 +283,10 @@ def generate_copilot(platforms):
 
     for name, cmd_file in iter_commands():
         fm, body, _ = read_source(cmd_file, "command", cfg)
-        agent_name = f"d3-{name}"
-        fm["name"] = agent_name
+        prompt_name = f"d3-{name}"
+        fm["name"] = prompt_name
         final = transform_frontmatter(fm, body, "command", cfg)
-        write_output(agents_dir / f"{agent_name}.agent.md", final)
+        write_output(prompts_dir / f"{prompt_name}.prompt.md", final)
 
     for name, skill_file, _skill_dir in iter_skills():
         fm, body, _ = read_source(skill_file, "skill", cfg)
@@ -304,11 +302,11 @@ def generate_copilot(platforms):
         final = transform_frontmatter(fm, body, "skill", cfg)
         write_output(agents_dir / f"{agent_name}.agent.md", final)
 
-    platform_md = _platform_md_with_frontmatter("Copilot", cfg, "skill")
-    write_output(agents_dir / "d3-platform.agent.md", platform_md)
+    platform_md = generate_platform_md(cfg)
+    write_output(out / ".github" / "d3-platform.md", platform_md)
 
     config_content = (CONFIG_DIR / "example-config.md").read_text(encoding="utf-8")
-    write_output(out / ".github" / "copilot-instructions.md", config_content)
+    write_output(out / "d3.config.md", config_content)
 
 
 def generate_cursor(platforms):
@@ -337,12 +335,7 @@ def generate_cursor(platforms):
     write_output(d3_dir / "d3-platform" / "RULE.md", platform_md)
 
     config_content = (CONFIG_DIR / "example-config.md").read_text(encoding="utf-8")
-    config_fm = {
-        "description": "D3 provider and template configuration. Always include in context.",
-        "alwaysApply": True,
-    }
-    final = build_frontmatter(config_fm) + "\n" + config_content
-    write_output(d3_dir / "config" / "RULE.md", final)
+    write_output(out / "d3.config.md", config_content)
 
 
 GENERATORS = {

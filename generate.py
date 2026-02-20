@@ -328,13 +328,14 @@ def generate_cursor(platforms):
     cfg = platforms["cursor"]
     out = DIST / "cursor"
     d3_dir = out / ".cursor" / "rules" / "d3"
+    cmd_dir = out / ".cursor" / "commands"
 
     if out.exists():
         shutil.rmtree(out)
 
     for name, cmd_file in iter_commands():
-        _, _, final = read_source(cmd_file, "command", cfg)
-        write_output(d3_dir / name / "RULE.md", final)
+        _, body, _ = read_source(cmd_file, "command", cfg)
+        write_output(cmd_dir / f"d3-{name}.md", body)
 
     for name, skill_file, skill_dir in iter_skills():
         _, _, final = read_source(skill_file, "rule", cfg)

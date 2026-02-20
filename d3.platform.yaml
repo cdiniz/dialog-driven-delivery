@@ -64,7 +64,7 @@ platforms:
         fields: [name, description]
 
   cursor:
-    invoke_skill: '@{name} {args}'
+    invoke_skill: '/{name} {args}'
     references_path: .cursor/rules/d3/d3-templates/references
     tools:
       read: read

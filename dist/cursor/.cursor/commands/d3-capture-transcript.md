@@ -1,7 +1,3 @@
----
-description: Capture and structure a meeting transcript. Extracts key decisions, action items, and open questions from raw conversation text. Stores as a referenceable transcript artifact. Use when you have a meeting recording/transcript to process, or when user asks to capture/save/process a transcript.
-alwaysApply: false
----
 ## Core Principle
 
 **Extract only what was said. Never invent decisions or actions not in the transcript.**

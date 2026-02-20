@@ -16,7 +16,7 @@ alwaysApply: false
 ## Skill Invocation
 To invoke a skill, use this syntax:
 ```
-@<skill-name> <arguments>
+/<skill-name> <arguments>
 ```
 
 ## Template References

@@ -73,7 +73,7 @@ case "$platform" in
     echo ""
     echo "Next steps:"
     echo "  1. Review d3.config.md and adjust provider configuration"
-    echo "  2. Start using D3: @d3-create-spec in Cursor agent mode"
+    echo "  2. Start using D3: /d3-create-spec in Cursor agent mode"
     ;;
 
   *)

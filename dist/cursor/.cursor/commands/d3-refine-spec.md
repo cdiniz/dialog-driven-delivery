@@ -10,9 +10,10 @@ Automatically detect which sections need updating - Product, Technical, or both.
 
 ## Workflow
 
-### 1. Detect Provider and Templates
+### 1. Detect Provider, Templates, and Spec Mode
 - Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
+- Read `Spec Mode` from Spec Provider configuration (default: `combined` when absent)
 - If templates (tech and product spec templates) are not configure use skill d3-templates
 - Store for later steps
 
@@ -23,6 +24,11 @@ Use provider's `get_spec`:
 - Identifier → Use directly
 - URL → Extract identifier
 - Title → Search, then get_spec
+
+**If Spec Mode is `separated`:**
+After fetching, detect which type it is (product or tech) from the title suffix or content structure.
+Read the `**Companion Spec:**` header line to identify the paired spec.
+Do NOT fetch the companion yet — wait until Step 6 determines whether changes affect both sections.
 
 ### 3. Detect Existing Stories
 Find the epic matching the spec title and list all its children (stories, tasks, or any issue type).
@@ -81,6 +87,11 @@ Update ONLY sections explicitly addressed in new input.
 1. Does new information explicitly address this section?
 2. YES → Update with actual content
 3. NO → Leave unchanged (existing content OR placeholder)
+
+**If Spec Mode is `separated` — Companion Fetch Optimisation:**
+After analysing the new information, determine if changes affect Product sections, Technical sections, or both.
+- If changes affect only the fetched spec type → proceed with just that spec, no companion fetch needed
+- If changes affect both → fetch the companion spec via `get_spec` using the identifier from the `**Companion Spec:**` header
 
 ### 7. Show Proposed Changes
 
@@ -171,10 +182,22 @@ Proceed with spec + story updates?
 
 ### 10. Apply Updates
 
-**Apply spec updates.** Invoke the [spec-provider] skill (see platform reference for invocation syntax):
+**If Spec Mode is `combined` (default):**
+
+Invoke the [spec-provider] skill (see platform reference for invocation syntax):
 ```
 update_spec page_id="[spec-id]" body="[UPDATED_SPEC]" version_message="[description]"
 ```
+
+**If Spec Mode is `separated`:**
+
+For each affected spec (product, tech, or both), invoke the [spec-provider] skill:
+```
+update_spec page_id="[product-spec-id]" body="[UPDATED_PRODUCT_SPEC]" version_message="[description]"
+update_spec page_id="[tech-spec-id]" body="[UPDATED_TECH_SPEC]" version_message="[description]"
+```
+
+Only update specs that had changes — skip the companion if it was unaffected.
 
 **Apply story updates (if stories are affected):**
 

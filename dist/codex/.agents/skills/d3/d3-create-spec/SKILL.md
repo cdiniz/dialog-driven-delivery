@@ -6,15 +6,16 @@ name: d3-create-spec
 
 **Fill only what you know. Empty sections are better than hallucinated content.**
 
-Create a single unified spec with BOTH Product and Technical sections. Specs grow progressively through refinement.
+Create a specification with BOTH Product and Technical sections. In `combined` mode (default), creates a single unified document. In `separated` mode, creates two linked documents — one for product, one for technical. Specs grow progressively through refinement.
 
 ---
 
 ## Workflow
 
-### 1. Detect Provider and Templates
+### 1. Detect Provider, Templates, and Spec Mode
 - Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
+- Read `Spec Mode` from Spec Provider configuration (default: `combined` when absent)
 - If templates (tech and product spec templates) are not configure use skill d3-templates
 - Store for later steps
 
@@ -90,15 +91,52 @@ Resolve now, leave marked, or review first?
 
 ### 7. Create Specification
 
+**If Spec Mode is `combined` (default):**
+
 Invoke the [provider-name] skill (see platform reference for invocation syntax):
 ```
 create_spec location_id="[LOCATION]" title="[Title]" body="[FULL_SPEC]"
 ```
 
+**If Spec Mode is `separated`:**
+
+Split the generated specification into two documents:
+
+1. **Product Spec** — contains only the Product Specification sections from the product template
+2. **Tech Spec** — contains only the Technical Specification sections from the tech template
+
+Add a cross-reference header to each document linking to its companion:
+```markdown
+**Companion Spec:** [companion title] - [companion path/URL]
+```
+
+Invoke the [provider-name] skill twice:
+```
+create_spec location_id="[LOCATION]" title="[Title] - Product Spec" body="[PRODUCT_SPEC]"
+create_spec location_id="[LOCATION]" title="[Title] - Tech Spec" body="[TECH_SPEC]"
+```
+
+The companion spec path is determined by the provider's response — update the first spec's cross-reference header after both are created if needed.
+
 ### 8. Provide Summary
 
+**If Spec Mode is `combined`:**
 ```
 ✅ Specification created: [Title] - [URL]
+
+Coverage:
+- Product Spec: [40-70% typical]
+- Technical Spec: [10-30% typical]
+- Uncertainties: [N] markers
+
+Next: Review → /d3:refine-spec → /d3:decompose
+```
+
+**If Spec Mode is `separated`:**
+```
+✅ Specification created:
+- Product Spec: [Title] - Product Spec - [URL]
+- Tech Spec: [Title] - Tech Spec - [URL]
 
 Coverage:
 - Product Spec: [40-70% typical]

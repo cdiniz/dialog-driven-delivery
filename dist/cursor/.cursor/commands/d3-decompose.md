@@ -16,14 +16,20 @@ Every story must follow INVEST:
 
 ## Workflow
 
-### 1. Detect Provider and Templates
+### 1. Detect Provider, Templates, and Spec Mode
 - Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
+- Read `Spec Mode` from Spec Provider configuration (default: `combined` when absent)
 - If user story template are not configure use skill d3-templates
 - Store for later steps
 
 ### 2. Fetch Specification
 Parse spec identifier from `$ARGUMENTS` (ID, URL, or title). Use spec provider's `get_spec`.
+
+**If Spec Mode is `separated`:**
+After fetching the identified spec, read its `**Companion Spec:**` header to find the paired spec.
+Fetch the companion via `get_spec`. Decomposition always needs both product and technical context.
+Use content from both specs — product for workflows, technical for implementation notes.
 
 Display:
 ```
@@ -120,6 +126,8 @@ create_epic project_key="[PROJECT]" summary="[Feature name]" description="[Epic 
 ```
 
 **Epic Description:**
+
+If Spec Mode is `combined`:
 ```
 Feature specification: [Spec Title]
 
@@ -127,6 +135,21 @@ Feature specification: [Spec Title]
 
 ## Reference
 - Specification: [Spec URL]
+- Location: [Location name]
+
+## User Stories
+This Epic contains [N] INVEST-compliant user stories.
+```
+
+If Spec Mode is `separated`:
+```
+Feature specification: [Spec Title]
+
+[Brief overview from Product Spec]
+
+## Reference
+- Product Specification: [Product Spec URL]
+- Technical Specification: [Tech Spec URL]
 - Location: [Location name]
 
 ## User Stories

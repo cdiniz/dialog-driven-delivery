@@ -10,6 +10,7 @@
 **Configuration:**
 - Cloud ID: your-cloud-id
 - Default Location: PROJ
+- Spec Mode: combined
 
 ### ADR Provider
 **Skill:** d3-atlassian:atlassian-spec-provider

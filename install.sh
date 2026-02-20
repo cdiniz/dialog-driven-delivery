@@ -56,6 +56,7 @@ case "$platform" in
     cp -r "$tmpdir/.github/prompts" .github/
     cp -r "$tmpdir/.github/agents" .github/
     cp -r "$tmpdir/.github/instructions" .github/
+    cp -r "$tmpdir/.github/d3-templates" .github/
     echo ""
     echo "D3 installed for GitHub Copilot."
     echo ""

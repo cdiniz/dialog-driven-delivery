@@ -39,10 +39,12 @@ Display:
 
 If no Product Spec: Warn but continue.
 
-### 3. Get Project
-Ask for project key. If needed, use story provider's `list_projects`.
+### 3. Detect Project and Capabilities
+Use story provider's `list_projects`:
+- If single project returned → use it automatically (no prompt needed)
+- If multiple projects → ask user to choose
 
-Verify project using `get_issue_types` - confirm Epic and Story types available.
+Call `get_issue_types` for the chosen project. Store whether Epic type is available (used in step 8).
 
 ### 4. Request Decomposition Input
 Ask user:
@@ -113,9 +115,11 @@ INVEST Validation Checklist:
 
 **Only create stories that pass all INVEST checks.**
 
-### 8. Create Epic
+### 8. Create Epic (if supported)
 
-Invoke the [story-provider] skill (see platform reference for invocation syntax):
+**Skip this step if Epic type was not available in step 3.**
+
+If Epic type is available, invoke the [story-provider] skill (see platform reference for invocation syntax):
 ```
 create_epic project_key="[PROJECT]" summary="[Feature name]" description="[Epic description]" labels="feature,epic"
 ```
@@ -159,29 +163,38 @@ Before creating, scan specs for uncertainty markers. If critical uncertainties:
 - References: Link to specification
 
 **Create each story.** Invoke the [story-provider] skill (see platform reference for invocation syntax):
+- If epic was created → pass `epic_id`
+- If no epic → pass `spec_id` instead (lets provider group stories by spec)
+
 ```
 create_story project_key="[PROJECT]" epic_id="[EPIC-KEY]" story_data="{summary: '...', description: '...', labels: [...]}"
+```
+or (when no epic):
+```
+create_story project_key="[PROJECT]" spec_id="[SPEC-ID]" story_data="{summary: '...', description: '...', labels: [...]}"
 ```
 
 ### 10. Provide Summary
 
+Use whatever keys/URLs the provider returned (don't assume format). Only show Epic line if one was created.
+
 ```
 ✅ Feature decomposed successfully!
 
-**Epic:** [EPIC-KEY]: [Feature Name] - [URL]
+**Epic:** [EPIC-KEY]: [Feature Name] - [URL]  ← only if epic was created
 **Stories:** [N] INVEST-compliant stories
 
 Story Breakdown:
-1. [ISSUE-KEY]: [Title] - [URL]
+1. [Story Key/ID]: [Title] - [URL if available]
    - Scope: [Full-stack/Backend/Frontend]
    - ACs: [N] scenarios
    - Dependencies: [None / "Blocked by [KEY]"]
    - INVEST: ✅ All criteria met
 
 Implementation Order:
-1. [ISSUE-KEY]: [Title] - Start here (no dependencies)
-2. [ISSUE-KEY]: [Title] - Depends on #1
-3. [ISSUE-KEY]: [Title] - Can run parallel
+1. [Story Key/ID]: [Title] - Start here (no dependencies)
+2. [Story Key/ID]: [Title] - Depends on #1
+3. [Story Key/ID]: [Title] - Can run parallel
 
 INVEST Compliance:
 ✅ Independent: [X/N stories] have no blocking dependencies
@@ -191,7 +204,7 @@ INVEST Compliance:
 ✅ Small: All stories sized 1-10 days
 ✅ Testable: All stories have Given-When-Then ACs
 
-Next: Review stories → Estimate → Start with [ISSUE-KEY]
+Next: Review stories → Estimate → Start with [Story Key/ID]
 ```
 
 ---

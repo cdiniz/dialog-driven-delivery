@@ -1,9 +1,9 @@
 repos:
   - repo: local
     hooks:
-      - id: check-generated-files
-        name: check generated files are up to date
-        entry: .venv/bin/python generate.py --check
+      - id: generate-platform-files
+        name: regenerate platform files
+        entry: .venv/bin/python generate.py --all
         language: system
         pass_filenames: false
-        files: ^(canonical/|d3/|d3-markdown/|d3-atlassian/)
+        files: ^(d3/|d3-markdown/|d3-atlassian/|d3\.platform\.yaml|metadata/|config/)

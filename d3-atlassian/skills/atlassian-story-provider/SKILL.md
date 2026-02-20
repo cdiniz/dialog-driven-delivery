@@ -2,7 +2,6 @@
 name: atlassian-story-provider
 description: Create and manage user stories in Jira using Atlassian MCP tools.
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
 
 ## What This Does
 
@@ -50,7 +49,7 @@ Creates dependency links between issues.
 
 ## Configuration
 
-Reads from CLAUDE.md:
+Reads from the D3 config file:
 - Cloud ID
 - Default Project (project key)
 

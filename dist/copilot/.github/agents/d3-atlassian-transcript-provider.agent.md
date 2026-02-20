@@ -2,15 +2,13 @@
 name: d3-atlassian-transcript-provider
 description: Store and manage meeting transcripts in Confluence using Atlassian MCP tools. Stores transcripts as child pages under a designated Transcripts parent page with labels for filtering.
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
-
 ## What This Does
 
 Manages meeting transcripts as Confluence child pages under a designated "Transcripts" parent page. Uses Atlassian MCP server to create, read, and search transcript pages. Transcripts are organized by labels for month and meeting type filtering.
 
 ## Configuration
 
-Reads from .github/copilot-instructions.md:
+Reads from the D3 config file:
 ```markdown
 ### Transcript Provider
 **Skill:** d3-atlassian:atlassian-transcript-provider

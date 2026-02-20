@@ -2,8 +2,6 @@
 description: Decompose feature specifications into INVEST-compliant user stories through conversational planning. Creates workflow-based stories that are Independent, Negotiable, Valuable, Estimable, Small, and Testable.
 name: d3-decompose
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
-
 ## Core Principle: INVEST-Driven Decomposition
 
 Every story must follow INVEST:
@@ -23,11 +21,11 @@ Every story must follow INVEST:
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read .github/copilot-instructions.md for D3 config
+- Read the D3 config file for D3 config
 - Search for ### D3 Config  ### Templates
-- If user story template are not configure use skill d3-templtes 
+- If user story template are not configure use skill d3-templtes
 - Store for later steps
-  
+
 ### 2. Fetch Specification
 Parse spec identifier from `$ARGUMENTS` (ID, URL, or title). Use spec provider's `get_spec`.
 
@@ -116,9 +114,9 @@ INVEST Validation Checklist:
 
 ### 8. Create Epic
 
-Use story provider:
+Invoke the [story-provider] skill (see platform reference for invocation syntax):
 ```
-/[story-provider] create_epic project_key=\"[PROJECT]\" summary=\"[Feature name]\" description=\"[Epic description]\" labels=\"feature,epic\"
+create_epic project_key="[PROJECT]" summary="[Feature name]" description="[Epic description]" labels="feature,epic"
 ```
 
 **Epic Description:**
@@ -147,8 +145,8 @@ Before creating, scan specs for uncertainty markers. If critical uncertainties:
 - Flag with "needs-clarification" label
 
 **Load Story Template:**
-1. Use `user_story_template` from config 
-2. Read template using Read tool
+1. Use `user_story_template` from config
+2. Read template using the read tool
 3. Use template structure for story content
 
 **Story Structure:**
@@ -159,9 +157,9 @@ Before creating, scan specs for uncertainty markers. If critical uncertainties:
 - Dependencies: List story keys if dependencies exist
 - References: Link to specification
 
-**Create each story:**
+**Create each story.** Invoke the [story-provider] skill (see platform reference for invocation syntax):
 ```
-/[story-provider] create_story project_key=\"[PROJECT]\" epic_id=\"[EPIC-KEY]\" story_data=\"{summary: '...', description: '...', labels: [...]}\"
+create_story project_key="[PROJECT]" epic_id="[EPIC-KEY]" story_data="{summary: '...', description: '...', labels: [...]}"
 ```
 
 ### 10. Provide Summary

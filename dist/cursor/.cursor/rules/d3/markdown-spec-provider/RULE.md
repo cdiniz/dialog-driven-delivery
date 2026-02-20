@@ -2,8 +2,6 @@
 description: Create and manage specifications as local markdown files. Stores specs in a configurable directory (default ./specs/) as markdown files tracked by git.
 alwaysApply: false
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
-
 ## What This Does
 
 Manages specifications as markdown files in the filesystem. Specs are stored in `{specs_dir}` directory with git version control.
@@ -12,9 +10,9 @@ Manages specifications as markdown files in the filesystem. Specs are stored in 
 
 ## Configuration
 
-This skill reads configuration from .cursor/rules/d3-config/RULE.md in the current working directory.
+This skill reads configuration from the D3 config file in the current working directory.
 
-**Expected format in .cursor/rules/d3-config/RULE.md:**
+**Expected format in the D3 config file:**
 ```markdown
 ### Spec Provider
 **Skill:** d3-markdown:markdown-spec-provider
@@ -26,7 +24,7 @@ This skill reads configuration from .cursor/rules/d3-config/RULE.md in the curre
 - **Specs Directory**: Path to the directory containing specification files (default: `./specs`)
 - **Default Location**: Default location ID for new specs (default: `.` meaning root)
 
-**Important:** All operations read this configuration at runtime. If .cursor/rules/d3-config/RULE.md is not found or doesn't contain the configuration section, defaults are used
+**Important:** All operations read this configuration at runtime. If the D3 config file is not found or doesn't contain the configuration section, defaults are used
 
 ---
 
@@ -39,7 +37,7 @@ When invoked with operation in `$ARGUMENTS`:
 Lists available directories for specifications.
 
 **Implementation:**
-Use search to find directories in {specs_dir}/, or return root location.
+Use the glob tool to find directories in {specs_dir}/, or return root location.
 
 **Returns:**
 ```json
@@ -67,7 +65,7 @@ Creates a specification markdown file.
 1. Sanitize title to filename: lowercase, spaces to hyphens, remove special chars
 2. Determine filepath: `{specs_dir}/{location_id}/{filename}.md`
 3. Create directory if needed
-4. Write body to file using edit tool
+4. Write body to file using the write tool
 5. Return metadata
 
 **Returns:**
@@ -89,11 +87,11 @@ Retrieves a specification markdown file.
 **Parse args:** page_id (can be full path, partial path, or filename)
 
 **Implementation:**
-1. Find file using read tool (always scope to specs directory):
+1. Find file using the read tool (always scope to specs directory):
    - If page_id starts with `{specs_dir}/`: try exact path
    - Try `{specs_dir}/{page_id}`
    - Try `{specs_dir}/{page_id}.md`
-   - Use search pattern `{specs_dir}/**/*{page_id}*.md` as fallback
+   - Use the glob tool with pattern `{specs_dir}/**/*{page_id}*.md` as fallback
 2. Read file content
 3. Extract title from first `# ` heading
 4. Get last modified time from file stats
@@ -121,7 +119,7 @@ Updates a specification markdown file.
 
 **Implementation:**
 1. Find file (same logic as get_spec)
-2. Write updated body using edit tool
+2. Write updated body using the write tool
 3. If version_message provided and in git repo: commit with message
 4. Return metadata
 
@@ -144,7 +142,7 @@ Searches specifications by content.
 **Parse args:** query, location_id (optional)
 
 **Implementation:**
-1. Use search to search markdown files in {specs_dir}/ (or specified location)
+1. Use the search tool to search markdown files in {specs_dir}/ (or specified location)
 2. For each match, extract title and excerpt
 3. Return list of results
 
@@ -199,8 +197,8 @@ documentation/
 
 ## Notes
 
-- Use read/edit tools for file operations
-- Use search for finding files
-- Use search for searching content
-- Git operations via execute (optional, only if version_message provided)
+- Use the read/write tools for file operations
+- Use the glob tool for finding files
+- Use the search tool for searching content
+- Git operations via the shell tool (optional, only if version_message provided)
 - Always create parent directories as needed

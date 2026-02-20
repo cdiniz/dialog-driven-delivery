@@ -2,8 +2,6 @@
 description: Create comprehensive feature specification from any input context (meeting transcripts, documents, or conversational discussion). Creates a unified specification containing both Product and Technical specifications. Use when starting a new feature, documenting a planning meeting, or when user asks to create/write a spec, specification, or feature documentation. Fills only known information and marks uncertainties.
 name: create-spec
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
-
 ## Core Principle
 
 **Fill only what you know. Empty sections are better than hallucinated content.**
@@ -15,9 +13,9 @@ Create a single unified spec with BOTH Product and Technical sections. Specs gro
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read AGENTS.md for D3 config
+- Read the D3 config file for D3 config
 - Search for ### D3 Config  ### Templates
-- If templates (tech and product spec templates) are not configure use skill d3-templates 
+- If templates (tech and product spec templates) are not configure use skill d3-templates
 - Store for later steps
 
 ### 2. Get Input Context
@@ -92,9 +90,9 @@ Resolve now, leave marked, or review first?
 
 ### 7. Create Specification
 
-Use provider:
+Invoke the [provider-name] skill (see platform reference for invocation syntax):
 ```
-$[provider-name] create_spec location_id=\"[LOCATION]\" title=\"[Title]\" body=\"[FULL_SPEC]\"
+create_spec location_id="[LOCATION]" title="[Title]" body="[FULL_SPEC]"
 ```
 
 ### 8. Provide Summary

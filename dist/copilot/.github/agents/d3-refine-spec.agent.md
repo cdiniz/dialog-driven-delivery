@@ -2,8 +2,6 @@
 description: Refine existing feature specifications based on new information (meeting transcripts, technical decisions, feedback, or discussions). Automatically detects whether changes are product-focused, technical, or both. Updates only affected sections while preserving existing content. When stories already exist for the spec, analyzes impact and proposes story updates. Use when updating specs, adding details to existing documentation, incorporating meeting notes into specs, or when user mentions refining/updating/improving an existing specification.
 name: d3-refine-spec
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
-
 ## Core Principle
 
 **Update only what has new information. Preserve everything else.**
@@ -17,7 +15,7 @@ Automatically detect which sections need updating - Product, Technical, or both.
 ## Workflow
 
 ### 1. Detect Provider and Templates
-- Read .github/copilot-instructions.md for D3 config
+- Read the D3 config file for D3 config
 - Search for ### D3 Config  ### Templates
 - If templates (tech and product spec templates) are not configure use skill d3-templates
 - Store for later steps
@@ -177,21 +175,21 @@ Proceed with spec + story updates?
 
 ### 10. Apply Updates
 
-**Apply spec updates:**
+**Apply spec updates.** Invoke the [spec-provider] skill (see platform reference for invocation syntax):
 ```
-/[spec-provider] update_spec page_id=\"[spec-id]\" body=\"[UPDATED_SPEC]\" version_message=\"[description]\"
+update_spec page_id="[spec-id]" body="[UPDATED_SPEC]" version_message="[description]"
 ```
 
 **Apply story updates (if stories are affected):**
 
-For each affected story:
+For each affected story, invoke the [story-provider] skill:
 ```
-/[story-provider] update_story issue_key=\"[STORY-KEY]\" description=\"[UPDATED_DESCRIPTION]\"
+update_story issue_key="[STORY-KEY]" description="[UPDATED_DESCRIPTION]"
 ```
 
-For new stories needed:
+For new stories needed, invoke the [story-provider] skill:
 ```
-/[story-provider] create_story project_key=\"[PROJECT]\" epic_id=\"[EPIC-KEY]\" story_data=\"{summary: '...', description: '...', labels: [...]}\"
+create_story project_key="[PROJECT]" epic_id="[EPIC-KEY]" story_data="{summary: '...', description: '...', labels: [...]}"
 ```
 
 For obsolete stories (after user confirmation):

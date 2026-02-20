@@ -2,8 +2,6 @@
 description: Create and manage specifications in Confluence using Atlassian MCP tools.
 alwaysApply: false
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
-
 ## What This Does
 
 Handles all Confluence operations for D3 specifications. Uses Atlassian MCP server to create, read, update, and search Confluence pages.
@@ -56,7 +54,7 @@ Searches Confluence pages.
 
 ## Configuration
 
-Reads from .cursor/rules/d3-config/RULE.md:
+Reads from the D3 config file:
 - Cloud ID
 - Default Location (space key)
 

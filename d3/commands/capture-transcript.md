@@ -1,7 +1,6 @@
 ---
 description: Capture and structure a meeting transcript. Extracts key decisions, action items, and open questions from raw conversation text. Stores as a referenceable transcript artifact. Use when you have a meeting recording/transcript to process, or when user asks to capture/save/process a transcript.
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
 
 ## Core Principle
 
@@ -14,9 +13,9 @@ Transcripts are standalone artifacts. Their relationship to specs is established
 ## Workflow
 
 ### 1. Detect Provider and Template
-- Read CLAUDE.md for D3 config
+- Read the D3 config file for D3 config
 - Search for `### Transcript Provider` section
-- If no Transcript Provider configured, guide user to add one to CLAUDE.md:
+- If no Transcript Provider configured, guide user to add one to the D3 config file:
   ```markdown
   ### Transcript Provider
   **Skill:** d3-markdown:markdown-transcript-provider
@@ -121,9 +120,9 @@ Ready to save? Or would you like to adjust anything?
 
 ### 8. Store via Provider
 
-Use provider:
+Invoke the [provider-name] skill (see platform reference for invocation syntax):
 ```
-Skill(skill="[provider-name]", args="store_transcript title=\"[Title]\" meeting_type=\"[type]\" meeting_date=\"[YYYY-MM-DD]\" participants=\"[comma-separated list]\" body=\"[FULL_CONTENT]\"")
+store_transcript title="[Title]" meeting_type="[type]" meeting_date="[YYYY-MM-DD]" participants="[comma-separated list]" body="[FULL_CONTENT]"
 ```
 
 The body includes:
@@ -156,7 +155,7 @@ Next steps:
 
 | Issue | Action |
 |-------|--------|
-| No provider configured | Guide user to add Transcript Provider to CLAUDE.md |
+| No provider configured | Guide user to add Transcript Provider to the D3 config file |
 | Empty transcript | Ask user to paste the transcript content |
 | No date in transcript | Ask user for the meeting date, default to today |
 | Very short transcript (<100 words) | Warn that the transcript is very short and extracted content may be minimal. Confirm before proceeding |

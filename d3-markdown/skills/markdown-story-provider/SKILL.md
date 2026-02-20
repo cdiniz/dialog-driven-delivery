@@ -2,7 +2,6 @@
 name: markdown-story-provider
 description: Create and manage user stories as local markdown files organized by feature/spec.
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
 
 ## What This Does
 
@@ -73,7 +72,7 @@ Returns Story type only.
 **Implementation:**
 
 1. Determine spec directory from spec_id (e.g., "specs/user-authentication.md" -> "user-authentication")
-2. Use Glob to find existing stories in that directory to determine next ID
+2. Use the glob tool to find existing stories in that directory to determine next ID
 3. Sanitize summary to filename
 
 4. **Transform generic template to markdown format:**
@@ -103,7 +102,7 @@ Returns Story type only.
 
    **Key responsibilities:**
    - **Frontmatter:** Provider-specific metadata wrapper
-   - **Body structure:** From template (configurable via CLAUDE.md)
+   - **Body structure:** From template (configurable via the D3 config file)
    - **Content:** From story_data parameter
 
 5. Write story file to `stories/{spec_dir}/{story_id}-{filename}.md`
@@ -127,7 +126,7 @@ Returns Story type only.
 **Parse args:** from_key, to_key, link_type (blocks, is_blocked_by, relates_to)
 
 **Implementation:**
-1. Use Glob to find story files by ID
+1. Use the glob tool to find story files by ID
 2. Read both story files
 3. Update frontmatter based on link_type:
    - `blocks`: Add to_key to from_key's blocks array
@@ -217,14 +216,14 @@ created: 2026-01-27
 ## Notes
 
 - No metadata file needed - all data lives in markdown frontmatter
-- Use Glob to find stories: `stories/**/story-*.md`
-- Use Grep to search by status, labels, dependencies
+- Use the glob tool to find stories: `stories/**/story-*.md`
+- Use the search tool to search by status, labels, dependencies
 - Story IDs determined by counting existing files in directory
 - Users update status by editing frontmatter directly
 - Dependencies tracked in frontmatter arrays
 
 ### Tools to Use
-- **Read/Write:** File operations
-- **Glob:** Find story files
-- **Grep:** Search by status, labels, dependencies
-- **Bash:** Git operations
+- **read/write tools:** File operations
+- **glob tool:** Find story files
+- **search tool:** Search by status, labels, dependencies
+- **shell tool:** Git operations

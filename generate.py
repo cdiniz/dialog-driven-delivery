@@ -1,48 +1,29 @@
 #!/usr/bin/env python3
 import argparse
-import filecmp
 import json
-import re
 import shutil
 import sys
-import tempfile
 from pathlib import Path
 
 import yaml
 
 ROOT = Path(__file__).parent
-CANONICAL = ROOT / "canonical"
 DIST = ROOT / "dist"
-PLATFORM_FILE = CANONICAL / "d3.platform.yaml"
+PLATFORM_FILE = ROOT / "d3.platform.yaml"
+METADATA_DIR = ROOT / "metadata"
+CONFIG_DIR = ROOT / "config"
+
+D3_DIR = ROOT / "d3"
+D3_MARKDOWN_DIR = ROOT / "d3-markdown"
+D3_ATLASSIAN_DIR = ROOT / "d3-atlassian"
 
 PLATFORMS = ["claude", "codex", "copilot", "cursor"]
 
-TEMPLATE_VAR_PATTERN = re.compile(r"\{\{[a-z_]+(?:\([^)]*\))?\}\}")
-GENERATED_HEADER = "<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->\n\n"
 
 
 def load_platforms():
     with open(PLATFORM_FILE) as f:
         return yaml.safe_load(f)["platforms"]
-
-
-def substitute_variables(content, platform_cfg):
-    content = content.replace("{{config_file}}", platform_cfg["config_file"])
-
-    for tool_key in ("read", "write", "search", "glob", "bash"):
-        content = content.replace(
-            "{{" + tool_key + "_tool}}", platform_cfg["tools"][tool_key]
-        )
-
-    pattern = r'\{\{invoke_skill\("([^"]*)",\s*"((?:[^"\\]|\\.)*)"\)\}\}'
-    template = platform_cfg["invoke_skill"]
-
-    def replace_invoke(match):
-        name = match.group(1)
-        args = match.group(2)
-        return template.replace("{name}", name).replace("{args}", args)
-
-    return re.sub(pattern, replace_invoke, content)
 
 
 def parse_frontmatter(content):
@@ -85,7 +66,13 @@ def transform_frontmatter(fm, body, file_type, platform_cfg):
         if k not in new_fm:
             new_fm[k] = v
 
-    return build_frontmatter(new_fm) + "\n" + GENERATED_HEADER + body
+    return build_frontmatter(new_fm) + "\n" + body
+
+
+def read_source(src_path, file_type, platform_cfg):
+    content = src_path.read_text(encoding="utf-8")
+    fm, body = parse_frontmatter(content)
+    return fm, body, transform_frontmatter(fm, body, file_type, platform_cfg)
 
 
 def write_output(path, content):
@@ -93,49 +80,129 @@ def write_output(path, content):
     path.write_text(content, encoding="utf-8")
 
 
-def process_file(src_path, platform_cfg, file_type):
-    content = src_path.read_text(encoding="utf-8")
-    content = substitute_variables(content, platform_cfg)
-    fm, body = parse_frontmatter(content)
-    return fm, body, transform_frontmatter(fm, body, file_type, platform_cfg)
-
-
-def copy_references(skill_dir, dest_dir):
-    refs_dir = skill_dir / "references"
+def copy_references(src_dir, dest_dir):
+    refs_dir = src_dir / "references"
     if refs_dir.exists():
         dest_dir.mkdir(parents=True, exist_ok=True)
         for ref_file in refs_dir.glob("*.md"):
             shutil.copy2(ref_file, dest_dir / ref_file.name)
 
 
-def _clear_dir(path):
-    if path.exists():
-        shutil.rmtree(path)
+def generate_platform_md(platform_cfg):
+    tools = platform_cfg["tools"]
+    tool_rows = [
+        ("read tool", tools["read"]),
+        ("write tool", tools["write"]),
+        ("search tool", tools["search"]),
+        ("glob tool", tools["glob"]),
+        ("shell tool", tools["bash"]),
+    ]
 
+    invoke_example = platform_cfg["invoke_skill"].replace(
+        "{name}", "<skill-name>"
+    ).replace("{args}", "<arguments>")
+
+    lines = [
+        "# D3 Platform Reference",
+        "",
+        "## Config File",
+        f"The D3 config file is `{platform_cfg['config_file']}`.",
+        "",
+        "## Tool Mapping",
+        "| Reference | Tool |",
+        "|---|---|",
+    ]
+    for label, tool in tool_rows:
+        lines.append(f"| {label} | `{tool}` |")
+
+    lines.extend([
+        "",
+        "## Skill Invocation",
+        "To invoke a skill, use this syntax:",
+        "```",
+        invoke_example,
+        "```",
+    ])
+
+    return "\n".join(lines) + "\n"
+
+
+def _platform_md_with_frontmatter(platform_name, platform_cfg, file_type):
+    body = generate_platform_md(platform_cfg)
+    fm = {
+        "name": "d3-platform",
+        "description": f"D3 platform-specific tool and configuration mappings for {platform_name}. Read this before executing D3 commands or skills.",
+    }
+
+    fm_spec = platform_cfg.get("frontmatter", {})
+    spec = fm_spec.get(file_type) or fm_spec.get(next(iter(fm_spec), None), {})
+
+    if isinstance(spec, dict):
+        allowed_fields = spec.get("fields", list(fm.keys()))
+        defaults = spec.get("defaults", {})
+    else:
+        allowed_fields = spec or list(fm.keys())
+        defaults = {}
+
+    final_fm = {k: v for k, v in fm.items() if k in allowed_fields}
+    for k, v in defaults.items():
+        if k not in final_fm:
+            final_fm[k] = v
+
+    return build_frontmatter(final_fm) + "\n" + body
+
+
+# --- Source iterators ---
+
+def iter_commands():
+    for cmd_file in sorted((D3_DIR / "commands").glob("*.md")):
+        yield cmd_file.stem, cmd_file
+
+
+def iter_skills():
+    for skill_dir in sorted((D3_DIR / "skills").iterdir()):
+        if not skill_dir.is_dir() or skill_dir.name == "d3-platform":
+            continue
+        skill_file = skill_dir / "SKILL.md"
+        if skill_file.exists():
+            yield skill_dir.name, skill_file, skill_dir
+
+
+def iter_providers():
+    for provider_dir in (D3_MARKDOWN_DIR, D3_ATLASSIAN_DIR):
+        skills_dir = provider_dir / "skills"
+        if not skills_dir.exists():
+            continue
+        for skill_dir in sorted(skills_dir.iterdir()):
+            if not skill_dir.is_dir():
+                continue
+            skill_file = skill_dir / "SKILL.md"
+            if skill_file.exists():
+                yield skill_dir.name, skill_file
+
+
+# --- Platform generators ---
 
 def generate_claude(platforms, output_root=None):
     cfg = platforms["claude"]
     base = output_root or ROOT
-    d3_dir = base / "d3"
+
     plugin_dirs = {
-        "d3": d3_dir,
+        "d3": base / "d3",
         "d3-markdown": base / "d3-markdown",
         "d3-atlassian": base / "d3-atlassian",
     }
 
-    _clear_dir(d3_dir / "commands")
-    _clear_dir(d3_dir / "skills")
-    for plugin_name in ("d3-markdown", "d3-atlassian"):
-        _clear_dir(plugin_dirs[plugin_name] / "skills")
-
-    metadata_dir = CANONICAL / "metadata"
     metas = {
-        name: yaml.safe_load((metadata_dir / f"{name}.yaml").read_text())
+        name: yaml.safe_load((METADATA_DIR / f"{name}.yaml").read_text())
         for name in plugin_dirs
     }
 
     for name, meta in metas.items():
-        plugin_json = {k: meta[k] for k in ("name", "version", "description", "author", "homepage", "repository", "keywords", "license")}
+        plugin_json = {
+            k: meta[k]
+            for k in ("name", "version", "description", "author", "homepage", "repository", "keywords", "license")
+        }
         write_output(
             plugin_dirs[name] / ".claude-plugin" / "plugin.json",
             json.dumps(plugin_json, indent=2) + "\n",
@@ -157,39 +224,20 @@ def generate_claude(platforms, output_root=None):
         ("d3-markdown", "./d3-markdown", "productivity"),
     ]:
         meta = metas[name]
-        marketplace["plugins"].append({
-            k: meta[k] for k in ("name", "description", "version", "author", "homepage", "repository", "license", "keywords")
-        } | {"source": source_dir, "category": category})
+        marketplace["plugins"].append(
+            {
+                k: meta[k]
+                for k in ("name", "description", "version", "author", "homepage", "repository", "license", "keywords")
+            }
+            | {"source": source_dir, "category": category}
+        )
     write_output(
         base / ".claude-plugin" / "marketplace.json",
         json.dumps(marketplace, indent=2) + "\n",
     )
 
-    for cmd_file in (CANONICAL / "commands").glob("*.md"):
-        _, _, final = process_file(cmd_file, cfg, "command")
-        write_output(d3_dir / "commands" / cmd_file.name, final)
-
-    for skill_dir in (CANONICAL / "skills").iterdir():
-        if not skill_dir.is_dir():
-            continue
-        skill_file = skill_dir / "SKILL.md"
-        if skill_file.exists():
-            _, _, final = process_file(skill_file, cfg, "skill")
-            write_output(d3_dir / "skills" / skill_dir.name / "SKILL.md", final)
-        copy_references(skill_dir, d3_dir / "skills" / skill_dir.name / "references")
-
-    provider_map = {
-        "markdown": ("d3-markdown", "markdown"),
-        "atlassian": ("d3-atlassian", "atlassian"),
-    }
-    for provider_dir_name, (plugin_name, prefix) in provider_map.items():
-        provider_dir = CANONICAL / "providers" / provider_dir_name
-        if not provider_dir.exists():
-            continue
-        for provider_file in provider_dir.glob("*.md"):
-            _, _, final = process_file(provider_file, cfg, "skill")
-            skill_name = f"{prefix}-{provider_file.stem}"
-            write_output(plugin_dirs[plugin_name] / "skills" / skill_name / "SKILL.md", final)
+    platform_md = _platform_md_with_frontmatter("Claude Code", cfg, "skill")
+    write_output(base / "d3" / "skills" / "d3-platform" / "SKILL.md", platform_md)
 
 
 def generate_codex(platforms):
@@ -200,31 +248,26 @@ def generate_codex(platforms):
     if out.exists():
         shutil.rmtree(out)
 
-    for cmd_file in (CANONICAL / "commands").glob("*.md"):
-        fm, body, final = process_file(cmd_file, cfg, "command")
-        fm["name"] = cmd_file.stem
+    for name, cmd_file in iter_commands():
+        fm, body, _ = read_source(cmd_file, "command", cfg)
+        fm["name"] = name
         final = transform_frontmatter(fm, body, "command", cfg)
-        write_output(d3_dir / cmd_file.stem / "SKILL.md", final)
+        write_output(d3_dir / name / "SKILL.md", final)
 
-    for skill_dir in (CANONICAL / "skills").iterdir():
-        if not skill_dir.is_dir():
-            continue
-        skill_file = skill_dir / "SKILL.md"
-        if skill_file.exists():
-            _, _, final = process_file(skill_file, cfg, "skill")
-            write_output(d3_dir / skill_dir.name / "SKILL.md", final)
-        copy_references(skill_dir, d3_dir / skill_dir.name / "references")
+    for name, skill_file, skill_dir in iter_skills():
+        _, _, final = read_source(skill_file, "skill", cfg)
+        write_output(d3_dir / name / "SKILL.md", final)
+        copy_references(skill_dir, d3_dir / name / "references")
 
-    for provider_dir in (CANONICAL / "providers").iterdir():
-        if not provider_dir.is_dir():
-            continue
-        for provider_file in provider_dir.glob("*.md"):
-            fm, body, _ = process_file(provider_file, cfg, "skill")
-            skill_name = fm.get("name", f"{provider_dir.name}-{provider_file.stem}")
-            final = transform_frontmatter(fm, body, "skill", cfg)
-            write_output(d3_dir / skill_name / "SKILL.md", final)
+    for name, provider_file in iter_providers():
+        fm, body, _ = read_source(provider_file, "skill", cfg)
+        final = transform_frontmatter(fm, body, "skill", cfg)
+        write_output(d3_dir / name / "SKILL.md", final)
 
-    config_content = (CANONICAL / "config" / "example-config.md").read_text(encoding="utf-8")
+    platform_md = _platform_md_with_frontmatter("Codex", cfg, "skill")
+    write_output(d3_dir / "d3-platform" / "SKILL.md", platform_md)
+
+    config_content = (CONFIG_DIR / "example-config.md").read_text(encoding="utf-8")
     write_output(out / "AGENTS.md", config_content)
 
 
@@ -240,36 +283,31 @@ def generate_copilot(platforms):
     if out.exists():
         shutil.rmtree(out)
 
-    for cmd_file in (CANONICAL / "commands").glob("*.md"):
-        fm, body, _ = process_file(cmd_file, cfg, "command")
-        agent_name = f"d3-{cmd_file.stem}"
+    for name, cmd_file in iter_commands():
+        fm, body, _ = read_source(cmd_file, "command", cfg)
+        agent_name = f"d3-{name}"
         fm["name"] = agent_name
         final = transform_frontmatter(fm, body, "command", cfg)
         write_output(agents_dir / f"{agent_name}.agent.md", final)
 
-    for skill_dir in (CANONICAL / "skills").iterdir():
-        if not skill_dir.is_dir():
-            continue
-        skill_file = skill_dir / "SKILL.md"
-        if skill_file.exists():
-            fm, body, _ = process_file(skill_file, cfg, "skill")
-            agent_name = _copilot_name(skill_dir.name)
-            fm["name"] = agent_name
-            final = transform_frontmatter(fm, body, "skill", cfg)
-            write_output(agents_dir / f"{agent_name}.agent.md", final)
+    for name, skill_file, _skill_dir in iter_skills():
+        fm, body, _ = read_source(skill_file, "skill", cfg)
+        agent_name = _copilot_name(name)
+        fm["name"] = agent_name
+        final = transform_frontmatter(fm, body, "skill", cfg)
+        write_output(agents_dir / f"{agent_name}.agent.md", final)
 
-    for provider_dir in (CANONICAL / "providers").iterdir():
-        if not provider_dir.is_dir():
-            continue
-        for provider_file in provider_dir.glob("*.md"):
-            fm, body, _ = process_file(provider_file, cfg, "skill")
-            base_name = fm.get("name", f"{provider_dir.name}-{provider_file.stem}")
-            agent_name = _copilot_name(base_name)
-            fm["name"] = agent_name
-            final = transform_frontmatter(fm, body, "skill", cfg)
-            write_output(agents_dir / f"{agent_name}.agent.md", final)
+    for name, provider_file in iter_providers():
+        fm, body, _ = read_source(provider_file, "skill", cfg)
+        agent_name = _copilot_name(name)
+        fm["name"] = agent_name
+        final = transform_frontmatter(fm, body, "skill", cfg)
+        write_output(agents_dir / f"{agent_name}.agent.md", final)
 
-    config_content = (CANONICAL / "config" / "example-config.md").read_text(encoding="utf-8")
+    platform_md = _platform_md_with_frontmatter("Copilot", cfg, "skill")
+    write_output(agents_dir / "d3-platform.agent.md", platform_md)
+
+    config_content = (CONFIG_DIR / "example-config.md").read_text(encoding="utf-8")
     write_output(out / ".github" / "copilot-instructions.md", config_content)
 
 
@@ -281,29 +319,24 @@ def generate_cursor(platforms):
     if out.exists():
         shutil.rmtree(out)
 
-    for cmd_file in (CANONICAL / "commands").glob("*.md"):
-        _, _, final = process_file(cmd_file, cfg, "command")
-        write_output(d3_dir / cmd_file.stem / "RULE.md", final)
+    for name, cmd_file in iter_commands():
+        _, _, final = read_source(cmd_file, "command", cfg)
+        write_output(d3_dir / name / "RULE.md", final)
 
-    for skill_dir in (CANONICAL / "skills").iterdir():
-        if not skill_dir.is_dir():
-            continue
-        skill_file = skill_dir / "SKILL.md"
-        if skill_file.exists():
-            _, _, final = process_file(skill_file, cfg, "rule")
-            write_output(d3_dir / skill_dir.name / "RULE.md", final)
-        copy_references(skill_dir, d3_dir / skill_dir.name / "references")
+    for name, skill_file, skill_dir in iter_skills():
+        _, _, final = read_source(skill_file, "rule", cfg)
+        write_output(d3_dir / name / "RULE.md", final)
+        copy_references(skill_dir, d3_dir / name / "references")
 
-    for provider_dir in (CANONICAL / "providers").iterdir():
-        if not provider_dir.is_dir():
-            continue
-        for provider_file in provider_dir.glob("*.md"):
-            fm, body, _ = process_file(provider_file, cfg, "rule")
-            rule_name = fm.get("name", f"{provider_dir.name}-{provider_file.stem}")
-            final = transform_frontmatter(fm, body, "rule", cfg)
-            write_output(d3_dir / rule_name / "RULE.md", final)
+    for name, provider_file in iter_providers():
+        fm, body, _ = read_source(provider_file, "rule", cfg)
+        final = transform_frontmatter(fm, body, "rule", cfg)
+        write_output(d3_dir / name / "RULE.md", final)
 
-    config_content = (CANONICAL / "config" / "example-config.md").read_text(encoding="utf-8")
+    platform_md = _platform_md_with_frontmatter("Cursor", cfg, "rule")
+    write_output(d3_dir / "d3-platform" / "RULE.md", platform_md)
+
+    config_content = (CONFIG_DIR / "example-config.md").read_text(encoding="utf-8")
     config_fm = {
         "description": "D3 provider and template configuration. Always include in context.",
         "alwaysApply": True,
@@ -320,63 +353,6 @@ GENERATORS = {
 }
 
 
-def validate_canonical():
-    unresolved = []
-    for md_file in CANONICAL.rglob("*.md"):
-        if md_file.is_relative_to(CANONICAL / "skills" / "d3-templates" / "references"):
-            continue
-        content = md_file.read_text(encoding="utf-8")
-        matches = TEMPLATE_VAR_PATTERN.findall(content)
-        if matches:
-            unresolved.append((md_file.relative_to(ROOT), matches))
-    return unresolved
-
-
-def _output_dirs(platform_name):
-    if platform_name == "claude":
-        return [ROOT / "d3", ROOT / "d3-markdown", ROOT / "d3-atlassian"]
-    return [DIST / platform_name]
-
-
-def validate_output(platform_name):
-    dirs = _output_dirs(platform_name)
-    if not any(d.exists() for d in dirs):
-        return [("(not generated)", ["directory does not exist"])]
-
-    issues = []
-    for out_dir in dirs:
-        for md_file in out_dir.rglob("*.md"):
-            content = md_file.read_text(encoding="utf-8")
-            matches = TEMPLATE_VAR_PATTERN.findall(content)
-            if matches:
-                issues.append((md_file.relative_to(ROOT), matches))
-    return issues
-
-
-def _check_claude_sync(platforms):
-    with tempfile.TemporaryDirectory() as tmp:
-        tmp_path = Path(tmp)
-        generate_claude(platforms, output_root=tmp_path)
-
-        diffs = []
-        for dir_name in ("d3", "d3-markdown", "d3-atlassian"):
-            actual = ROOT / dir_name
-            expected = tmp_path / dir_name
-            if not expected.exists():
-                continue
-            for expected_file in expected.rglob("*"):
-                if not expected_file.is_file():
-                    continue
-                rel = expected_file.relative_to(expected)
-                actual_file = actual / rel
-                if not actual_file.exists():
-                    diffs.append(f"  missing: {dir_name}/{rel}")
-                elif not filecmp.cmp(actual_file, expected_file, shallow=False):
-                    diffs.append(f"  differs: {dir_name}/{rel}")
-
-    return diffs
-
-
 def main():
     parser = argparse.ArgumentParser(description="Generate D3 platform-specific output")
     parser.add_argument(
@@ -385,51 +361,14 @@ def main():
         help="Generate for a specific platform",
     )
     parser.add_argument("--all", action="store_true", help="Generate for all platforms")
-    parser.add_argument(
-        "--validate",
-        action="store_true",
-        help="Validate no unresolved variables in output",
-    )
-    parser.add_argument(
-        "--validate-canonical",
-        action="store_true",
-        help="List template variables in canonical source",
-    )
-    parser.add_argument(
-        "--check",
-        action="store_true",
-        help="Check Claude generated files are up to date (no working tree changes)",
-    )
 
     args = parser.parse_args()
 
-    if not any([args.platform, args.all, args.validate, args.validate_canonical, args.check]):
+    if not any([args.platform, args.all]):
         parser.print_help()
         sys.exit(1)
 
     platforms = load_platforms()
-
-    if args.check:
-        diffs = _check_claude_sync(platforms)
-        if diffs:
-            print("Do not edit generated files directly. Edit canonical/ instead.")
-            print()
-            for d in diffs:
-                print(d)
-            print("\nThen run: python generate.py --platform claude")
-            sys.exit(1)
-        print("Generated files are up to date.")
-        return
-
-    if args.validate_canonical:
-        unresolved = validate_canonical()
-        if unresolved:
-            print("Template variables found in canonical source:")
-            for path, matches in unresolved:
-                print(f"  {path}: {', '.join(set(matches))}")
-        else:
-            print("No template variables found in canonical source.")
-        return
 
     if args.platform:
         targets = [args.platform]
@@ -442,23 +381,11 @@ def main():
         print(f"Generating {target}...")
         GENERATORS[target](platforms)
         if target == "claude":
-            print("  Output: d3/, d3-markdown/, d3-atlassian/")
+            print("  Output: d3/ (metadata + platform ref)")
         else:
             print(f"  Output: dist/{target}/")
 
-    if args.validate or targets:
-        check_targets = targets or PLATFORMS
-        all_clean = True
-        for target in check_targets:
-            issues = validate_output(target)
-            if issues:
-                all_clean = False
-                print(f"\nUnresolved variables in {target}:")
-                for path, matches in issues:
-                    print(f"  {path}: {', '.join(set(matches))}")
-
-        if all_clean and check_targets:
-            print("\nValidation passed: no unresolved variables in output.")
+    print("\nDone.")
 
 
 if __name__ == "__main__":

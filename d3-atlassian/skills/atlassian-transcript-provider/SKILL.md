@@ -2,7 +2,6 @@
 name: atlassian-transcript-provider
 description: Store and manage meeting transcripts in Confluence using Atlassian MCP tools. Stores transcripts as child pages under a designated Transcripts parent page with labels for filtering.
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
 
 ## What This Does
 
@@ -10,7 +9,7 @@ Manages meeting transcripts as Confluence child pages under a designated "Transc
 
 ## Configuration
 
-Reads from CLAUDE.md:
+Reads from the D3 config file:
 ```markdown
 ### Transcript Provider
 **Skill:** d3-atlassian:atlassian-transcript-provider

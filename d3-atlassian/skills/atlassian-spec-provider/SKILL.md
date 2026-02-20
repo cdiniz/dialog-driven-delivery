@@ -2,7 +2,6 @@
 name: atlassian-spec-provider
 description: Create and manage specifications in Confluence using Atlassian MCP tools.
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
 
 ## What This Does
 
@@ -56,7 +55,7 @@ Searches Confluence pages.
 
 ## Configuration
 
-Reads from CLAUDE.md:
+Reads from the D3 config file:
 - Cloud ID
 - Default Location (space key)
 

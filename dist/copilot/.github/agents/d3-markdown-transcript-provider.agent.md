@@ -2,8 +2,6 @@
 name: d3-markdown-transcript-provider
 description: Store and manage meeting transcripts as local markdown files. Stores transcripts in ./transcripts/ directory organized by month as markdown files tracked by git.
 ---
-<!-- DO NOT EDIT - Generated from canonical/ by generate.py -->
-
 ## What This Does
 
 Manages meeting transcripts as markdown files in the filesystem. Transcripts are stored in `./transcripts/` directory organized by year-month subdirectories with git version control.
@@ -12,7 +10,7 @@ Manages meeting transcripts as markdown files in the filesystem. Transcripts are
 
 ## Configuration
 
-Reads from .github/copilot-instructions.md:
+Reads from the D3 config file:
 ```markdown
 ### Transcript Provider
 **Skill:** d3-markdown:markdown-transcript-provider
@@ -34,7 +32,7 @@ When invoked with operation in `$ARGUMENTS`:
 Lists available directories for transcripts.
 
 **Implementation:**
-Use search to find subdirectories in transcripts/ (typically YYYY-MM directories), or return root location.
+Use the glob tool to find subdirectories in transcripts/ (typically YYYY-MM directories), or return root location.
 
 **Returns:**
 ```json
@@ -79,7 +77,7 @@ Creates a transcript markdown file.
      - "{YYYY-MM}"
    ---
    ```
-7. Write frontmatter + body to file using edit tool
+7. Write frontmatter + body to file using the write tool
 8. Return metadata
 
 **Returns:**
@@ -101,11 +99,11 @@ Retrieves a transcript markdown file.
 **Parse args:** transcript_id (can be full path, partial path, or filename)
 
 **Implementation:**
-1. Find file using read tool:
+1. Find file using the read tool:
    - Try exact path
    - Try `transcripts/{transcript_id}`
    - Try `transcripts/{transcript_id}.md`
-   - Use search pattern `transcripts/**/*{transcript_id}*.md` as fallback
+   - Use the glob tool with pattern `transcripts/**/*{transcript_id}*.md` as fallback
 2. Read file content
 3. Parse YAML frontmatter (between `---` markers)
 4. Extract body (content after frontmatter)
@@ -138,7 +136,7 @@ Lists all transcripts, optionally filtered.
 **Parse args:** meeting_type (optional), month (optional, format YYYY-MM)
 
 **Implementation:**
-1. Use search to find all markdown files: `transcripts/**/*.md`
+1. Use the glob tool to find all markdown files: `transcripts/**/*.md`
 2. For each file, parse YAML frontmatter
 3. Filter by meeting_type if provided (match frontmatter `meeting_type` field)
 4. Filter by month if provided (match directory name or frontmatter `meeting_date`)
@@ -170,7 +168,7 @@ Searches transcript content.
 **Parse args:** query, meeting_type (optional)
 
 **Implementation:**
-1. Use search to search markdown files in transcripts/ for the query
+1. Use the search tool to search markdown files in transcripts/ for the query
 2. For each match, parse frontmatter to extract title and meeting_type
 3. Filter by meeting_type if provided
 4. Return list of results with excerpts
@@ -247,9 +245,9 @@ labels:
 
 ## Notes
 
-- Use read/edit tools for file operations
-- Use search for finding files
-- Use search for searching content
+- Use the read/write tools for file operations
+- Use the glob tool for finding files
+- Use the search tool for searching content
 - Always create parent directories as needed (including YYYY-MM directories)
 - Frontmatter is parsed by splitting on `---` markers
 - Body content starts after the closing `---` of frontmatter

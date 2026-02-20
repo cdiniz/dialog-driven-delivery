@@ -1,6 +1,6 @@
 ---
 description: Create comprehensive feature specification from any input context (meeting transcripts, documents, or conversational discussion). Creates a unified specification containing both Product and Technical specifications. Use when starting a new feature, documenting a planning meeting, or when user asks to create/write a spec, specification, or feature documentation. Fills only known information and marks uncertainties.
-name: create-spec
+name: d3-create-spec
 ---
 ## Core Principle
 

@@ -258,9 +258,10 @@ def generate_codex(platforms):
 
     for name, cmd_file in iter_commands():
         fm, body, _ = read_source(cmd_file, "command", cfg)
-        fm["name"] = name
+        skill_name = f"d3-{name}"
+        fm["name"] = skill_name
         final = transform_frontmatter(fm, body, "command", cfg)
-        write_output(d3_dir / name / "SKILL.md", final)
+        write_output(d3_dir / skill_name / "SKILL.md", final)
 
     for name, skill_file, skill_dir in iter_skills():
         _, _, final = read_source(skill_file, "skill", cfg)

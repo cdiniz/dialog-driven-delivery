@@ -106,3 +106,49 @@ def markdown_workspace_with_refined_spec(request):
         os.path.join(specs_dir, "about-page.md")
     )
     yield workspace
+
+
+@pytest.fixture
+def separated_workflow_workspace(request):
+    yield _init_workspace(
+        str(E2E_TMP / request.node.name),
+        claude_md_name="CLAUDE-separated.md",
+    )
+
+
+@pytest.fixture
+def separated_workspace_with_specs(request):
+    workspace = _init_workspace(
+        str(E2E_TMP / request.node.name),
+        claude_md_name="CLAUDE-separated.md",
+    )
+    specs_dir = os.path.join(workspace, "specs")
+    os.makedirs(specs_dir, exist_ok=True)
+    shutil.copy(
+        FIXTURES_DIR / "specs" / "about-page-product-spec-base.md",
+        os.path.join(specs_dir, "about-page-product-spec.md"),
+    )
+    shutil.copy(
+        FIXTURES_DIR / "specs" / "about-page-tech-spec-base.md",
+        os.path.join(specs_dir, "about-page-tech-spec.md"),
+    )
+    yield workspace
+
+
+@pytest.fixture
+def separated_workspace_with_refined_specs(request):
+    workspace = _init_workspace(
+        str(E2E_TMP / request.node.name),
+        claude_md_name="CLAUDE-separated.md",
+    )
+    specs_dir = os.path.join(workspace, "specs")
+    os.makedirs(specs_dir, exist_ok=True)
+    shutil.copy(
+        FIXTURES_DIR / "specs" / "about-page-product-spec-refined-base.md",
+        os.path.join(specs_dir, "about-page-product-spec.md"),
+    )
+    shutil.copy(
+        FIXTURES_DIR / "specs" / "about-page-tech-spec-refined-base.md",
+        os.path.join(specs_dir, "about-page-tech-spec.md"),
+    )
+    yield workspace

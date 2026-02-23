@@ -71,6 +71,10 @@ def markers_tracked_in_open_questions(content: str) -> bool:
     return "open questions" in lower
 
 
+def has_companion_header(content: str) -> bool:
+    return bool(re.search(r"\*\*Companion Spec:\*\*", content))
+
+
 def extract_frontmatter(content: str) -> dict | None:
     match = re.match(r"^---\n(.+?)\n---", content, re.DOTALL)
     if not match:

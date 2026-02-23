@@ -7,6 +7,7 @@ from .claude_runner import run_claude_conversation
 from .validators import (
     extract_frontmatter,
     extract_sections,
+    has_companion_header,
     has_placeholder,
     heading_texts_lower,
     markers_tracked_in_open_questions,
@@ -178,6 +179,136 @@ class TestMarkdownWorkflow:
             assert spec_stem in str(fm.get("spec", "")), (
                 f"Story doesn't reference parent spec in {path}"
             )
+
+            lower = content.lower()
+            assert "given" in lower and "when" in lower and "then" in lower, (
+                f"Missing Given-When-Then ACs in {path}"
+            )
+
+
+def _find_separated_specs(workspace):
+    all_specs = _find_specs(workspace)
+    product = [f for f in all_specs if "product" in os.path.basename(f).lower()]
+    tech = [f for f in all_specs if "tech" in os.path.basename(f).lower()]
+    return product, tech
+
+
+class TestSeparatedModeWorkflow:
+    """
+    E2E tests for separated spec mode.
+    Verifies create, refine, and decompose produce/consume paired spec files.
+    """
+
+    @pytest.mark.timeout(600)
+    def test_create_separated_specs(self, separated_workflow_workspace, plugin_dirs):
+        transcript = _read_fixture("sample_transcript.txt")
+        run_claude_conversation(
+            _create_spec_messages(transcript),
+            cwd=separated_workflow_workspace,
+            plugin_dirs=plugin_dirs,
+        )
+
+        product_specs, tech_specs = _find_separated_specs(separated_workflow_workspace)
+        assert len(product_specs) == 1, (
+            f"Expected 1 product spec, found: {product_specs}"
+        )
+        assert len(tech_specs) == 1, (
+            f"Expected 1 tech spec, found: {tech_specs}"
+        )
+
+        product_content = open(product_specs[0]).read()
+        tech_content = open(tech_specs[0]).read()
+
+        product_headings = heading_texts_lower(product_content)
+        for h in PRODUCT_HEADINGS:
+            assert h in product_headings, f"Missing product heading: {h}"
+
+        tech_headings = heading_texts_lower(tech_content)
+        for h in TECH_HEADINGS:
+            assert h in tech_headings, f"Missing tech heading: {h}"
+
+        assert has_companion_header(product_content), (
+            "Product spec missing Companion Spec header"
+        )
+        assert has_companion_header(tech_content), (
+            "Tech spec missing Companion Spec header"
+        )
+
+    @pytest.mark.timeout(600)
+    def test_refine_separated_spec(self, separated_workspace_with_specs, plugin_dirs):
+        product_specs, tech_specs = _find_separated_specs(
+            separated_workspace_with_specs
+        )
+        assert len(product_specs) == 1
+        assert len(tech_specs) == 1
+
+        product_name = os.path.basename(product_specs[0])
+        original_product = open(product_specs[0]).read()
+        original_tech = open(tech_specs[0]).read()
+        refinement = _read_fixture("refinement_input.txt")
+
+        run_claude_conversation(
+            _refine_spec_messages(product_name, refinement),
+            cwd=separated_workspace_with_specs,
+            plugin_dirs=plugin_dirs,
+        )
+
+        updated_product = open(product_specs[0]).read()
+        updated_tech = open(tech_specs[0]).read()
+
+        assert updated_product != original_product or updated_tech != original_tech, (
+            "Neither spec changed after refinement"
+        )
+        combined = (updated_product + updated_tech).lower()
+        assert "acme" in combined, "Refinement content not found in either spec"
+
+        assert has_companion_header(updated_product), (
+            "Product spec lost Companion Spec header after refinement"
+        )
+
+    @pytest.mark.timeout(600)
+    def test_decompose_separated_specs(
+        self, separated_workspace_with_refined_specs, plugin_dirs
+    ):
+        product_specs, tech_specs = _find_separated_specs(
+            separated_workspace_with_refined_specs
+        )
+        assert len(product_specs) == 1
+        assert len(tech_specs) == 1
+
+        product_name = os.path.basename(product_specs[0])
+        output = run_claude_conversation(
+            _decompose_messages(product_name),
+            cwd=separated_workspace_with_refined_specs,
+            plugin_dirs=plugin_dirs,
+        )
+
+        stories_dir = os.path.join(
+            separated_workspace_with_refined_specs, "stories"
+        )
+        assert os.path.isdir(stories_dir), (
+            f"Stories dir not created. Output:\n{output[:1000]}"
+        )
+
+        all_files = glob.glob(
+            os.path.join(stories_dir, "**", "*.md"), recursive=True
+        )
+
+        stories = []
+        for path in all_files:
+            content = open(path).read()
+            fm = extract_frontmatter(content)
+            if fm is None or fm.get("type") != "story":
+                continue
+            stories.append((path, content, fm))
+
+        assert len(stories) >= 1, (
+            f"No story files found. Files: {all_files}. Output:\n{output[:1000]}"
+        )
+
+        for path, content, fm in stories:
+            for field in STORY_FRONTMATTER_FIELDS:
+                assert field in fm, f"Missing frontmatter '{field}' in {path}"
 
             lower = content.lower()
             assert "given" in lower and "when" in lower and "then" in lower, (

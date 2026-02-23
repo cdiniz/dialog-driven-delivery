@@ -316,6 +316,93 @@ class TestSeparatedModeWorkflow:
             )
 
 
+class TestQuietModeWorkflow:
+    """
+    E2E tests for quiet mode.
+    Verifies commands skip confirmations and use $ARGUMENTS directly.
+    """
+
+    @pytest.mark.timeout(600)
+    def test_create_spec_quiet(self, quiet_workflow_workspace, plugin_dirs):
+        transcript = _read_fixture("sample_transcript.txt")
+        run_claude_conversation(
+            [f"/d3:create-spec {transcript}"],
+            cwd=quiet_workflow_workspace,
+            plugin_dirs=plugin_dirs,
+        )
+
+        spec_files = _find_specs(quiet_workflow_workspace)
+        assert len(spec_files) == 1, (
+            f"Expected 1 spec file, found: {spec_files}"
+        )
+
+        content = open(spec_files[0]).read()
+        headings = heading_texts_lower(content)
+
+        for h in PRODUCT_HEADINGS:
+            assert h in headings, f"Missing product heading: {h}"
+        for h in TECH_HEADINGS:
+            assert h in headings, f"Missing tech heading: {h}"
+
+    @pytest.mark.timeout(600)
+    def test_refine_spec_quiet(self, quiet_workspace_with_spec, plugin_dirs):
+        spec_files = _find_specs(quiet_workspace_with_spec)
+        assert len(spec_files) == 1
+        spec_path = spec_files[0]
+        spec_name = os.path.basename(spec_path)
+        original_content = open(spec_path).read()
+        refinement = _read_fixture("refinement_input.txt")
+
+        run_claude_conversation(
+            [f"/d3:refine-spec {spec_name}\n\n{refinement}"],
+            cwd=quiet_workspace_with_spec,
+            plugin_dirs=plugin_dirs,
+        )
+
+        updated_content = open(spec_path).read()
+        assert updated_content != original_content, "Spec unchanged after refinement"
+        assert "acme" in updated_content.lower(), (
+            "Refinement content not found in updated spec"
+        )
+
+    @pytest.mark.timeout(600)
+    def test_decompose_spec_quiet(self, quiet_workspace_with_refined_spec, plugin_dirs):
+        spec_files = _find_specs(quiet_workspace_with_refined_spec)
+        assert len(spec_files) == 1
+        spec_name = os.path.basename(spec_files[0])
+
+        output = run_claude_conversation(
+            [f"/d3:decompose {spec_name}"],
+            cwd=quiet_workspace_with_refined_spec,
+            plugin_dirs=plugin_dirs,
+        )
+
+        stories_dir = os.path.join(quiet_workspace_with_refined_spec, "stories")
+        assert os.path.isdir(stories_dir), (
+            f"Stories dir not created. Output:\n{output[:1000]}"
+        )
+
+        all_files = glob.glob(
+            os.path.join(stories_dir, "**", "*.md"), recursive=True
+        )
+
+        stories = []
+        for path in all_files:
+            content = open(path).read()
+            fm = extract_frontmatter(content)
+            if fm is None or fm.get("type") != "story":
+                continue
+            stories.append((path, content, fm))
+
+        assert len(stories) >= 1, (
+            f"No story files found. Files: {all_files}. Output:\n{output[:1000]}"
+        )
+
+        for path, content, fm in stories:
+            for field in STORY_FRONTMATTER_FIELDS:
+                assert field in fm, f"Missing frontmatter '{field}' in {path}"
+
+
 class TestMarkdownConfiguration:
     """
     Configuration and customisation tests for markdown provider.

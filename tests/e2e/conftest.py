@@ -109,6 +109,44 @@ def markdown_workspace_with_refined_spec(request):
 
 
 @pytest.fixture
+def quiet_workflow_workspace(request):
+    yield _init_workspace(
+        str(E2E_TMP / request.node.name),
+        claude_md_name="CLAUDE-quiet.md",
+    )
+
+
+@pytest.fixture
+def quiet_workspace_with_spec(request):
+    workspace = _init_workspace(
+        str(E2E_TMP / request.node.name),
+        claude_md_name="CLAUDE-quiet.md",
+    )
+    specs_dir = os.path.join(workspace, "specs")
+    os.makedirs(specs_dir, exist_ok=True)
+    shutil.copy(
+        FIXTURES_DIR / "specs" / "about-page-base.md",
+        os.path.join(specs_dir, "about-page.md"),
+    )
+    yield workspace
+
+
+@pytest.fixture
+def quiet_workspace_with_refined_spec(request):
+    workspace = _init_workspace(
+        str(E2E_TMP / request.node.name),
+        claude_md_name="CLAUDE-quiet.md",
+    )
+    specs_dir = os.path.join(workspace, "specs")
+    os.makedirs(specs_dir, exist_ok=True)
+    shutil.copy(
+        FIXTURES_DIR / "specs" / "about-page-refined-base.md",
+        os.path.join(specs_dir, "about-page.md"),
+    )
+    yield workspace
+
+
+@pytest.fixture
 def separated_workflow_workspace(request):
     yield _init_workspace(
         str(E2E_TMP / request.node.name),

@@ -1,2 +1,8 @@
-Meeting: About Page
+Meeting: About Page Planning
 PM: We need a static about page showing the company name and a short description.
+Dev: Should we pull that content from the CMS or hardcode it?
+PM: Not sure yet, let's decide later. For now just plan for both options.
+Designer: Do we need a hero image or banner at the top?
+PM: Good question — I'll check with marketing and get back to you.
+Dev: What about mobile responsiveness? Same layout or simplified?
+PM: Same layout should be fine, but let's confirm with the design team.

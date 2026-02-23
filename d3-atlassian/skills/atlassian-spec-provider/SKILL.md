@@ -61,7 +61,7 @@ Searches Confluence pages.
 
 ## Configuration
 
-Reads from `d3.config.md`:
+Reads from `d3.config.md`. This skill can appear under `### Spec Provider` (combined mode), `### Product Spec Provider`, or `### Tech Spec Provider` (separated mode):
 ```markdown
 ### Spec Provider
 **Skill:** d3-atlassian:atlassian-spec-provider
@@ -70,7 +70,6 @@ Reads from `d3.config.md`:
 - Default Location: PROJ
 - spaceId: 1234567
 - Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789/Specs
-- Spec Mode: combined
 ```
 
 ## Notes

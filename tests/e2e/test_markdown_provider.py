@@ -7,7 +7,6 @@ from .claude_runner import run_claude_conversation
 from .validators import (
     extract_frontmatter,
     extract_sections,
-    has_companion_header,
     has_placeholder,
     heading_texts_lower,
     markers_tracked_in_open_questions,
@@ -227,12 +226,6 @@ class TestSeparatedModeWorkflow:
         for h in TECH_HEADINGS:
             assert h in tech_headings, f"Missing tech heading: {h}"
 
-        assert has_companion_header(product_content), (
-            "Product spec missing Companion Spec header"
-        )
-        assert has_companion_header(tech_content), (
-            "Tech spec missing Companion Spec header"
-        )
 
     @pytest.mark.timeout(600)
     def test_refine_separated_spec(self, separated_workspace_with_specs, plugin_dirs):
@@ -261,10 +254,6 @@ class TestSeparatedModeWorkflow:
         )
         combined = (updated_product + updated_tech).lower()
         assert "acme" in combined, "Refinement content not found in either spec"
-
-        assert has_companion_header(updated_product), (
-            "Product spec lost Companion Spec header after refinement"
-        )
 
     @pytest.mark.timeout(600)
     def test_decompose_separated_specs(

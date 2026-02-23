@@ -13,7 +13,7 @@ Manages specifications as markdown files in the filesystem. Specs are stored in 
 
 This skill reads configuration from `d3.config.md` in the current working directory.
 
-**Expected format in `d3.config.md`:**
+**Expected format in `d3.config.md`.** This skill can appear under `### Spec Provider` (combined mode), `### Product Spec Provider`, or `### Tech Spec Provider` (separated mode):
 ```markdown
 ### Spec Provider
 **Skill:** d3-markdown:markdown-spec-provider

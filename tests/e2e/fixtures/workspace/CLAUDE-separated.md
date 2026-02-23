@@ -5,12 +5,17 @@
 ### Settings
 - Quiet Mode: false
 
-### Spec Provider
+### Product Spec Provider
 **Skill:** d3-markdown:markdown-spec-provider
 **Configuration:**
 - Specs Directory: ./specs
 - Default Location: .
-- Spec Mode: separated
+
+### Tech Spec Provider
+**Skill:** d3-markdown:markdown-spec-provider
+**Configuration:**
+- Specs Directory: ./specs
+- Default Location: .
 
 ### Story Provider
 **Skill:** d3-markdown:markdown-story-provider

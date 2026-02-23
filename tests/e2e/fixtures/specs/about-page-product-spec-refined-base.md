@@ -1,7 +1,5 @@
 # Feature: About Page - Product Spec
 
-**Companion Spec:** About Page - Tech Spec - ./specs/about-page-tech-spec.md
-
 ## Overview
 A static about page that displays the company name and a short description for Acme Corp.
 

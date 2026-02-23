@@ -1,7 +1,5 @@
 # Technical Specification: About Page - Tech Spec
 
-**Companion Spec:** About Page - Product Spec - ./specs/about-page-product-spec.md
-
 ## Technical Approach
 Create a simple static HTML page or component that renders the Acme Corp information.
 

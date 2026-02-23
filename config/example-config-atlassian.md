@@ -23,7 +23,6 @@
 - Default Location: PROJ
 - spaceId: 1234567
 - Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456789/Specs
-- Spec Mode: combined
 
 ### Story Provider
 **Skill:** d3-atlassian:atlassian-story-provider

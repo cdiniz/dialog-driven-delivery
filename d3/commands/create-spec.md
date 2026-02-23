@@ -6,16 +6,18 @@ description: Create comprehensive feature specification from any input context (
 
 **Fill only what you know. Empty sections are better than hallucinated content.**
 
-Create a specification with BOTH Product and Technical sections. In `combined` mode (default), creates a single unified document. In `separated` mode, creates two linked documents — one for product, one for technical. Specs grow progressively through refinement.
+Create a specification with BOTH Product and Technical sections. When a single `### Spec Provider` is configured, creates a single unified document. When `### Product Spec Provider` and `### Tech Spec Provider` are both configured, creates two separate documents — one for product, one for technical — using their respective providers. Specs grow progressively through refinement.
 
 ---
 
 ## Workflow
 
-### 1. Detect Provider, Templates, Spec Mode, and Settings
+### 1. Detect Providers, Templates, and Settings
 - Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
-- Read `Spec Mode` from Spec Provider configuration (default: `combined` when absent)
+- Detect spec mode from provider configuration:
+  - If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. Store each provider's skill and configuration independently.
+  - If only `### Spec Provider` exists → **combined mode**. Store single provider config.
 - Read `Quiet Mode` from Settings (default: `false` when absent)
 - If templates (tech and product spec templates) are not configure use skill d3-templates
 - Store for later steps
@@ -104,36 +106,29 @@ Resolve now, leave marked, or review first?
 
 ### 7. Create Specification
 
-**If Spec Mode is `combined` (default):**
+**If combined mode (single Spec Provider):**
 
-Invoke the [provider-name] skill (see platform reference for invocation syntax):
+Invoke the [spec-provider] skill (see platform reference for invocation syntax):
 ```
 create_spec location_id="[LOCATION]" title="[Title]" body="[FULL_SPEC]"
 ```
 
-**If Spec Mode is `separated`:**
+**If separated mode (Product Spec Provider + Tech Spec Provider):**
 
 Split the generated specification into two documents:
 
 1. **Product Spec** — contains only the Product Specification sections from the product template
 2. **Tech Spec** — contains only the Technical Specification sections from the tech template
 
-Add a cross-reference header to each document linking to its companion:
-```markdown
-**Companion Spec:** [companion title] - [companion path/URL]
+Invoke each provider's skill:
 ```
-
-Invoke the [provider-name] skill twice:
+[product-spec-provider] create_spec location_id="[LOCATION]" title="[Title] - Product Spec" body="[PRODUCT_SPEC]"
+[tech-spec-provider] create_spec location_id="[LOCATION]" title="[Title] - Tech Spec" body="[TECH_SPEC]"
 ```
-create_spec location_id="[LOCATION]" title="[Title] - Product Spec" body="[PRODUCT_SPEC]"
-create_spec location_id="[LOCATION]" title="[Title] - Tech Spec" body="[TECH_SPEC]"
-```
-
-The companion spec path is determined by the provider's response — update the first spec's cross-reference header after both are created if needed.
 
 ### 8. Provide Summary
 
-**If Spec Mode is `combined`:**
+**If combined mode:**
 ```
 ✅ Specification created: [Title] - [URL]
 
@@ -145,7 +140,7 @@ Coverage:
 Next: Review → /d3:refine-spec → /d3:decompose
 ```
 
-**If Spec Mode is `separated`:**
+**If separated mode:**
 ```
 ✅ Specification created:
 - Product Spec: [Title] - Product Spec - [URL]

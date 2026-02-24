@@ -208,6 +208,66 @@ D3 configuration tells the agent which providers to use and how to connect to yo
 - Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456/Transcripts
 ```
 
+### Spec Modes
+
+D3 supports two modes for creating and storing specifications, controlled entirely by your config file.
+
+**Combined mode** (default) — a single spec document contains both the Product and Technical specifications. Use this when your team works in one place and doesn't need to separate the two audiences.
+
+```markdown
+### Spec Provider
+**Skill:** markdown-spec-provider
+**Configuration:**
+- Specs Directory: ./specs
+```
+
+`create-spec` produces one document. `refine-spec` updates it. `decompose` reads it.
+
+---
+
+**Separated mode** — Product and Technical specifications are created as two independent documents, each using its own provider. Use this when product and engineering teams work in different tools, or when you want to control access separately.
+
+```markdown
+### Product Spec Provider
+**Skill:** atlassian-spec-provider
+**Configuration:**
+- Cloud ID: your-cloud-id
+- Default Location: PROJ
+- spaceId: 1234567
+- Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456
+
+### Tech Spec Provider
+**Skill:** markdown-spec-provider
+**Configuration:**
+- Specs Directory: ./specs
+```
+
+`create-spec` produces two documents — one per provider. `refine-spec` detects whether new information affects the product spec, the tech spec, or both, and updates only what's needed. `decompose` always fetches both for full context.
+
+Providers can be mixed freely — product specs in Confluence, tech specs in local markdown, or any other combination.
+
+---
+
+### Quiet Mode (Optional)
+
+By default, D3 commands are conversational — they ask clarifying questions, confirm titles, and present proposed changes before applying them. This is the recommended mode for teams.
+
+For automated pipelines or scripted workflows, enable quiet mode to suppress all prompts:
+
+```markdown
+### Settings
+- Quiet Mode: true
+```
+
+In quiet mode:
+- Input must be passed directly in the command (transcript text, spec name, etc.)
+- Location selection is skipped — the provider's `Default Location` is used
+- Titles are inferred automatically without confirmation
+- Changes are applied immediately without a review step
+- Uncertainties are marked inline rather than surfaced interactively
+
+---
+
 ### ADR Provider (Optional)
 
 By default, ADRs use the Spec Provider. To store ADRs separately:

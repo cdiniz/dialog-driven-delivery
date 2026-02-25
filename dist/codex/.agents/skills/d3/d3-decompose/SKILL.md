@@ -20,21 +20,18 @@ Every story must follow INVEST:
 
 ## Workflow
 
-### 1. Detect Provider, Templates, Spec Mode, and Settings
-- Read `d3.config.md` for D3 config
-- Search for ### D3 Config  ### Templates
-- Read `Spec Mode` from Spec Provider configuration (default: `combined` when absent)
-- Read `Quiet Mode` from Settings (default: `false` when absent)
-- If user story template are not configure use skill d3-templates
-- Store for later steps
+### 1. Detect Providers, Templates, and Settings
+Read and execute `d3/shared/detect-config.md`.
+If user story template is not configured, use skill `d3-templates`.
 
 ### 2. Fetch Specification
-Parse spec identifier from `$ARGUMENTS` (ID, URL, or title). Use spec provider's `get_spec`.
+Parse spec identifier from `$ARGUMENTS` (ID, URL, or title).
 
-**If Spec Mode is `separated`:**
-After fetching the identified spec, read its `**Companion Spec:**` header to find the paired spec.
-Fetch the companion via `get_spec`. Decomposition always needs both product and technical context.
-Use content from both specs — product for workflows, technical for implementation notes.
+Follow provider dispatch conventions (`d3/shared/provider-dispatch.md`).
+
+**If combined mode:** Use the single spec provider's `get_spec`.
+
+**If separated mode:** Detect which spec type the identifier refers to and fetch it. Always fetch the companion too — decomposition needs both product and technical context. Use product content for workflows, technical content for implementation notes.
 
 Display:
 ```
@@ -144,7 +141,7 @@ create_epic project_key="[PROJECT]" summary="[Feature name]" description="[Epic 
 
 **Epic Description:**
 
-If Spec Mode is `combined`:
+If combined mode:
 ```
 Feature specification: [Spec Title]
 
@@ -158,7 +155,7 @@ Feature specification: [Spec Title]
 This Epic contains [N] INVEST-compliant user stories.
 ```
 
-If Spec Mode is `separated`:
+If separated mode:
 ```
 Feature specification: [Spec Title]
 

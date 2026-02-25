@@ -74,12 +74,12 @@ Returns Story type only.
 2. Use the glob tool to find existing stories in that directory to determine next ID
 3. Sanitize summary to filename
 
-4. **Transform generic template to markdown format:**
+4. **Write file — YAML frontmatter is REQUIRED and must come first:**
 
-   **Transformation:** Wrap generic story template content in YAML frontmatter (markdown-specific format)
+   The file MUST start with a YAML frontmatter block. A story file without frontmatter is invalid.
 
-   **YAML frontmatter (added by provider):**
-   ```yaml
+   **Exact file structure (frontmatter block, then body):**
+   ```
    ---
    type: story
    id: [story_id]
@@ -87,22 +87,16 @@ Returns Story type only.
    title: [summary]
    status: todo
    size: medium
-   created: [date]
+   created: [YYYY-MM-DD]
    dependencies: []
    blocks: []
    labels: [labels]
    ---
+
+   [body content from story_data]
    ```
 
-   **Body content:** From user-story.md template (generic structure)
-   - Template provides sections: Description, Acceptance Criteria, Technical Notes, etc.
-   - Provider fills template sections with story_data content
-   - Appends markdown body after YAML frontmatter
-
-   **Key responsibilities:**
-   - **Frontmatter:** Provider-specific metadata wrapper
-   - **Body structure:** From template (configurable via `d3.config.md`)
-   - **Content:** From story_data parameter
+   The `type: story` field is what identifies this file as a story. Never omit it.
 
 5. Write story file to `stories/{spec_dir}/{story_id}-{filename}.md`
 6. Return story metadata

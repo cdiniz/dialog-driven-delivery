@@ -6,13 +6,13 @@
   },
   "metadata": {
     "description": "Dialog Driven Delivery - A pragmatic workflow for building software through conversational, transcript-first documentation and development. Create specs, refine them, and decompose into user stories.",
-    "version": "0.1.1"
+    "version": "0.0.1"
   },
   "plugins": [
     {
       "name": "d3",
       "description": "Dialog Driven Delivery - A pragmatic workflow for building software through conversational, transcript-first documentation and development. Create specs, refine them, and decompose into user stories.",
-      "version": "0.1.1",
+      "version": "0.0.1",
       "author": {
         "name": "D3 Team"
       },
@@ -35,7 +35,7 @@
     {
       "name": "d3-atlassian",
       "description": "Atlassian provider for D3 (Dialog Driven Delivery). Enables D3 to work with Confluence for specifications and Jira for user stories.",
-      "version": "0.1.1",
+      "version": "0.0.1",
       "author": {
         "name": "D3 Team"
       },
@@ -55,7 +55,7 @@
     {
       "name": "d3-markdown",
       "description": "Markdown provider for D3 (Dialog Driven Delivery). Enables D3 to work with local markdown files for specifications and user stories. Perfect for solo developers and small teams.",
-      "version": "0.1.1",
+      "version": "0.0.1",
       "author": {
         "name": "D3 Team"
       },

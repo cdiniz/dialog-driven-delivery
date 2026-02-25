@@ -67,7 +67,6 @@ case "$platform" in
   codex)
     echo "Installing D3 for OpenAI Codex..."
     cp -r "$tmpdir/.agents" .
-    cp -r "$tmpdir/d3" .
     echo ""
     echo "D3 installed for Codex."
     echo ""
@@ -87,7 +86,6 @@ case "$platform" in
     cp -r "$tmpdir/.github/agents" .github/
     cp -r "$tmpdir/.github/instructions" .github/
     cp -r "$tmpdir/.github/d3-templates" .github/
-    cp -r "$tmpdir/d3" .
     echo ""
     echo "D3 installed for GitHub Copilot."
     echo ""
@@ -103,7 +101,6 @@ case "$platform" in
   cursor)
     echo "Installing D3 for Cursor..."
     cp -r "$tmpdir/.cursor" .
-    cp -r "$tmpdir/d3" .
     echo ""
     echo "D3 installed for Cursor."
     echo ""

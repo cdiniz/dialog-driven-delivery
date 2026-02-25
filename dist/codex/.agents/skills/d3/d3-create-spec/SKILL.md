@@ -13,7 +13,7 @@ Create a specification with BOTH Product and Technical sections. When a single `
 ## Workflow
 
 ### 1. Detect Providers, Templates, and Settings
-Read and execute `d3/shared/detect-config.md`.
+Read and execute `shared/detect-config.md`.
 If spec templates (tech and product spec) are not configured, use skill `d3-templates`.
 
 ### 2. Get Input Context
@@ -108,7 +108,7 @@ Resolve now, leave marked, or review first?
 
 ### 7. Create Specification
 
-Follow provider dispatch conventions (`d3/shared/provider-dispatch.md`):
+Follow provider dispatch conventions (`shared/provider-dispatch.md`):
 
 **If combined mode:**
 ```

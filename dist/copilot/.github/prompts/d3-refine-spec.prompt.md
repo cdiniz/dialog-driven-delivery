@@ -16,7 +16,7 @@ Automatically detect which sections need updating - Product, Technical, or both.
 ## Workflow
 
 ### 1. Detect Providers, Templates, and Settings
-Read and execute `d3/shared/detect-config.md`.
+Read and execute `shared/detect-config.md`.
 If spec templates (tech and product spec) are not configured, use skill `d3-templates`.
 
 ### 2. Fetch Specification
@@ -32,7 +32,7 @@ Use provider's `get_spec`:
 - Title → Search, then get_spec
 
 **If separated mode:**
-Note the spec type and feature title (strip the title suffix — see `d3/shared/provider-dispatch.md`). Do NOT fetch the companion yet — wait until Step 6 determines whether changes affect both sections.
+Note the spec type and feature title (strip the title suffix — see `shared/provider-dispatch.md`). Do NOT fetch the companion yet — wait until Step 6 determines whether changes affect both sections.
 
 ### 3. Detect Existing Stories
 Find the epic matching the spec title and list all its children (stories, tasks, or any issue type).
@@ -99,7 +99,7 @@ Update ONLY sections explicitly addressed in new input.
 **If separated mode — Companion Fetch Optimisation:**
 After analysing the new information, determine if changes affect Product sections, Technical sections, or both.
 - If changes affect only the fetched spec type → proceed with just that spec, no companion fetch needed
-- If changes affect both → fetch the companion (see `d3/shared/provider-dispatch.md` for title suffix convention and fetch approach)
+- If changes affect both → fetch the companion (see `shared/provider-dispatch.md` for title suffix convention and fetch approach)
 
 ### 7. Show Proposed Changes
 
@@ -194,7 +194,7 @@ Proceed with spec + story updates?
 
 ### 10. Apply Updates
 
-Follow provider dispatch conventions (`d3/shared/provider-dispatch.md`):
+Follow provider dispatch conventions (`shared/provider-dispatch.md`):
 
 **If combined mode:**
 ```

@@ -17,13 +17,13 @@ Every story must follow INVEST:
 ## Workflow
 
 ### 1. Detect Providers, Templates, and Settings
-Read and execute `d3/shared/detect-config.md`.
+Read and execute `shared/detect-config.md`.
 If user story template is not configured, use skill `d3-templates`.
 
 ### 2. Fetch Specification
 Parse spec identifier from `$ARGUMENTS` (ID, URL, or title).
 
-Follow provider dispatch conventions (`d3/shared/provider-dispatch.md`).
+Follow provider dispatch conventions (`shared/provider-dispatch.md`).
 
 **If combined mode:** Use the single spec provider's `get_spec`.
 

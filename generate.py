@@ -251,10 +251,14 @@ def generate_claude(platforms, output_root=None):
 def copy_shared(dest_dir):
     shared_src = D3_DIR / "shared"
     if shared_src.exists():
-        dest = dest_dir / "d3" / "shared"
+        dest = dest_dir / "shared"
         dest.mkdir(parents=True, exist_ok=True)
         for f in shared_src.glob("*.md"):
             shutil.copy2(f, dest / f.name)
+
+
+def rewrite_shared(content):
+    return content.replace("d3/shared/", "shared/")
 
 
 def generate_codex(platforms):
@@ -269,23 +273,23 @@ def generate_codex(platforms):
         fm, body, _ = read_source(cmd_file, "command", cfg)
         skill_name = f"d3-{name}"
         fm["name"] = skill_name
-        final = transform_frontmatter(fm, body, "command", cfg)
+        final = rewrite_shared(transform_frontmatter(fm, body, "command", cfg))
         write_output(d3_dir / skill_name / "SKILL.md", final)
 
     for name, skill_file, skill_dir in iter_skills():
         _, _, final = read_source(skill_file, "skill", cfg)
-        write_output(d3_dir / name / "SKILL.md", final)
+        write_output(d3_dir / name / "SKILL.md", rewrite_shared(final))
         copy_references(skill_dir, d3_dir / name / "references")
 
     for name, provider_file in iter_providers():
         fm, body, _ = read_source(provider_file, "skill", cfg)
-        final = transform_frontmatter(fm, body, "skill", cfg)
+        final = rewrite_shared(transform_frontmatter(fm, body, "skill", cfg))
         write_output(d3_dir / name / "SKILL.md", final)
 
     platform_md = _platform_md_with_frontmatter("Codex", cfg, "skill")
     write_output(d3_dir / "d3-platform" / "SKILL.md", platform_md)
 
-    copy_shared(out)
+    copy_shared(d3_dir)
 
     for variant in ("markdown", "atlassian"):
         content = (CONFIG_DIR / f"example-config-{variant}.md").read_text(encoding="utf-8")
@@ -309,14 +313,14 @@ def generate_copilot(platforms):
         fm, body, _ = read_source(cmd_file, "command", cfg)
         prompt_name = f"d3-{name}"
         fm["name"] = prompt_name
-        final = transform_frontmatter(fm, body, "command", cfg)
+        final = rewrite_shared(transform_frontmatter(fm, body, "command", cfg))
         write_output(prompts_dir / f"{prompt_name}.prompt.md", final)
 
     for name, skill_file, skill_dir in iter_skills():
         fm, body, _ = read_source(skill_file, "skill", cfg)
         agent_name = _copilot_name(name)
         fm["name"] = agent_name
-        final = transform_frontmatter(fm, body, "skill", cfg)
+        final = rewrite_shared(transform_frontmatter(fm, body, "skill", cfg))
         write_output(agents_dir / f"{agent_name}.agent.md", final)
         copy_references(skill_dir, out / ".github" / agent_name / "references")
 
@@ -324,7 +328,7 @@ def generate_copilot(platforms):
         fm, body, _ = read_source(provider_file, "skill", cfg)
         agent_name = _copilot_name(name)
         fm["name"] = agent_name
-        final = transform_frontmatter(fm, body, "skill", cfg)
+        final = rewrite_shared(transform_frontmatter(fm, body, "skill", cfg))
         write_output(agents_dir / f"{agent_name}.agent.md", final)
 
     instructions_dir = out / ".github" / "instructions"
@@ -332,7 +336,7 @@ def generate_copilot(platforms):
     platform_fm = build_frontmatter({"applyTo": '"**"'})
     write_output(instructions_dir / "d3-platform.instructions.md", platform_fm + "\n" + platform_body)
 
-    copy_shared(out)
+    copy_shared(agents_dir)
 
     for variant in ("markdown", "atlassian"):
         content = (CONFIG_DIR / f"example-config-{variant}.md").read_text(encoding="utf-8")
@@ -350,22 +354,22 @@ def generate_cursor(platforms):
 
     for name, cmd_file in iter_commands():
         _, body, _ = read_source(cmd_file, "command", cfg)
-        write_output(cmd_dir / f"d3-{name}.md", body)
+        write_output(cmd_dir / f"d3-{name}.md", rewrite_shared(body))
 
     for name, skill_file, skill_dir in iter_skills():
         _, _, final = read_source(skill_file, "rule", cfg)
-        write_output(d3_dir / name / "RULE.md", final)
+        write_output(d3_dir / name / "RULE.md", rewrite_shared(final))
         copy_references(skill_dir, d3_dir / name / "references")
 
     for name, provider_file in iter_providers():
         fm, body, _ = read_source(provider_file, "rule", cfg)
-        final = transform_frontmatter(fm, body, "rule", cfg)
+        final = rewrite_shared(transform_frontmatter(fm, body, "rule", cfg))
         write_output(d3_dir / name / "RULE.md", final)
 
     platform_md = _platform_md_with_frontmatter("Cursor", cfg, "rule")
     write_output(d3_dir / "d3-platform" / "RULE.md", platform_md)
 
-    copy_shared(out)
+    copy_shared(cmd_dir)
 
     for variant in ("markdown", "atlassian"):
         content = (CONFIG_DIR / f"example-config-{variant}.md").read_text(encoding="utf-8")

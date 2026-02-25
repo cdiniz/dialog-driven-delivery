@@ -3,7 +3,6 @@ repos:
     hooks:
       - id: generate-platform-files
         name: regenerate platform files
-        entry: .venv/bin/python generate.py --all
+        entry: bash -c '.venv/bin/python generate.py --all && git diff --exit-code dist/'
         language: system
         pass_filenames: false
-        files: ^(d3/|d3-markdown/|d3-atlassian/|d3\.platform\.yaml|metadata/|config/)

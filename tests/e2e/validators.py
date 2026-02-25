@@ -15,6 +15,19 @@ def heading_texts_lower(content: str) -> str:
     return " | ".join(h.lower() for h in heading_texts(content))
 
 
+def has_placeholder(content: str) -> bool:
+    lower = content.lower()
+    indicators = [
+        "to be defined",
+        "not yet discussed",
+        "not yet defined",
+        "tbd",
+        "[to be defined]",
+        "not yet determined",
+    ]
+    return any(ind in lower for ind in indicators)
+
+
 def extract_uncertainty_markers(content: str) -> dict[str, list[str]]:
     markers = {}
     for marker_type in [
@@ -31,17 +44,6 @@ def extract_uncertainty_markers(content: str) -> dict[str, list[str]]:
 def total_markers(content: str) -> int:
     return sum(len(v) for v in extract_uncertainty_markers(content).values())
 
-
-def has_placeholder(content: str) -> bool:
-    lower = content.lower()
-    indicators = [
-        "to be defined",
-        "not yet discussed",
-        "tbd",
-        "[to be defined]",
-        "not yet determined",
-    ]
-    return any(ind in lower for ind in indicators)
 
 
 def extract_sections(content: str) -> dict[str, str]:

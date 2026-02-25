@@ -6,3 +6,6 @@ Designer: Do we need a hero image or banner at the top?
 PM: Good question — I'll check with marketing and get back to you.
 Dev: What about mobile responsiveness? Same layout or simplified?
 PM: Same layout should be fine, but let's confirm with the design team.
+Dev: If we use the CMS we'll need to hook into the existing Contentful client.
+Dev: Either way we should have an integration test for the fetch and a unit test for the static fallback.
+PM: We haven't defined success metrics or the user journey yet — that's for a follow-up.

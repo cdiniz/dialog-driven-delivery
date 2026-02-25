@@ -13,14 +13,8 @@ Create a specification with BOTH Product and Technical sections. When a single `
 ## Workflow
 
 ### 1. Detect Providers, Templates, and Settings
-- Read `d3.config.md` for D3 config
-- Search for ### D3 Config  ### Templates
-- Detect spec mode from provider configuration:
-  - If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. Store each provider's skill and configuration independently.
-  - If only `### Spec Provider` exists → **combined mode**. Store single provider config.
-- Read `Quiet Mode` from Settings (default: `false` when absent)
-- If templates (tech and product spec templates) are not configure use skill d3-templates
-- Store for later steps
+Read and execute `d3/shared/detect-config.md`.
+If spec templates (tech and product spec) are not configured, use skill `d3-templates`.
 
 ### 2. Get Input Context
 
@@ -56,35 +50,43 @@ Extract from context:
 
 **CRITICAL RULES:**
 
-1. **Create FULL structure:**
-   - ALL section headings from both templates
-   - BOTH Product and Technical sections
-   - Never skip sections
+1. **Create FULL structure — NEVER omit a section:**
+   - ALL section headings from both templates MUST appear in the output
+   - BOTH Product and Technical sections, every heading, every time
+   - A section with placeholder text is correct. A missing section is ALWAYS wrong.
+   - Adding something to Open Questions does NOT replace the section heading + placeholder
 
-3. **Fill ONLY what was discussed:**
+2. **Fill ONLY what was discussed:**
    - Discussed → Real content
    - NOT discussed → `_To be defined - not yet discussed_`
    - Template examples (like `POST /api/path`) are structure guides, NOT content
 
-4. **NEVER invent:**
+   **Example of a correctly handled undiscussed section:**
+   ```
+   ## User Journey
+   _To be defined - not yet discussed_
+   ```
+
+3. **NEVER invent:**
    - Endpoints, schemas, architectures, error codes, technology choices
    - When in doubt: placeholder, not guess
 
-5. **Mark uncertainties:**
-   - `[OPEN QUESTION: ...]` - User didn't answer
-   - `[CLARIFICATION NEEDED: ...]` - Vague requirement
-   - `[ASSUMPTION: ...]` - Reasonable inference
-   - `[DECISION PENDING: ...]` - Multiple approaches
+4. **Mark uncertainties with inline markers (separate from placeholder text):**
+   - `[OPEN QUESTION: ...]` - Something discussed but not resolved
+   - `[CLARIFICATION NEEDED: ...]` - Vague requirement that was raised
+   - `[ASSUMPTION: ...]` - Reasonable inference you are making
+   - `[DECISION PENDING: ...]` - Multiple approaches in play
+   - These markers go in sections that HAVE content — not as a substitute for placeholder text in empty sections
 
 Invoke uncertainty-markers skill for detailed guidance.
 
 ### 6. Validate Before Creation
 
 **Structure validation:**
-- [ ] ALL template headings present (with numbering)
-- [ ] No sections skipped
+- [ ] ALL template headings present — count them against the template
+- [ ] No sections skipped or merged — every heading appears individually
 - [ ] Each discussed section has real content
-- [ ] Each non-discussed section has placeholder text
+- [ ] Each non-discussed section has `_To be defined - not yet discussed_` (not just an Open Questions entry)
 - [ ] No template examples treated as real content
 
 **Uncertainty validation:**
@@ -106,21 +108,14 @@ Resolve now, leave marked, or review first?
 
 ### 7. Create Specification
 
-**If combined mode (single Spec Provider):**
+Follow provider dispatch conventions (`d3/shared/provider-dispatch.md`):
 
-Invoke the [spec-provider] skill (see platform reference for invocation syntax):
+**If combined mode:**
 ```
 create_spec location_id="[LOCATION]" title="[Title]" body="[FULL_SPEC]"
 ```
 
-**If separated mode (Product Spec Provider + Tech Spec Provider):**
-
-Split the generated specification into two documents:
-
-1. **Product Spec** — contains only the Product Specification sections from the product template
-2. **Tech Spec** — contains only the Technical Specification sections from the tech template
-
-Invoke each provider's skill:
+**If separated mode** — split into product sections and technical sections, then:
 ```
 [product-spec-provider] create_spec location_id="[LOCATION]" title="[Title] - Product Spec" body="[PRODUCT_SPEC]"
 [tech-spec-provider] create_spec location_id="[LOCATION]" title="[Title] - Tech Spec" body="[TECH_SPEC]"

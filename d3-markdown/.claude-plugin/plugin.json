@@ -1,6 +1,6 @@
 {
   "name": "d3-markdown",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "Markdown provider for D3 (Dialog Driven Delivery). Enables D3 to work with local markdown files for specifications and user stories. Perfect for solo developers and small teams.",
   "author": {
     "name": "D3 Team"

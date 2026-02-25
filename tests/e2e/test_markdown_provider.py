@@ -32,10 +32,8 @@ def _find_specs(workspace):
 def _create_spec_messages(transcript: str) -> list[str]:
     return [
         "/d3:create-spec\n\nI want to provide a meeting transcript.",
-        f"Here is the transcript:\n---\n{transcript}\n---\n\n"
-        f"Use the default root location.\n"
-        f'For the title, use "About Page".',
-        "The spec looks good, please create it.",
+        f"Here is the transcript:\n---\n{transcript}\n---",
+        'Use the default root location. For the title, use "About Page". The spec looks good, please create it.',
     ]
 
 

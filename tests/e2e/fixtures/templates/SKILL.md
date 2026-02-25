@@ -11,9 +11,10 @@ Templates are in this skill's `references/` directory.
 
 ### 1. Feature Product Specification Template
 - **File:** `references/feature-product-spec.md`
-- **Sections:** 3 sections
+- **Sections:** 4 sections
   - Overview
   - Requirements
+  - Success Metrics
   - Open Questions
 
 ### 2. Feature Technical Specification Template

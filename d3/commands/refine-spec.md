@@ -15,14 +15,8 @@ Automatically detect which sections need updating - Product, Technical, or both.
 ## Workflow
 
 ### 1. Detect Providers, Templates, and Settings
-- Read `d3.config.md` for D3 config
-- Search for ### D3 Config  ### Templates
-- Detect spec mode from provider configuration:
-  - If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. Store each provider's skill and configuration independently.
-  - If only `### Spec Provider` exists → **combined mode**. Store single provider config.
-- Read `Quiet Mode` from Settings (default: `false` when absent)
-- If templates (tech and product spec templates) are not configure use skill d3-templates
-- Store for later steps
+Read and execute `d3/shared/detect-config.md`.
+If spec templates (tech and product spec) are not configured, use skill `d3-templates`.
 
 ### 2. Fetch Specification
 Command accepts spec identifier, URL, or title in `$ARGUMENTS`.
@@ -37,8 +31,7 @@ Use provider's `get_spec`:
 - Title → Search, then get_spec
 
 **If separated mode:**
-After fetching, note the spec type (product or tech) and the feature title (strip the "- Product Spec" / "- Tech Spec" suffix).
-Do NOT fetch the companion yet — wait until Step 6 determines whether changes affect both sections.
+Note the spec type and feature title (strip the title suffix — see `d3/shared/provider-dispatch.md`). Do NOT fetch the companion yet — wait until Step 6 determines whether changes affect both sections.
 
 ### 3. Detect Existing Stories
 Find the epic matching the spec title and list all its children (stories, tasks, or any issue type).
@@ -105,7 +98,7 @@ Update ONLY sections explicitly addressed in new input.
 **If separated mode — Companion Fetch Optimisation:**
 After analysing the new information, determine if changes affect Product sections, Technical sections, or both.
 - If changes affect only the fetched spec type → proceed with just that spec, no companion fetch needed
-- If changes affect both → derive the companion title by swapping the suffix ("Product Spec" ↔ "Tech Spec") and fetch it from the other provider via `search_specs` or `get_spec`
+- If changes affect both → fetch the companion (see `d3/shared/provider-dispatch.md` for title suffix convention and fetch approach)
 
 ### 7. Show Proposed Changes
 
@@ -200,22 +193,18 @@ Proceed with spec + story updates?
 
 ### 10. Apply Updates
 
-**If combined mode:**
+Follow provider dispatch conventions (`d3/shared/provider-dispatch.md`):
 
-Invoke the [spec-provider] skill (see platform reference for invocation syntax):
+**If combined mode:**
 ```
 update_spec page_id="[spec-id]" body="[UPDATED_SPEC]" version_message="[description]"
 ```
 
-**If separated mode:**
-
-For each affected spec, invoke the owning provider's skill:
+**If separated mode** — invoke only the providers whose spec changed, skip the companion if unaffected:
 ```
 [product-spec-provider] update_spec page_id="[product-spec-id]" body="[UPDATED_PRODUCT_SPEC]" version_message="[description]"
 [tech-spec-provider] update_spec page_id="[tech-spec-id]" body="[UPDATED_TECH_SPEC]" version_message="[description]"
 ```
-
-Only update specs that had changes — skip the companion if it was unaffected.
 
 **Apply story updates (if stories are affected):**
 

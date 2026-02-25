@@ -6,5 +6,8 @@
 ## Requirements
 [Key requirements.]
 
+## Success Metrics
+[How we measure success.]
+
 ## Open Questions
 [Unresolved questions and assumptions.]

@@ -21,25 +21,17 @@ Every story must follow INVEST:
 ## Workflow
 
 ### 1. Detect Providers, Templates, and Settings
-- Read `d3.config.md` for D3 config
-- Search for ### D3 Config  ### Templates
-- Detect spec mode from provider configuration:
-  - If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. Store each provider's skill and configuration independently.
-  - If only `### Spec Provider` exists → **combined mode**. Store single provider config.
-- Read `Quiet Mode` from Settings (default: `false` when absent)
-- If user story template are not configure use skill d3-templates
-- Store for later steps
+Read and execute `d3/shared/detect-config.md`.
+If user story template is not configured, use skill `d3-templates`.
 
 ### 2. Fetch Specification
 Parse spec identifier from `$ARGUMENTS` (ID, URL, or title).
 
+Follow provider dispatch conventions (`d3/shared/provider-dispatch.md`).
+
 **If combined mode:** Use the single spec provider's `get_spec`.
 
-**If separated mode:**
-Detect whether the identifier refers to a product or tech spec (from title suffix, filename, or content). Use the matching provider's `get_spec`.
-After fetching, derive the companion title by swapping the suffix ("Product Spec" ↔ "Tech Spec") and fetch it from the other provider via `search_specs` or `get_spec`.
-Decomposition always needs both product and technical context.
-Use content from both specs — product for workflows, technical for implementation notes.
+**If separated mode:** Detect which spec type the identifier refers to and fetch it. Always fetch the companion too — decomposition needs both product and technical context. Use product content for workflows, technical content for implementation notes.
 
 Display:
 ```

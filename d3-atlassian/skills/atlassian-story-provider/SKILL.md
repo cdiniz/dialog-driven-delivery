@@ -40,6 +40,24 @@ Creates a user story in Jira.
 **Links to Epic:** Uses Epic Link field
 **Returns:** id, key, url, summary, epic_link
 
+### get_story
+Fetches an existing user story from Jira.
+
+**Parse args:** issue_key
+**MCP:** `mcp__atlassian__getJiraIssue`
+**Returns:** id, key, url, summary, description, status, labels, epic_link, story_points
+
+### update_story
+Updates fields on an existing user story in Jira.
+
+**Parse args:** issue_key, story_data (JSON with fields to update: summary, description, acceptance_criteria, labels, story_points, priority)
+**Combines:** description + acceptance_criteria into one description field (same as create_story)
+**MCP:** `mcp__atlassian__updateJiraIssue`
+**Only updates provided fields** — omitted fields are left unchanged
+**Returns:** id, key, url, summary
+
+> **Note:** Status changes require a Jira transition and are not handled here.
+
 ### link_issues (optional)
 Creates dependency links between issues.
 

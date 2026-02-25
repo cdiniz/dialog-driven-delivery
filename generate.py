@@ -248,6 +248,15 @@ def generate_claude(platforms, output_root=None):
     write_output(base / "d3" / "skills" / "d3-platform" / "SKILL.md", platform_md)
 
 
+def copy_shared(dest_dir):
+    shared_src = D3_DIR / "shared"
+    if shared_src.exists():
+        dest = dest_dir / "d3" / "shared"
+        dest.mkdir(parents=True, exist_ok=True)
+        for f in shared_src.glob("*.md"):
+            shutil.copy2(f, dest / f.name)
+
+
 def generate_codex(platforms):
     cfg = platforms["codex"]
     out = DIST / "codex"
@@ -275,6 +284,8 @@ def generate_codex(platforms):
 
     platform_md = _platform_md_with_frontmatter("Codex", cfg, "skill")
     write_output(d3_dir / "d3-platform" / "SKILL.md", platform_md)
+
+    copy_shared(out)
 
     for variant in ("markdown", "atlassian"):
         content = (CONFIG_DIR / f"example-config-{variant}.md").read_text(encoding="utf-8")
@@ -321,6 +332,8 @@ def generate_copilot(platforms):
     platform_fm = build_frontmatter({"applyTo": '"**"'})
     write_output(instructions_dir / "d3-platform.instructions.md", platform_fm + "\n" + platform_body)
 
+    copy_shared(out)
+
     for variant in ("markdown", "atlassian"):
         content = (CONFIG_DIR / f"example-config-{variant}.md").read_text(encoding="utf-8")
         write_output(out / f"d3.config.{variant}.md", content)
@@ -351,6 +364,8 @@ def generate_cursor(platforms):
 
     platform_md = _platform_md_with_frontmatter("Cursor", cfg, "rule")
     write_output(d3_dir / "d3-platform" / "RULE.md", platform_md)
+
+    copy_shared(out)
 
     for variant in ("markdown", "atlassian"):
         content = (CONFIG_DIR / f"example-config-{variant}.md").read_text(encoding="utf-8")

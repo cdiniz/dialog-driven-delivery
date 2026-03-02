@@ -7,7 +7,6 @@
 **Skill:** d3-markdown:markdown-spec-provider
 **Configuration:**
 - Specs Directory: ./specs
-- Spec Mode: combined
 
 ### ADR Provider
 **Skill:** d3-markdown:markdown-spec-provider

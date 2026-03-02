@@ -14,10 +14,12 @@ Automatically detect which sections need updating - Product, Technical, or both.
 
 ## Workflow
 
-### 1. Detect Provider, Templates, Spec Mode, and Settings
+### 1. Detect Providers, Templates, and Settings
 - Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
-- Read `Spec Mode` from Spec Provider configuration (default: `combined` when absent)
+- Detect spec mode from provider configuration:
+  - If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. Store each provider's skill and configuration independently.
+  - If only `### Spec Provider` exists → **combined mode**. Store single provider config.
 - Read `Quiet Mode` from Settings (default: `false` when absent)
 - If templates (tech and product spec templates) are not configure use skill d3-templates
 - Store for later steps
@@ -25,14 +27,17 @@ Automatically detect which sections need updating - Product, Technical, or both.
 ### 2. Fetch Specification
 Command accepts spec identifier, URL, or title in `$ARGUMENTS`.
 
+Determine which provider owns the spec:
+- **Combined mode:** Use the single spec provider's `get_spec`
+- **Separated mode:** Detect whether the identifier refers to a product or tech spec (from title suffix, filename, or content). Use the matching provider's `get_spec`.
+
 Use provider's `get_spec`:
 - Identifier → Use directly
 - URL → Extract identifier
 - Title → Search, then get_spec
 
-**If Spec Mode is `separated`:**
-After fetching, detect which type it is (product or tech) from the title suffix or content structure.
-Read the `**Companion Spec:**` header line to identify the paired spec.
+**If separated mode:**
+After fetching, note the spec type (product or tech) and the feature title (strip the "- Product Spec" / "- Tech Spec" suffix).
 Do NOT fetch the companion yet — wait until Step 6 determines whether changes affect both sections.
 
 ### 3. Detect Existing Stories
@@ -97,10 +102,10 @@ Update ONLY sections explicitly addressed in new input.
 2. YES → Update with actual content
 3. NO → Leave unchanged (existing content OR placeholder)
 
-**If Spec Mode is `separated` — Companion Fetch Optimisation:**
+**If separated mode — Companion Fetch Optimisation:**
 After analysing the new information, determine if changes affect Product sections, Technical sections, or both.
 - If changes affect only the fetched spec type → proceed with just that spec, no companion fetch needed
-- If changes affect both → fetch the companion spec via `get_spec` using the identifier from the `**Companion Spec:**` header
+- If changes affect both → derive the companion title by swapping the suffix ("Product Spec" ↔ "Tech Spec") and fetch it from the other provider via `search_specs` or `get_spec`
 
 ### 7. Show Proposed Changes
 
@@ -195,19 +200,19 @@ Proceed with spec + story updates?
 
 ### 10. Apply Updates
 
-**If Spec Mode is `combined` (default):**
+**If combined mode:**
 
 Invoke the [spec-provider] skill (see platform reference for invocation syntax):
 ```
 update_spec page_id="[spec-id]" body="[UPDATED_SPEC]" version_message="[description]"
 ```
 
-**If Spec Mode is `separated`:**
+**If separated mode:**
 
-For each affected spec (product, tech, or both), invoke the [spec-provider] skill:
+For each affected spec, invoke the owning provider's skill:
 ```
-update_spec page_id="[product-spec-id]" body="[UPDATED_PRODUCT_SPEC]" version_message="[description]"
-update_spec page_id="[tech-spec-id]" body="[UPDATED_TECH_SPEC]" version_message="[description]"
+[product-spec-provider] update_spec page_id="[product-spec-id]" body="[UPDATED_PRODUCT_SPEC]" version_message="[description]"
+[tech-spec-provider] update_spec page_id="[tech-spec-id]" body="[UPDATED_TECH_SPEC]" version_message="[description]"
 ```
 
 Only update specs that had changes — skip the companion if it was unaffected.

@@ -20,20 +20,25 @@ Every story must follow INVEST:
 
 ## Workflow
 
-### 1. Detect Provider, Templates, Spec Mode, and Settings
+### 1. Detect Providers, Templates, and Settings
 - Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
-- Read `Spec Mode` from Spec Provider configuration (default: `combined` when absent)
+- Detect spec mode from provider configuration:
+  - If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. Store each provider's skill and configuration independently.
+  - If only `### Spec Provider` exists → **combined mode**. Store single provider config.
 - Read `Quiet Mode` from Settings (default: `false` when absent)
 - If user story template are not configure use skill d3-templates
 - Store for later steps
 
 ### 2. Fetch Specification
-Parse spec identifier from `$ARGUMENTS` (ID, URL, or title). Use spec provider's `get_spec`.
+Parse spec identifier from `$ARGUMENTS` (ID, URL, or title).
 
-**If Spec Mode is `separated`:**
-After fetching the identified spec, read its `**Companion Spec:**` header to find the paired spec.
-Fetch the companion via `get_spec`. Decomposition always needs both product and technical context.
+**If combined mode:** Use the single spec provider's `get_spec`.
+
+**If separated mode:**
+Detect whether the identifier refers to a product or tech spec (from title suffix, filename, or content). Use the matching provider's `get_spec`.
+After fetching, derive the companion title by swapping the suffix ("Product Spec" ↔ "Tech Spec") and fetch it from the other provider via `search_specs` or `get_spec`.
+Decomposition always needs both product and technical context.
 Use content from both specs — product for workflows, technical for implementation notes.
 
 Display:
@@ -144,7 +149,7 @@ create_epic project_key="[PROJECT]" summary="[Feature name]" description="[Epic 
 
 **Epic Description:**
 
-If Spec Mode is `combined`:
+If combined mode:
 ```
 Feature specification: [Spec Title]
 
@@ -158,7 +163,7 @@ Feature specification: [Spec Title]
 This Epic contains [N] INVEST-compliant user stories.
 ```
 
-If Spec Mode is `separated`:
+If separated mode:
 ```
 Feature specification: [Spec Title]
 

@@ -7,8 +7,9 @@ import pytest
 from .claude_runner import REPO_ROOT
 
 FIXTURES_DIR = REPO_ROOT / "tests" / "e2e" / "fixtures"
-PLUGIN_DIRS = [REPO_ROOT / "d3", REPO_ROOT / "d3-markdown"]
+PLUGIN_DIRS = [REPO_ROOT / "d3"]
 TEMPLATES_DIR = FIXTURES_DIR / "templates"
+CONFIGS_DIR = FIXTURES_DIR / "workspace" / "configs"
 FILE_SWAPS = {
     "skills/d3-templates/references/feature-product-spec.md": "product-spec.md",
     "skills/d3-templates/references/feature-tech-spec.md": "tech-spec.md",
@@ -20,6 +21,12 @@ CUSTOM_TEMPLATE_FILES = [
     "custom-tech-spec.md",
     "custom-user-story.md",
 ]
+CLAUDE_MD_TO_CONFIG = {
+    "CLAUDE.md": "d3.config.yaml",
+    "CLAUDE-quiet.md": "d3.config-quiet.yaml",
+    "CLAUDE-separated.md": "d3.config-separated.yaml",
+    "CLAUDE-custom-templates.md": "d3.config-custom-templates.yaml",
+}
 
 E2E_TMP = REPO_ROOT / "tests" / "e2e" / ".workspaces"
 
@@ -55,6 +62,11 @@ def _init_workspace(workspace_dir, claude_md_name="CLAUDE.md"):
     shutil.copy(
         FIXTURES_DIR / "workspace" / claude_md_name,
         os.path.join(workspace_dir, "CLAUDE.md"),
+    )
+    config_name = CLAUDE_MD_TO_CONFIG.get(claude_md_name, "d3.config.yaml")
+    shutil.copy(
+        CONFIGS_DIR / config_name,
+        os.path.join(workspace_dir, "d3.config.yaml"),
     )
     subprocess.run(["git", "init"], cwd=workspace_dir, capture_output=True)
     return workspace_dir

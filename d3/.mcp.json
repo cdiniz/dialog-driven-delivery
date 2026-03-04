@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "d3": {
+      "command": "uv",
+      "args": ["--directory", "${CLAUDE_PLUGIN_ROOT}", "run", "python", "${CLAUDE_PLUGIN_ROOT}/mcp_server/server.py"],
+      "env": {
+        "VIRTUAL_ENV": ""
+      }
+    }
+  }
+}

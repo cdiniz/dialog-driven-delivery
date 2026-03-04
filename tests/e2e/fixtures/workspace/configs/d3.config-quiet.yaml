@@ -1,0 +1,17 @@
+artifacts:
+  product_spec:
+    adapter: markdown
+    config:
+      directory: ./specs
+  tech_spec:
+    adapter: markdown
+    config:
+      directory: ./specs
+  user_story:
+    adapter: markdown
+    config:
+      directory: ./stories
+      mode: story
+
+settings:
+  quiet_mode: true

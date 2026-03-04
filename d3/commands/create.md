@@ -14,16 +14,16 @@ This command creates any artifact type defined in the project's artifact catalog
 
 ### 1. Read Configuration
 
-- Read `d3.config.md` for D3 Configuration section
-- Parse `### Artifacts` for available artifact types. Each artifact entry has:
-  - **Name** (the `####` heading, e.g. "Product Spec", "ADR", "Meeting Transcript")
-  - **Provider** — skill reference and plugin (e.g. `d3-markdown:markdown-spec-provider`)
-  - **Provider Config** — directory, default location, and other provider-specific settings
-- Parse `### Templates` for custom template paths (optional section — if absent, defaults are used)
-- Parse `### Settings` for Quiet Mode (default: `false` when absent)
+- Read `d3.config.yaml` from the project root
+- Parse `artifacts` map for available artifact types. Each artifact entry has:
+  - **Key** (e.g. `product_spec`, `tech_spec`, `meeting_transcript`)
+  - **adapter** — which adapter handles I/O (e.g. `markdown`)
+  - **config** — directory, mode, and other adapter-specific settings
+- Parse `templates` map for custom template paths (optional — if absent, defaults are used)
+- Parse `settings` for `quiet_mode` (default: `false` when absent)
 - Store configuration for later steps
 
-**If no `### Artifacts` section found:** Check for legacy config format (`### Spec Provider`, `### Product Spec Provider`, etc.). If found, inform the user their config uses the old format and guide them to update. Do not proceed with legacy config.
+**If `d3.config.yaml` not found:** Check for legacy `d3.config.md`. If found, inform the user their config uses the old format and guide them to create a `d3.config.yaml`. Do not proceed with legacy config.
 
 ### 2. Determine Artifact Type
 
@@ -77,16 +77,16 @@ Would you like to reference any existing artifacts as additional context? (e.g. 
 
 If yes:
 1. Ask which artifact type to search
-2. Use that type's provider to search/list artifacts
-3. Fetch the selected artifact
+2. Use `search_artifacts(artifact_type="...", query="...")` to find candidates
+3. Use `read_artifact(artifact_type="...", artifact_id="...")` to fetch the selected artifact
 4. Include its content as additional context for generation
 
 ### 5. Get Location
 
-**If quiet mode:** Use Default Location from the artifact type's provider config. If no default is configured, use the provider's root location (`.`).
+**If quiet mode:** Use the default location `.` (root of the artifact's configured directory).
 
 **Otherwise:**
-Ask where to create the artifact. If needed, use the provider's `list_locations` operation.
+Ask where to create the artifact. If needed, use `list_locations(artifact_type="...")` to show available locations.
 
 ### 6. Analyse Input and Propose Title
 
@@ -154,15 +154,20 @@ Artifact ready with [N] uncertainty markers:
 Resolve now, leave marked, or review first?
 ```
 
-### 9. Create via Provider
+### 9. Create via MCP
 
-Invoke the artifact type's provider skill (see platform reference for invocation syntax).
+Use the D3 MCP server's `create_artifact` tool:
+```
+create_artifact(
+  artifact_type="[type_key]",
+  title="[Title]",
+  body="[FULL_CONTENT]",
+  location_id="[LOCATION]",
+  metadata={...}  # optional: meeting_type, meeting_date, participants, spec_id, labels, etc.
+)
+```
 
-The provider operation to use depends on the provider type. Read the provider skill to discover available operations. Common patterns:
-- Spec-like providers: `create_spec location_id="[LOCATION]" title="[Title]" body="[FULL_CONTENT]"`
-- Transcript providers: `store_transcript title="[Title]" meeting_type="[type]" meeting_date="[date]" participants="[list]" body="[FULL_CONTENT]"`
-
-Use the operation that matches the provider's capabilities.
+The MCP server routes to the correct adapter based on the artifact type's config.
 
 ### 10. Provide Summary
 
@@ -187,22 +192,21 @@ Next steps:
 
 | Issue | Action |
 |-------|--------|
-| No artifacts configured | Guide user to add `### Artifacts` section to `d3.config.md` |
+| No artifacts configured | Guide user to create `d3.config.yaml` with an `artifacts` section |
 | Artifact type not found | List available types, ask user to pick |
 | Template not found | Ask user for template path |
 | Ambiguous scope | Ask clarifying questions |
 | Minimal concrete info | Warn artifact will be mostly empty, confirm |
 | Conflicting info | Mark `[DECISION PENDING]` |
-| Creation fails | Provide full artifact text for manual creation |
+| MCP tool failed | Show error, provide full artifact text for manual creation |
 | Location not found | List available locations |
-| Provider skill not found | Guide user to install the provider plugin |
 
 ---
 
 ## Key Principles
 
 1. **Template-driven** — The template defines what sections exist; the command fills them
-2. **Provider-agnostic** — Any provider skill works, operations discovered at runtime
+2. **Adapter-agnostic** — MCP server routes to the correct adapter based on config
 3. **Fill only what you know** — Empty sections are better than hallucinated content
 4. **Uncertainty is explicit** — Every unknown gets a marker, every marker gets tracked
 5. **Transcript-first** — Meeting transcripts are the preferred input

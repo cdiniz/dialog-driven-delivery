@@ -3,7 +3,10 @@ name = "dialog-driven-delivery"
 version = "0.1.0"
 description = "Dialog-Driven Delivery - D3 skills for Claude Code"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "mcp[cli]>=1.0.0",
+    "pyyaml>=6.0.3",
+]
 
 [dependency-groups]
 dev = [

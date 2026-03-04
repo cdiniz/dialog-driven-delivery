@@ -14,24 +14,24 @@ Detect which sections need updating based on the new input. Don't fill empty sec
 
 ### 1. Read Configuration
 
-- Read `d3.config.md` for D3 Configuration section
-- Parse `### Artifacts` for available artifact types, their providers, and provider configs
-- Parse `### Templates` for custom template paths (optional)
-- Parse `### Settings` for Quiet Mode (default: `false` when absent)
+- Read `d3.config.yaml` from the project root
+- Parse `artifacts` map for available artifact types, their adapters, and adapter configs
+- Parse `templates` map for custom template paths (optional)
+- Parse `settings` for `quiet_mode` (default: `false` when absent)
 - Store configuration for later steps
 
-**If no `### Artifacts` section found:** Check for legacy config format. If found, inform the user their config uses the old format and guide them to update.
+**If `d3.config.yaml` not found:** Check for legacy `d3.config.md`. If found, inform the user their config uses the old format and guide them to create a `d3.config.yaml`.
 
 ### 2. Fetch Existing Artifact
 
 Parse `$ARGUMENTS` for an artifact identifier (filename, ID, URL, or title).
 
-Determine which artifact type owns it by trying each configured artifact type's provider:
-1. If the identifier clearly matches a type (e.g. filename contains "product-spec", title suffix) → use that type's provider directly
-2. If ambiguous → try each provider's search/get operation until one returns a match
+Determine which artifact type owns it by trying each configured artifact type:
+1. If the identifier clearly matches a type (e.g. filename contains "product-spec", title suffix) → use that type directly
+2. If ambiguous → try `search_artifacts(artifact_type="...", query="...")` for each type until one returns a match
 3. If the user provides a type hint in `$ARGUMENTS` (e.g. `/d3:refine Product Spec about-page`) → use that type directly
 
-Fetch the artifact using the matched provider's get operation (e.g. `get_spec`, `get_transcript`).
+Fetch the artifact using `read_artifact(artifact_type="...", artifact_id="...")`.
 
 Store the artifact content, identifier, and detected type.
 
@@ -75,7 +75,7 @@ After receiving primary input, ask:
 Would you like to reference any existing artifacts as additional context?
 ```
 
-If yes: search and fetch via the relevant provider, include as context.
+If yes: use `search_artifacts` and `read_artifact` to find and fetch the reference artifact, include as context.
 
 ### 6. Analyse New Information
 
@@ -145,13 +145,17 @@ Does this look correct?
 - Resolved → Remove markers and corresponding Open Questions entries
 - New → Add markers and corresponding Open Questions entries
 
-### 9. Update via Provider
+### 9. Update via MCP
 
-Invoke the artifact type's provider skill (see platform reference for invocation syntax).
-
-The provider operation to use depends on the provider type. Read the provider skill to discover available operations. Common patterns:
-- Spec-like providers: `update_spec page_id="[artifact-id]" body="[UPDATED_CONTENT]" version_message="[description]"`
-- Other providers: use the appropriate update operation
+Use the D3 MCP server's `update_artifact` tool:
+```
+update_artifact(
+  artifact_type="[type_key]",
+  artifact_id="[artifact-id]",
+  body="[UPDATED_CONTENT]",
+  version_message="[description of changes]"
+)
+```
 
 ### 10. Provide Summary
 
@@ -182,13 +186,12 @@ Next steps:
 
 | Issue | Action |
 |-------|--------|
-| Artifact not found | Verify identifier, suggest search via provider |
+| Artifact not found | Verify identifier, suggest search via `search_artifacts` |
 | No changes detected | Inform user, ask for clarification |
 | Conflicting info | Show conflict, ask how to resolve |
 | Ambiguous updates | Ask which section to update |
 | Major scope change | Warn about impact, confirm |
-| Update fails | Provide full updated text for manual update |
-| Provider skill not found | Guide user to install the provider plugin |
+| MCP tool failed | Show error, provide full updated text for manual update |
 | Template not found | Proceed without template validation, warn user |
 
 ---
@@ -197,7 +200,7 @@ Next steps:
 
 1. **Non-greedy** — Only change what has new information
 2. **Template-validated** — Structure is checked against template after updates
-3. **Provider-agnostic** — Any provider skill works, operations discovered at runtime
+3. **Adapter-agnostic** — MCP server routes to the correct adapter based on config
 4. **Track resolution** — Remove resolved uncertainty markers, add new ones
 5. **Preserve existing** — Content not addressed by new input stays exactly as-is
 6. **Rationale required** — Every change must have a clear reason

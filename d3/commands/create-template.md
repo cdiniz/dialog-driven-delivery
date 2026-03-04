@@ -78,21 +78,19 @@ Write the template file to the specified path.
 
 ### 6. Suggest Config Addition
 
-Show the user what to add to their `d3.config.md` to register the new artifact type:
+Show the user what to add to their `d3.config.yaml` to register the new artifact type:
 
-```
-Add this to your d3.config.md:
+```yaml
+# Add to your d3.config.yaml:
 
-Under ### Artifacts:
+# Under artifacts:
+  [artifact_type_key]:
+    adapter: markdown
+    config:
+      directory: ./[suggested-directory]
 
-#### [Artifact Type Name]
-- Provider: [suggest appropriate provider, e.g. d3-markdown:markdown-spec-provider]
-- Provider Config:
-  - Directory: ./[suggested-directory]
-  - Default Location: .
-
-Under ### Templates:
-- [Artifact Type Name]: [path-to-template-file]
+# Under templates:
+  [artifact_type_key]: [path-to-template-file]
 ```
 
 ---

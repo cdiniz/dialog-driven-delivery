@@ -12,24 +12,24 @@ Systematically compare what the specification says should exist against what the
 
 ## Workflow
 
-### 1. Detect Providers, Templates, and Settings
-- Read `d3.config.md` for D3 config
-- Search for ### D3 Config  ### Templates
-- Detect spec providers using **either** config format:
-  - **New format (### Artifacts):** Look for `#### Product Spec` and `#### Tech Spec` entries under `### Artifacts`. If both exist → **separated mode**. If only one spec type exists → **combined mode** using that entry's provider.
-  - **Legacy format:** If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. If only `### Spec Provider` exists → **combined mode**.
-- Detect story provider: from `#### User Story` under `### Artifacts` (new format), or `### Story Provider` (legacy format)
+### 1. Read Configuration
+- Read `d3.config.yaml` from the project root
+- Parse `artifacts` map for available artifact types
+- Detect spec mode: if both `product_spec` and `tech_spec` exist → **separated mode**. If only one spec type exists → **combined mode**.
+- Detect story type: look for `user_story` in `artifacts`
 - Store for later steps
+
+**If `d3.config.yaml` not found:** Check for legacy `d3.config.md`. If found, inform the user and guide them to create a `d3.config.yaml`.
 
 ### 2. Fetch Specification
 Command accepts spec identifier, URL, or title in `$ARGUMENTS`.
 
-Determine which provider owns the spec:
-- **Combined mode:** Use the single spec provider's `get_spec`
-- **Separated mode:** Detect whether the identifier refers to a product or tech spec (from title suffix, filename, or content). Use the matching provider's `get_spec`.
+Determine which artifact type owns the spec:
+- **Combined mode:** Use `read_artifact(artifact_type="[spec_type]", artifact_id="[identifier]")`
+- **Separated mode:** Detect whether the identifier refers to a product or tech spec (from title suffix, filename, or content). Use `read_artifact` with the matching type.
 
 **If separated mode:**
-After fetching, derive the companion title by swapping the suffix ("Product Spec" ↔ "Tech Spec") and fetch it from the other provider via `search_specs` or `get_spec`.
+After fetching, derive the companion title by swapping the suffix ("Product Spec" ↔ "Tech Spec") and fetch it from the other type via `search_artifacts` or `read_artifact`.
 Alignment always needs both product and technical context.
 
 Display:
@@ -42,9 +42,9 @@ Display:
 If either spec is missing or minimal: Warn but continue with available content.
 
 ### 3. Detect Existing Stories
-Find the epic matching the spec title and list all its children (stories, tasks, or any issue type).
-- Store epic key and child list for later story drift analysis
-- If no epic or no children found, skip story drift in Step 6
+Use `search_artifacts(artifact_type="user_story", query="[spec title]")` to find stories related to the spec.
+- Store story list for later story drift analysis
+- If no stories found, skip story drift in Step 6
 
 ### 4. Extract Search Anchors
 Parse the specification for concrete, searchable implementation clues:
@@ -184,8 +184,8 @@ Next: /d3:refine-spec (update spec) → /d3:decompose (new stories)
 | No search anchors extracted | Inform user the spec may be too high-level for code alignment, suggest refining tech spec first |
 | Codebase too large / too many matches | Tighten search to exact matches, increase specificity, note gaps |
 | No code found for anchor | Report as potential "Missing Implementation" with caveat that search may have missed it |
-| Epic/stories not found | Skip story drift analysis, proceed with spec-vs-code only |
-| Story provider unavailable | Skip story drift analysis, proceed with spec-vs-code only |
+| Stories not found | Skip story drift analysis, proceed with spec-vs-code only |
+| MCP tool failed | Show error, skip that analysis step, proceed with available data |
 
 ---
 

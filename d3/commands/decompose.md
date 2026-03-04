@@ -20,25 +20,26 @@ Every story must follow INVEST:
 
 ## Workflow
 
-### 1. Detect Providers, Templates, and Settings
-- Read `d3.config.md` for D3 config
-- Search for ### D3 Config  ### Templates
-- Detect spec providers using **either** config format:
-  - **New format (### Artifacts):** Look for `#### Product Spec` and `#### Tech Spec` entries under `### Artifacts`. If both exist → **separated mode**. If only one spec type exists → **combined mode** using that entry's provider.
-  - **Legacy format:** If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. If only `### Spec Provider` exists → **combined mode**.
-- Detect story provider: from `#### User Story` under `### Artifacts` (new format), or `### Story Provider` (legacy format)
-- Read `Quiet Mode` from Settings (default: `false` when absent)
-- If user story template are not configure use skill d3-templates
+### 1. Read Configuration
+- Read `d3.config.yaml` from the project root
+- Parse `artifacts` map for available artifact types
+- Detect spec mode: if both `product_spec` and `tech_spec` exist → **separated mode**. If only one spec type exists → **combined mode**.
+- Detect story type: look for `user_story` in `artifacts`
+- Parse `templates` for custom template paths
+- Parse `settings` for `quiet_mode` (default: `false` when absent)
+- If user story template not configured, use d3-templates skill defaults
 - Store for later steps
+
+**If `d3.config.yaml` not found:** Check for legacy `d3.config.md`. If found, inform the user and guide them to create a `d3.config.yaml`.
 
 ### 2. Fetch Specification
 Parse spec identifier from `$ARGUMENTS` (ID, URL, or title).
 
-**If combined mode:** Use the single spec provider's `get_spec`.
+**If combined mode:** Use `read_artifact(artifact_type="[spec_type]", artifact_id="[identifier]")`.
 
 **If separated mode:**
-Detect whether the identifier refers to a product or tech spec (from title suffix, filename, or content). Use the matching provider's `get_spec`.
-After fetching, derive the companion title by swapping the suffix ("Product Spec" ↔ "Tech Spec") and fetch it from the other provider via `search_specs` or `get_spec`.
+Detect whether the identifier refers to a product or tech spec (from title suffix, filename, or content). Use `read_artifact` with the matching type.
+After fetching, derive the companion title by swapping the suffix ("Product Spec" ↔ "Tech Spec") and fetch it from the other type via `search_artifacts` or `read_artifact`.
 Decomposition always needs both product and technical context.
 Use content from both specs — product for workflows, technical for implementation notes.
 
@@ -52,15 +53,15 @@ Display:
 If no Product Spec: Warn but continue.
 
 ### 3. Detect Project and Capabilities
-Use story provider's `list_projects`:
+Use `list_projects(artifact_type="user_story")`:
 - If single project returned → use it automatically (no prompt needed)
 - If multiple projects:
 
-  **If quiet mode:** Use Default Project from Story Provider configuration in `d3.config.md`. If no default is configured, ask the user.
+  **If quiet mode:** Use the first project. If ambiguous, ask the user.
 
   **Otherwise:** Ask user to choose.
 
-Call `get_issue_types` for the chosen project. Store whether Epic type is available (used in step 8).
+Call `get_issue_types(artifact_type="user_story", project_key="[PROJECT]")` for the chosen project. Store whether Epic type is available (used in step 8).
 
 ### 4. Request Decomposition Input
 
@@ -143,9 +144,14 @@ INVEST Validation Checklist:
 
 **Skip this step if Epic type was not available in step 3.**
 
-If Epic type is available, invoke the [story-provider] skill (see platform reference for invocation syntax):
+If Epic type is available, use:
 ```
-create_epic project_key="[PROJECT]" summary="[Feature name]" description="[Epic description]" labels="feature,epic"
+create_artifact(
+  artifact_type="user_story",
+  title="[Feature name]",
+  body="[Epic description]",
+  metadata={"labels": ["feature", "epic"]}
+)
 ```
 
 **Epic Description:**
@@ -203,17 +209,19 @@ Before creating, scan specs for uncertainty markers. If critical uncertainties:
 - Dependencies: List story keys if dependencies exist
 - References: Link to specification
 
-**Create each story.** Invoke the [story-provider] skill (see platform reference for invocation syntax):
-- If epic was created → pass `epic_id`
-- If no epic → pass `spec_id` instead (lets provider group stories by spec)
+**Create each story** using the D3 MCP server:
+```
+create_artifact(
+  artifact_type="user_story",
+  title="[Story summary]",
+  body="[Story content from template]",
+  parent_id="[EPIC-KEY or SPEC-ID]",
+  metadata={"spec_id": "[SPEC-ID]", "labels": [...], "size": "[small/medium/large]"}
+)
+```
 
-```
-create_story project_key="[PROJECT]" epic_id="[EPIC-KEY]" story_data="{summary: '...', description: '...', labels: [...]}"
-```
-or (when no epic):
-```
-create_story project_key="[PROJECT]" spec_id="[SPEC-ID]" story_data="{summary: '...', description: '...', labels: [...]}"
-```
+- If epic was created → pass epic key as `parent_id`
+- If no epic → pass `spec_id` in metadata (lets adapter group stories by spec)
 
 ### 10. Provide Summary
 
@@ -280,7 +288,7 @@ Next: Review stories → Estimate → Start with [Story Key/ID]
 | Project not found | List available projects |
 | Epic linking fails | Provide manual instructions |
 | Unclear boundaries | Ask clarifying questions |
-| Provider fails | Fall back to providing story content |
+| MCP tool failed | Show error, fall back to providing story content for manual creation |
 
 ---
 

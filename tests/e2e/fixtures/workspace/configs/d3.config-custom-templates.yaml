@@ -1,0 +1,10 @@
+artifacts:
+  product_spec:
+    adapter: markdown
+    config:
+      directory: ./custom-specs
+
+templates:
+  product_spec: ./templates/custom-product-spec.md
+  tech_spec: ./templates/custom-tech-spec.md
+  user_story: ./templates/custom-user-story.md

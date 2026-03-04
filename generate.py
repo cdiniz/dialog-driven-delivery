@@ -191,32 +191,37 @@ def iter_providers():
 
 # --- Platform generators ---
 
+def _copy_mcp_server(src_dir, dest_dir):
+    if src_dir.resolve() == dest_dir.resolve():
+        return
+    mcp_src = src_dir / "mcp_server"
+    mcp_dest = dest_dir / "mcp_server"
+    if mcp_src.exists():
+        if mcp_dest.exists():
+            shutil.rmtree(mcp_dest)
+        shutil.copytree(mcp_src, mcp_dest, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+
+    mcp_json = src_dir / ".mcp.json"
+    if mcp_json.exists():
+        shutil.copy2(mcp_json, dest_dir / ".mcp.json")
+
+
 def generate_claude(platforms, output_root=None):
     cfg = platforms["claude"]
     base = output_root or ROOT
 
-    plugin_dirs = {
-        "d3": base / "d3",
-        "d3-markdown": base / "d3-markdown",
-        "d3-atlassian": base / "d3-atlassian",
+    d3_meta = yaml.safe_load((METADATA_DIR / "d3.yaml").read_text())
+    plugin_json = {
+        k: d3_meta[k]
+        for k in ("name", "version", "description", "author", "homepage", "repository", "keywords", "license")
     }
+    write_output(
+        base / "d3" / ".claude-plugin" / "plugin.json",
+        json.dumps(plugin_json, indent=2) + "\n",
+    )
 
-    metas = {
-        name: yaml.safe_load((METADATA_DIR / f"{name}.yaml").read_text())
-        for name in plugin_dirs
-    }
+    _copy_mcp_server(D3_DIR, base / "d3")
 
-    for name, meta in metas.items():
-        plugin_json = {
-            k: meta[k]
-            for k in ("name", "version", "description", "author", "homepage", "repository", "keywords", "license")
-        }
-        write_output(
-            plugin_dirs[name] / ".claude-plugin" / "plugin.json",
-            json.dumps(plugin_json, indent=2) + "\n",
-        )
-
-    d3_meta = metas["d3"]
     marketplace = {
         "name": "d3-marketplace",
         "owner": {"name": "D3 Team", "email": "claudio@cdiniz.com"},
@@ -224,28 +229,22 @@ def generate_claude(platforms, output_root=None):
             "description": d3_meta["description"],
             "version": d3_meta["version"],
         },
-        "plugins": [],
-    }
-    for name, source_dir, category in [
-        ("d3", "./d3", "productivity"),
-        ("d3-atlassian", "./d3-atlassian", "integrations"),
-        ("d3-markdown", "./d3-markdown", "productivity"),
-    ]:
-        meta = metas[name]
-        marketplace["plugins"].append(
+        "plugins": [
             {
-                k: meta[k]
+                k: d3_meta[k]
                 for k in ("name", "description", "version", "author", "homepage", "repository", "license", "keywords")
             }
-            | {"source": source_dir, "category": category}
-        )
+            | {"source": "./d3", "category": "productivity"},
+        ],
+    }
     write_output(
         base / ".claude-plugin" / "marketplace.json",
         json.dumps(marketplace, indent=2) + "\n",
     )
 
-    platform_md = _platform_md_with_frontmatter("Claude Code", cfg, "skill")
-    write_output(base / "d3" / "skills" / "d3-platform" / "SKILL.md", platform_md)
+    if output_root is not None:
+        platform_md = _platform_md_with_frontmatter("Claude Code", cfg, "skill")
+        write_output(base / "d3" / "skills" / "d3-platform" / "SKILL.md", platform_md)
 
 
 def generate_codex(platforms):

@@ -23,9 +23,10 @@ Every story must follow INVEST:
 ### 1. Detect Providers, Templates, and Settings
 - Read `d3.config.md` for D3 config
 - Search for ### D3 Config  ### Templates
-- Detect spec mode from provider configuration:
-  - If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. Store each provider's skill and configuration independently.
-  - If only `### Spec Provider` exists → **combined mode**. Store single provider config.
+- Detect spec providers using **either** config format:
+  - **New format (### Artifacts):** Look for `#### Product Spec` and `#### Tech Spec` entries under `### Artifacts`. If both exist → **separated mode**. If only one spec type exists → **combined mode** using that entry's provider.
+  - **Legacy format:** If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. If only `### Spec Provider` exists → **combined mode**.
+- Detect story provider: from `#### User Story` under `### Artifacts` (new format), or `### Story Provider` (legacy format)
 - Read `Quiet Mode` from Settings (default: `false` when absent)
 - If user story template are not configure use skill d3-templates
 - Store for later steps

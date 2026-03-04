@@ -2,7 +2,7 @@
 
 [D3](https://dialogdrivendelivery.com/) is a methodology for AI-enabled software delivery, built from real engagements by practitioners at Equal Experts. It helps teams — not just individuals — work effectively with AI by focusing on collaboration and context, not tooling.
 
-**This repository provides tooling that implements D3's workflow across multiple AI coding platforms.** It turns the methodology's principles into a concrete, repeatable process: capture conversations, create structured specifications, and decompose features into implementable stories.
+**This repository provides tooling that implements D3's workflow across multiple AI coding platforms.** It turns the methodology's principles into a flexible toolkit: capture conversations, create structured artifacts from templates, refine them with new information, and decompose features into implementable stories.
 
 Works with your existing tools. Built-in providers for Atlassian (Confluence + Jira) and Markdown (local files + git). Expandable to any specification storage or work tracking system through pluggable provider skills.
 
@@ -39,11 +39,9 @@ Where `<platform>` is `codex`, `copilot`, or `cursor`.
 
 Or copy files manually from `dist/<platform>/` into your project.
 
-### 2. Configure Your Provider
+### 2. Configure Your Artifact Catalog
 
-Edit `d3.config.md` in your project root to configure providers. This file is the same across all platforms.
-
-See the [Configuration](#configuration) section for provider setup.
+Edit `d3.config.md` in your project root to configure artifact types and providers. See the [Configuration](#configuration) section for details.
 
 ### 3. Use D3 Commands
 
@@ -51,19 +49,28 @@ Command invocation varies by platform:
 
 | Command | Claude Code | Codex | Copilot | Cursor |
 |---------|------------|-------|---------|--------|
-| Create spec | `/d3:create-spec` | `$d3-create-spec` | `@d3-create-spec` | `@d3-create-spec` |
-| Refine spec | `/d3:refine-spec` | `$d3-refine-spec` | `@d3-refine-spec` | `@d3-refine-spec` |
+| Create artifact | `/d3:create` | `$d3-create` | `@d3-create` | `@d3-create` |
+| Refine artifact | `/d3:refine` | `$d3-refine` | `@d3-refine` | `@d3-refine` |
+| Create template | `/d3:create-template` | `$d3-create-template` | `@d3-create-template` | `@d3-create-template` |
 | Decompose | `/d3:decompose` | `$d3-decompose` | `@d3-decompose` | `@d3-decompose` |
-| Capture transcript | `/d3:capture-transcript` | `$d3-capture-transcript` | `@d3-capture-transcript` | `@d3-capture-transcript` |
-| Create ADR | `/d3:create-adr` | `$d3-create-adr` | `@d3-create-adr` | `@d3-create-adr` |
 
-### Complete Feature Development Flow
+### Core Workflow
 
 ```
-Capture Phase (optional)  →  create-spec  →  refine-spec (iterative)  →  decompose
-     ↓                           ↓                  ↓                       ↓
-Meeting transcript      Feature specification   Updated spec       Epic + User Stories
-                        (Product + Technical)   with new info      with acceptance criteria
+Input (transcript / document / conversation)
+        +
+Template (defines artifact structure)
+        ↓
+   /d3:create [artifact type]
+        ↓
+Artifact with uncertainty markers
+(fills what's known, marks what's unknown)
+        ↓
+   /d3:refine (iterative, with new information)
+        ↓
+Mature artifact ready for use
+        ↓
+   /d3:decompose (for specs → user stories)
 ```
 
 ---
@@ -76,11 +83,11 @@ D3 is grounded in [three principles](https://dialogdrivendelivery.com/) observed
 2. **Context engineering is the core skill** — AI follows context. The richer and more structured that context, the better the output. Structuring specifications and curating decisions determines AI effectiveness.
 3. **Human accountability is non-negotiable** — AI drafts. Humans review. Every specification, every story, every decision passes through human judgment.
 
-This tooling applies those principles through a concrete workflow:
+This tooling applies those principles through a flexible toolkit:
 
-- **Feature-centric**: Specifications at feature level, not task level
+- **Template-driven**: Artifacts are structured by templates — customise or create your own
 - **Transcript-first**: Commands accept meeting transcripts as primary input
-- **Incremental delivery**: Features decompose into independently deliverable stories
+- **Incremental delivery**: Artifacts grow through refinement, features decompose into stories
 - **Explicit over implicit**: Uncertainties are marked, not assumed — prevents AI hallucination
 - **Tool-agnostic**: Provider architecture works with whatever tools your team already uses
 
@@ -157,92 +164,58 @@ cp -r dist/cursor/.cursor your-project/
 
 ## Configuration
 
-D3 configuration tells the agent which providers to use and how to connect to your tools. Edit `d3.config.md` in your project root.
+D3 configuration tells the agent which artifact types are available, which providers to use, and where to store artifacts. Edit `d3.config.md` in your project root.
 
-### Markdown Provider (Lightweight)
+### Artifact Catalog
+
+The `### Artifacts` section defines what artifact types your project uses. Each `####` entry is an artifact type with its provider and configuration:
 
 ```markdown
 ## D3 Configuration
 
-### Spec Provider
-**Skill:** markdown-spec-provider
-**Configuration:**
-- Specs Directory: ./specs
+### Artifacts
 
-### Story Provider
-**Skill:** markdown-story-provider
-**Configuration:**
-- Stories Directory: ./stories
+#### Product Spec
+- Provider: d3-markdown:markdown-spec-provider
+- Provider Config:
+  - Directory: ./specs
+  - Default Location: .
 
-### Transcript Provider
-**Skill:** markdown-transcript-provider
-**Configuration:**
-- Transcripts Directory: ./transcripts
+#### Tech Spec
+- Provider: d3-markdown:markdown-spec-provider
+- Provider Config:
+  - Directory: ./specs
+
+#### ADR
+- Provider: d3-markdown:markdown-spec-provider
+- Provider Config:
+  - Directory: ./docs/adrs
+
+#### Meeting Transcript
+- Provider: d3-markdown:markdown-transcript-provider
+- Provider Config:
+  - Directory: ./transcripts
 ```
 
 ### Atlassian Provider (Enterprise)
 
 ```markdown
-## D3 Configuration
+### Artifacts
 
-### Spec Provider
-**Skill:** atlassian-spec-provider
-**Configuration:**
-- Cloud ID: your-cloud-id
-- Default Location: PROJ
-- spaceId: 1234567
-- Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456
+#### Product Spec
+- Provider: d3-atlassian:atlassian-spec-provider
+- Provider Config:
+  - Cloud ID: your-cloud-id
+  - Default Location: PROJ
+  - spaceId: 1234567
+  - Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456
 
-### Story Provider
-**Skill:** atlassian-story-provider
-**Configuration:**
-- Cloud ID: your-cloud-id
-- Default Project: PROJ
-
-### Transcript Provider
-**Skill:** atlassian-transcript-provider
-**Configuration:**
-- Cloud ID: your-cloud-id
-- Default Location: PROJ
-- spaceId: 1234567
-- Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456/Transcripts
+#### User Story
+- Provider: d3-atlassian:atlassian-story-provider
+- Provider Config:
+  - Cloud ID: your-cloud-id
+  - Default Project: PROJ
 ```
-
-### Spec Modes
-
-D3 supports two modes for creating and storing specifications, controlled entirely by your config file.
-
-**Combined mode** (default) — a single spec document contains both the Product and Technical specifications. Use this when your team works in one place and doesn't need to separate the two audiences.
-
-```markdown
-### Spec Provider
-**Skill:** markdown-spec-provider
-**Configuration:**
-- Specs Directory: ./specs
-```
-
-`create-spec` produces one document. `refine-spec` updates it. `decompose` reads it.
-
----
-
-**Separated mode** — Product and Technical specifications are created as two independent documents, each using its own provider. Use this when product and engineering teams work in different tools, or when you want to control access separately.
-
-```markdown
-### Product Spec Provider
-**Skill:** atlassian-spec-provider
-**Configuration:**
-- Cloud ID: your-cloud-id
-- Default Location: PROJ
-- spaceId: 1234567
-- Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456
-
-### Tech Spec Provider
-**Skill:** markdown-spec-provider
-**Configuration:**
-- Specs Directory: ./specs
-```
-
-`create-spec` produces two documents — one per provider. `refine-spec` detects whether new information affects the product spec, the tech spec, or both, and updates only what's needed. `decompose` always fetches both for full context.
 
 Providers can be mixed freely — product specs in Confluence, tech specs in local markdown, or any other combination.
 
@@ -268,17 +241,6 @@ In quiet mode:
 
 ---
 
-### ADR Provider (Optional)
-
-By default, ADRs use the Spec Provider. To store ADRs separately:
-
-```markdown
-### ADR Provider
-**Skill:** markdown-spec-provider
-**Configuration:**
-- Specs Directory: ./docs/adrs
-```
-
 ### Template Customisation (Optional)
 
 D3 includes default templates via the `d3-templates` skill that work out of the box. Only customise if you need domain-specific sections, compliance requirements, or team conventions.
@@ -301,52 +263,54 @@ D3 includes default templates via the `d3-templates` skill that work out of the 
 2. Configure custom paths in your config file:
    ```markdown
    ### Templates
-     - Feature Product Spec: ./.d3/templates/feature-product-spec.md
-     - Feature Technical Spec: ./.d3/templates/feature-tech-spec.md
-     - User Story: ./.d3/templates/user-story.md
-     - Meeting Transcript: ./.d3/templates/meeting-transcript.md
-     - ADR: ./.d3/templates/adr.md
+   - Product Spec: ./.d3/templates/feature-product-spec.md
+   - Tech Spec: ./.d3/templates/feature-tech-spec.md
+   - User Story: ./.d3/templates/user-story.md
+   - Meeting Transcript: ./.d3/templates/meeting-transcript.md
+   - ADR: ./.d3/templates/adr.md
    ```
+
+**To create a new template type:**
+
+Use `/d3:create-template` to interactively design a new template, then add the artifact type to your config's `### Artifacts` section.
 
 ---
 
 ## Commands
 
-| Command | Phase | Purpose |
-|---------|-------|---------|
-| `create-spec` | Planning | Create feature specification from conversation, transcript, or document |
-| `create-adr` | Planning | Record architectural decisions as immutable ADRs (MADR v4) |
-| `refine-spec` | Planning | Update specifications with new information |
-| `decompose` | Planning | Break feature into INVEST-compliant user stories |
-| `capture-transcript` | Capture | Capture and structure a meeting transcript |
+| Command | Purpose |
+|---------|---------|
+| `create` | Create any artifact from input + template (specs, ADRs, transcripts, custom types) |
+| `refine` | Update any existing artifact with new information |
+| `create-template` | Design and generate a new artifact template |
+| `decompose` | Break feature specs into INVEST-compliant user stories |
 
 ### When to Use Each Command
 
-- **Had a meeting?** → `capture-transcript`
-- **Starting a feature?** → `create-spec`
-- **Made an architectural decision?** → `create-adr`
-- **Got new information?** → `refine-spec`
-- **Ready to implement?** → `decompose`
-
-After decomposition, implement using your team's existing workflow.
+- **Starting a feature?** → `create` a Product Spec
+- **Made an architectural decision?** → `create` an ADR
+- **Had a meeting?** → `create` a Meeting Transcript
+- **Got new information?** → `refine` an existing artifact
+- **Ready to implement?** → `decompose` a spec into stories
+- **Need a new artifact type?** → `create-template`
 
 ### Workflow
 
 ```
 Cross-functional Meeting/Discussion
         ↓
-capture-transcript (optional — capture and structure the meeting)
+create Meeting Transcript (optional — capture and structure the meeting)
         ↓
-create-spec (paste transcript/document/description)
+create Product Spec (paste transcript/document/description)
         ↓
-Specification with BOTH Product & Technical Specs
+Artifact with uncertainty markers
 (fills what's known, leaves rest empty)
         ↓
 [Progressive Refinement as information becomes available]
         ↓
-refine-spec (paste any new information)
+refine (paste any new information)
         ↓
-Updated Specification (product, technical, or both)
+Updated artifact (only changed sections update)
         ↓
 [Continue refining until ready]
         ↓
@@ -362,11 +326,11 @@ Epic + User Stories (linked to specification with dependencies)
 ```
 Architectural discussion (meeting/transcript)
         ↓
-create-adr (paste transcript or describe decision)
+create ADR (paste transcript or describe decision)
         ↓
 ADR created (Context, Decision, Alternatives, Consequences)
         ↓
-refine-spec (incorporate ADR into spec)
+refine (incorporate ADR into relevant spec)
         ↓
 Spec's "Architectural Context > Relevant ADRs" section updated
 ```
@@ -394,9 +358,9 @@ GOOD (explicit uncertainty):
 Users authenticate via [OPEN QUESTION: OAuth2, password, or social login?]
 ```
 
-### Pragmatic Templates
+### Template-Driven Artifacts
 
-Feature specs use a **streamlined 5-section product template** and **8-section technical template**. This produces 2-3 pages instead of 5-10. Faster to write, faster to review, still captures everything that matters.
+The core technique is **inputs + template → artifact**. Templates define the structure, commands provide the scaffolding (config, input gathering, uncertainty markers, validation, provider dispatch). No domain-specific logic in the commands — that lives in templates.
 
 ### Conversational Workflow
 
@@ -406,11 +370,11 @@ Commands ask for meeting transcripts (preferred input), work conversationally if
 
 ```
 D3 Core Commands (Tool-Agnostic)
-    ├── capture-transcript → Uses Transcript Provider
-    ├── create-spec        → Uses Spec Provider
-    ├── create-adr         → Uses ADR Provider (falls back to Spec Provider)
-    ├── refine-spec        → Uses Spec Provider
-    └── decompose          → Uses Spec Provider + Story Provider
+    ├── create             → Uses any artifact provider
+    ├── refine             → Uses any artifact provider
+    ├── create-template    → Generates template files
+    ├── decompose          → Uses Spec Provider + Story Provider
+    └── align-spec         → Uses Spec Provider + Codebase
 
 Providers (Pluggable)
     ├── Atlassian (Confluence + Jira)   — built-in

@@ -1,11 +1,19 @@
 ---
 name: d3-templates
-description: Provides templates for D3 specifications and user stories.
+description: Provides templates for D3 artifacts.
 ---
 
 # D3 Templates
 
 Templates are in this skill's `references/` directory.
+
+## Default Template Lookup
+
+| Artifact Type | Template File |
+|---------------|---------------|
+| Product Spec | `references/feature-product-spec.md` |
+| Tech Spec | `references/feature-tech-spec.md` |
+| User Story | `references/user-story.md` |
 
 ## Available Templates
 
@@ -31,15 +39,16 @@ Templates are in this skill's `references/` directory.
 
 ## How D3 Commands Use These Templates
 
-### d3:create-spec
-1. Loads templates from CLAUDE.md config or this skill
-2. Creates unified spec with both Product and Technical sections
+### d3:create
+1. Reads artifact type from config's `### Artifacts` section
+2. Resolves template: custom path from `### Templates` or default from this skill's lookup table
 3. Uses template structure to ensure all sections present
 
-### d3:refine-spec
-1. Loads templates from CLAUDE.md config or this skill
-2. Uses templates to validate structure
+### d3:refine
+1. Detects artifact type from the existing artifact's provider
+2. Resolves template for that type
+3. Uses template to validate structure
 
 ### d3:decompose
-1. Loads user story template from CLAUDE.md config or this skill
+1. Loads user story template from config or this skill
 2. Creates stories following template structure

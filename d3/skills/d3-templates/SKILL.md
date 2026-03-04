@@ -1,11 +1,25 @@
 ---
 name: d3-templates
-description: Provides standard templates for Dialog-Driven Delivery (D3) specifications, user stories, architectural decision records, and meeting transcripts. Use when creating or refining feature specifications (product or technical), decomposing features into user stories, recording architectural decisions, or capturing meeting transcripts. Contains templates for Product Specs, Technical Specs, User Stories, ADRs, and Meeting Transcripts following D3 methodology.
+description: Provides standard templates for Dialog-Driven Delivery (D3) artifacts — specifications, user stories, architectural decision records, and meeting transcripts. Use when creating or refining any D3 artifact. Contains templates for Product Specs, Technical Specs, User Stories, ADRs, and Meeting Transcripts following D3 methodology.
 ---
 
 # D3 Standard Templates
 
-This skill provides canonical templates for D3 specification, story, ADR, and transcript creation. These templates are used by d3:create-spec, d3:refine-spec, d3:decompose, d3:create-adr, and d3:capture-transcript commands.
+This skill provides canonical templates for D3 artifact creation. These templates are used by d3:create, d3:refine, d3:decompose, and d3:create-template commands.
+
+## Default Template Lookup
+
+When no custom template path is configured in `d3.config.md`, commands resolve templates by artifact type name:
+
+| Artifact Type | Template File |
+|---------------|---------------|
+| Product Spec | `references/feature-product-spec.md` |
+| Tech Spec | `references/feature-tech-spec.md` |
+| User Story | `references/user-story.md` |
+| ADR | `references/adr.md` |
+| Meeting Transcript | `references/meeting-transcript.md` |
+
+Commands match the artifact type name from the config's `### Artifacts` section against this table (case-insensitive). If no match is found, the command asks the user to provide a template path.
 
 ## Available Templates
 
@@ -68,35 +82,26 @@ Templates are located in this skill's `references/` directory:
 
 ## How D3 Commands Use These Templates
 
-### d3:create-spec
-1. Loads user spec templates feature-product-spec and feature-tech-spec from `d3.config.md` or this skill
-2. Creates unified spec with both Product and Technical sections
-3. Uses template structure to ensure all sections present
+### d3:create
+1. Reads artifact type from config's `### Artifacts` section
+2. Resolves template: custom path from `### Templates` or default from this skill's lookup table
+3. Uses template structure to ensure all sections present in the generated artifact
+4. Fills only what was discussed, marks uncertainties
 
-### d3:refine-spec
-1. Loads user spec templates feature-product-spec and feature-tech-spec from `d3.config.md` or this skill
-2. Loads existing spec
-3. Uses templates to validate structure
-4. Ensures all required sections present when updating
+### d3:refine
+1. Detects artifact type from the existing artifact's provider
+2. Resolves template for that type (same lookup as create)
+3. Uses template to validate structure is maintained during updates
+4. Ensures non-greedy updates — only sections with new information change
 
 ### d3:decompose
-1. Loads user story template from `d3.config.md` or this skill
+1. Loads user story template from config or this skill
 2. Creates stories following template structure
 3. Ensures consistent Given-When-Then acceptance criteria format
 
-### d3:create-adr
-1. Loads ADR template from `d3.config.md` or this skill
-2. Extracts decision context, alternatives, rationale, and consequences from input
-3. Auto-numbers by searching existing ADRs
-4. Creates ADR using template structure
-5. Handles superseding (cross-references old and new ADRs)
-
-### d3:capture-transcript
-1. Loads meeting transcript template from `d3.config.md` or this skill
-2. Asks user to paste raw transcript
-3. Extracts decisions, action items, and open questions
-4. Generates structured summary using template
-5. Stores via transcript provider
+### d3:create-template
+1. Uses existing templates as starting points for new template creation
+2. Ensures Open Questions section is included (required for uncertainty markers)
 
 ## Template Loading Pattern
 
@@ -104,13 +109,9 @@ D3 commands follow this loading pattern:
 
 ```
 1. Read `d3.config.md` for D3 Configuration section
-2. Extract template paths:
-   - feature_spec_template
-   - technical_spec_template
-   - user_story_template
-   - adr_template
-   - meeting_transcript_template
-3. For each template:
-   - If custom path specified → Read that file
-   - If no custom path → Read from this skill's references/
+2. Determine artifact type
+3. Check `### Templates` section for custom path matching the artifact type name
+4. If custom path found → Read that file
+5. If no custom path → Look up artifact type in this skill's Default Template Lookup table
+6. If no default match → Ask user for template path
 ```

@@ -2,18 +2,13 @@
 
 ## D3 Configuration
 
-### Spec Provider
-**Skill:** d3-markdown:markdown-spec-provider
-**Configuration:**
-- Specs Directory: ./custom-specs
-- Default Location: .
+### Artifacts
 
-### Story Provider
-**Skill:** d3-markdown:markdown-story-provider
-**Configuration:**
-- Stories Directory: ./stories
-- Epic Prefix: epic-
-- Story Prefix: story-
+#### Product Spec
+- Provider: d3-markdown:markdown-spec-provider
+- Provider Config:
+  - Directory: ./custom-specs
+  - Default Location: .
 
 ### Templates
 - Product Spec: ./templates/custom-product-spec.md

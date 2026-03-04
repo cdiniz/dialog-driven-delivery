@@ -29,19 +29,19 @@ def _find_specs(workspace):
     return glob.glob(os.path.join(workspace, "specs", "*.md"))
 
 
-def _create_spec_messages(transcript: str) -> list[str]:
+def _create_messages(artifact_type: str, transcript: str) -> list[str]:
     return [
-        "/d3:create-spec\n\nI want to provide a meeting transcript.",
+        f"/d3:create {artifact_type}\n\nI want to provide a meeting transcript.",
         f"Here is the transcript:\n---\n{transcript}\n---\n\n"
         f"Use the default root location.\n"
         f'For the title, use "About Page".',
-        "The spec looks good, please create it.",
+        "The artifact looks good, please create it.",
     ]
 
 
-def _refine_spec_messages(spec_name: str, refinement: str) -> list[str]:
+def _refine_messages(spec_name: str, refinement: str) -> list[str]:
     return [
-        f"/d3:refine-spec {spec_name}\n\nI want to describe changes.",
+        f"/d3:refine {spec_name}\n\nI want to describe changes.",
         f"Here are the updates from our follow-up meeting:\n---\n{refinement}\n---",
         "The proposed changes look correct, please apply them.",
     ]
@@ -56,6 +56,85 @@ def _decompose_messages(spec_name: str) -> list[str]:
     ]
 
 
+class TestGenericCreate:
+    """
+    E2E tests for the generic create command with different artifact types.
+    """
+
+    @pytest.mark.timeout(600)
+    def test_create_product_spec(self, markdown_workflow_workspace, plugin_dirs):
+        transcript = _read_fixture("sample_transcript.txt")
+        run_claude_conversation(
+            _create_messages("Product Spec", transcript),
+            cwd=markdown_workflow_workspace,
+            plugin_dirs=plugin_dirs,
+        )
+
+        spec_files = _find_specs(markdown_workflow_workspace)
+        assert len(spec_files) >= 1, "No spec files found"
+        assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"
+        spec_path = spec_files[0]
+        spec_name = os.path.basename(spec_path)
+
+        content = open(spec_path).read()
+        headings = heading_texts_lower(content)
+
+        for h in PRODUCT_HEADINGS:
+            assert h in headings, f"Missing product heading: {h}"
+
+        assert has_placeholder(content), "No placeholder text for undiscussed sections"
+        assert total_markers(content) > 0, "No uncertainty markers found"
+
+        assert spec_name.startswith("about-page"), (
+            f"Unexpected spec filename: {spec_name}"
+        )
+        assert markers_tracked_in_open_questions(content), (
+            "Uncertainty markers exist but no Open Questions section found"
+        )
+
+
+class TestGenericRefine:
+    """
+    E2E tests for the generic refine command.
+    """
+
+    @pytest.mark.timeout(600)
+    def test_refine_existing_artifact(self, markdown_workspace_with_spec, plugin_dirs):
+        spec_files = _find_specs(markdown_workspace_with_spec)
+        assert len(spec_files) >= 1, "No spec files found"
+        assert len(spec_files) == 1, f"Multiple spec files found: {spec_files}"
+        spec_path = spec_files[0]
+        spec_name = os.path.basename(spec_path)
+        refinement = _read_fixture("refinement_input.txt")
+        original_content = open(spec_path).read()
+        original_sections = extract_sections(original_content)
+
+        run_claude_conversation(
+            _refine_messages(spec_name, refinement),
+            cwd=markdown_workspace_with_spec,
+            plugin_dirs=plugin_dirs,
+        )
+
+        post_refine_specs = _find_specs(markdown_workspace_with_spec)
+        assert len(post_refine_specs) >= 1, "Spec file missing after refinement"
+        assert len(post_refine_specs) == 1, f"Spec duplicated after refinement: {post_refine_specs}"
+        updated_content = open(spec_path).read()
+        assert updated_content != original_content, "Spec unchanged after refinement"
+
+        lower = updated_content.lower()
+        assert "acme" in lower, (
+            "Refinement content not found in updated spec"
+        )
+
+        updated_sections = extract_sections(updated_content)
+        for heading in ["overview"]:
+            orig = original_sections.get(heading)
+            if orig is not None:
+                assert heading in updated_sections, (
+                    f"Section '{heading}' removed during refinement"
+                )
+
+
 class TestMarkdownWorkflow:
     """
     Sequential E2E workflow tests for markdown provider.
@@ -66,7 +145,7 @@ class TestMarkdownWorkflow:
     def test_create_spec_from_transcript(self, markdown_workflow_workspace, plugin_dirs):
         transcript = _read_fixture("sample_transcript.txt")
         run_claude_conversation(
-            _create_spec_messages(transcript),
+            _create_messages("Product Spec", transcript),
             cwd=markdown_workflow_workspace,
             plugin_dirs=plugin_dirs,
         )
@@ -107,7 +186,7 @@ class TestMarkdownWorkflow:
         original_sections = extract_sections(original_content)
 
         run_claude_conversation(
-            _refine_spec_messages(spec_name, refinement),
+            _refine_messages(spec_name, refinement),
             cwd=markdown_workspace_with_spec,
             plugin_dirs=plugin_dirs,
         )
@@ -202,7 +281,13 @@ class TestSeparatedModeWorkflow:
     def test_create_separated_specs(self, separated_workflow_workspace, plugin_dirs):
         transcript = _read_fixture("sample_transcript.txt")
         run_claude_conversation(
-            _create_spec_messages(transcript),
+            [
+                "/d3:create\n\nI want to create both a Product Spec and a Tech Spec from a meeting transcript.",
+                f"Here is the transcript:\n---\n{transcript}\n---\n\n"
+                f"Use the default root location.\n"
+                f'For the title, use "About Page".',
+                "The artifact looks good, please create it.",
+            ],
             cwd=separated_workflow_workspace,
             plugin_dirs=plugin_dirs,
         )
@@ -241,7 +326,7 @@ class TestSeparatedModeWorkflow:
         refinement = _read_fixture("refinement_input.txt")
 
         run_claude_conversation(
-            _refine_spec_messages(product_name, refinement),
+            _refine_messages(product_name, refinement),
             cwd=separated_workspace_with_specs,
             plugin_dirs=plugin_dirs,
         )
@@ -305,17 +390,17 @@ class TestSeparatedModeWorkflow:
             )
 
 
-class TestQuietModeWorkflow:
+class TestGenericQuietMode:
     """
-    E2E tests for quiet mode.
+    E2E tests for quiet mode with generic commands.
     Verifies commands skip confirmations and use $ARGUMENTS directly.
     """
 
     @pytest.mark.timeout(600)
-    def test_create_spec_quiet(self, quiet_workflow_workspace, plugin_dirs):
+    def test_create_quiet(self, quiet_workflow_workspace, plugin_dirs):
         transcript = _read_fixture("sample_transcript.txt")
         run_claude_conversation(
-            [f"/d3:create-spec {transcript}"],
+            [f"/d3:create Product Spec {transcript}"],
             cwd=quiet_workflow_workspace,
             plugin_dirs=plugin_dirs,
         )
@@ -330,11 +415,9 @@ class TestQuietModeWorkflow:
 
         for h in PRODUCT_HEADINGS:
             assert h in headings, f"Missing product heading: {h}"
-        for h in TECH_HEADINGS:
-            assert h in headings, f"Missing tech heading: {h}"
 
     @pytest.mark.timeout(600)
-    def test_refine_spec_quiet(self, quiet_workspace_with_spec, plugin_dirs):
+    def test_refine_quiet(self, quiet_workspace_with_spec, plugin_dirs):
         spec_files = _find_specs(quiet_workspace_with_spec)
         assert len(spec_files) == 1
         spec_path = spec_files[0]
@@ -343,7 +426,7 @@ class TestQuietModeWorkflow:
         refinement = _read_fixture("refinement_input.txt")
 
         run_claude_conversation(
-            [f"/d3:refine-spec {spec_name}\n\n{refinement}"],
+            [f"/d3:refine {spec_name}\n\n{refinement}"],
             cwd=quiet_workspace_with_spec,
             plugin_dirs=plugin_dirs,
         )
@@ -355,7 +438,7 @@ class TestQuietModeWorkflow:
         )
 
     @pytest.mark.timeout(600)
-    def test_decompose_spec_quiet(self, quiet_workspace_with_refined_spec, plugin_dirs):
+    def test_decompose_quiet(self, quiet_workspace_with_refined_spec, plugin_dirs):
         spec_files = _find_specs(quiet_workspace_with_refined_spec)
         assert len(spec_files) == 1
         spec_name = os.path.basename(spec_files[0])
@@ -399,10 +482,10 @@ class TestMarkdownConfiguration:
     """
 
     @pytest.mark.timeout(600)
-    def test_create_spec_uses_custom_template(self, markdown_custom_template_workspace, plugin_dirs):
+    def test_create_uses_custom_template(self, markdown_custom_template_workspace, plugin_dirs):
         transcript = _read_fixture("sample_transcript.txt")
         output = run_claude_conversation(
-            _create_spec_messages(transcript),
+            _create_messages("Product Spec", transcript),
             cwd=markdown_custom_template_workspace,
             plugin_dirs=plugin_dirs,
         )

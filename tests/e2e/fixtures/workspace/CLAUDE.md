@@ -2,18 +2,29 @@
 
 ## D3 Configuration
 
-### Spec Provider
-**Skill:** d3-markdown:markdown-spec-provider
-**Configuration:**
-- Specs Directory: ./specs
-- Default Location: .
+### Artifacts
 
-### Story Provider
-**Skill:** d3-markdown:markdown-story-provider
-**Configuration:**
-- Stories Directory: ./stories
-- Epic Prefix: epic-
-- Story Prefix: story-
+#### Product Spec
+- Provider: d3-markdown:markdown-spec-provider
+- Provider Config:
+  - Directory: ./specs
+  - Default Location: .
+
+#### Tech Spec
+- Provider: d3-markdown:markdown-spec-provider
+- Provider Config:
+  - Directory: ./specs
+  - Default Location: .
+
+#### User Story
+- Provider: d3-markdown:markdown-story-provider
+- Provider Config:
+  - Directory: ./stories
+  - Epic Prefix: epic-
+  - Story Prefix: story-
+
+### Settings
+- Quiet Mode: false
 
 ## Project Information
 **Project Name:** E2E Test Project

@@ -1,0 +1,22 @@
+adapters:
+  confluence:
+    base_url: https://yoursite.atlassian.net
+    email: you@example.com
+    space_key: PROJ
+
+artifacts:
+  product_spec:
+    adapter: confluence
+    location_id: "123456789"
+    template: ./templates/product-spec.md
+  tech_spec:
+    adapter: markdown
+    directory: ./specs
+    template: ./templates/tech-spec.md
+  meeting_transcript:
+    adapter: confluence
+    location_id: "123456791"
+    template: ./templates/meeting-transcript.md
+
+settings:
+  quiet_mode: false

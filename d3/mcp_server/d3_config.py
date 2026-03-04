@@ -6,17 +6,20 @@ from pathlib import Path
 
 import yaml
 
+_RESERVED_ARTIFACT_KEYS = {"adapter", "template"}
+
 
 @dataclass
 class ArtifactConfig:
     adapter: str = "markdown"
+    template: str | None = None
     config: dict = field(default_factory=dict)
 
 
 @dataclass
 class D3Config:
+    adapters: dict[str, dict] = field(default_factory=dict)
     artifacts: dict[str, ArtifactConfig] = field(default_factory=dict)
-    templates: dict[str, str] = field(default_factory=dict)
     settings: dict[str, object] = field(default_factory=dict)
 
 
@@ -29,6 +32,12 @@ def _project_root() -> Path:
     if root:
         return Path(root)
     return Path.cwd()
+
+
+def _merge_artifact_config(adapter_name: str, artifact_fields: dict, adapters: dict) -> dict:
+    shared = dict(adapters.get(adapter_name, {}))
+    shared.update(artifact_fields)
+    return shared
 
 
 def load_config(config_path: Path | None = None) -> D3Config:
@@ -44,19 +53,24 @@ def load_config(config_path: Path | None = None) -> D3Config:
     if not raw:
         return D3Config()
 
+    adapters = raw.get("adapters", {}) or {}
+
     artifacts = {}
     for name, entry in raw.get("artifacts", {}).items():
         key = _normalise_key(name)
+        adapter_name = entry.get("adapter", "markdown")
+        template = entry.get("template")
+        artifact_fields = {
+            k: v for k, v in entry.items()
+            if k not in _RESERVED_ARTIFACT_KEYS
+        }
+        merged = _merge_artifact_config(adapter_name, artifact_fields, adapters)
         artifacts[key] = ArtifactConfig(
-            adapter=entry.get("adapter", "markdown"),
-            config=entry.get("config", {}),
+            adapter=adapter_name,
+            template=template,
+            config=merged,
         )
-
-    templates = {
-        _normalise_key(k): v
-        for k, v in raw.get("templates", {}).items()
-    }
 
     settings = raw.get("settings", {}) or {}
 
-    return D3Config(artifacts=artifacts, templates=templates, settings=settings)
+    return D3Config(adapters=adapters, artifacts=artifacts, settings=settings)

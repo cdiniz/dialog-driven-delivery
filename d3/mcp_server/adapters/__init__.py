@@ -3,9 +3,11 @@ from __future__ import annotations
 from typing import Any
 
 from .base import BaseAdapter
+from .confluence import ConfluenceAdapter
 from .markdown import MarkdownAdapter
 
 ADAPTERS: dict[str, type[BaseAdapter]] = {
+    "confluence": ConfluenceAdapter,
     "markdown": MarkdownAdapter,
 }
 

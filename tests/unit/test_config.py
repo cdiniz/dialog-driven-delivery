@@ -14,7 +14,7 @@ class TestLoadConfig:
         cfg = load_config(tmp_path / "nonexistent.yaml")
         assert cfg == D3Config()
         assert cfg.artifacts == {}
-        assert cfg.templates == {}
+        assert cfg.adapters == {}
         assert cfg.settings == {}
 
     def test_empty_file_returns_defaults(self, tmp_path):
@@ -22,21 +22,16 @@ class TestLoadConfig:
         cfg = load_config(config_file)
         assert cfg == D3Config()
 
-    def test_full_config(self, tmp_path):
+    def test_flat_artifact_fields(self, tmp_path):
         config_file = _write_yaml(tmp_path, """\
 artifacts:
   product_spec:
     adapter: markdown
-    config:
-      directory: ./specs
+    directory: ./specs
   user_story:
     adapter: markdown
-    config:
-      directory: ./stories
-      mode: story
-
-templates:
-  product_spec: ./templates/custom-product-spec.md
+    directory: ./stories
+    mode: story
 
 settings:
   quiet_mode: false
@@ -47,20 +42,18 @@ settings:
         assert cfg.artifacts["product_spec"].adapter == "markdown"
         assert cfg.artifacts["product_spec"].config["directory"] == "./specs"
         assert cfg.artifacts["user_story"].config["mode"] == "story"
-        assert cfg.templates["product_spec"] == "./templates/custom-product-spec.md"
         assert cfg.settings["quiet_mode"] is False
 
     def test_adapter_defaults_to_markdown(self, tmp_path):
         config_file = _write_yaml(tmp_path, """\
 artifacts:
   my_type:
-    config:
-      directory: ./things
+    directory: ./things
 """)
         cfg = load_config(config_file)
         assert cfg.artifacts["my_type"].adapter == "markdown"
 
-    def test_config_defaults_to_empty_dict(self, tmp_path):
+    def test_empty_artifact_has_empty_config(self, tmp_path):
         config_file = _write_yaml(tmp_path, """\
 artifacts:
   my_type:
@@ -74,15 +67,10 @@ artifacts:
 artifacts:
   Product Spec:
     adapter: markdown
-    config:
-      directory: ./specs
-
-templates:
-  Product Spec: ./templates/ps.md
+    directory: ./specs
 """)
         cfg = load_config(config_file)
         assert "product_spec" in cfg.artifacts
-        assert "product_spec" in cfg.templates
 
     def test_missing_settings_defaults_empty(self, tmp_path):
         config_file = _write_yaml(tmp_path, """\
@@ -93,11 +81,100 @@ artifacts:
         cfg = load_config(config_file)
         assert cfg.settings == {}
 
-    def test_missing_templates_defaults_empty(self, tmp_path):
+    def test_template_on_artifact(self, tmp_path):
+        config_file = _write_yaml(tmp_path, """\
+artifacts:
+  product_spec:
+    adapter: markdown
+    directory: ./specs
+    template: ./templates/custom-product-spec.md
+""")
+        cfg = load_config(config_file)
+        assert cfg.artifacts["product_spec"].template == "./templates/custom-product-spec.md"
+        assert "template" not in cfg.artifacts["product_spec"].config
+
+    def test_template_defaults_to_none(self, tmp_path):
         config_file = _write_yaml(tmp_path, """\
 artifacts:
   spec:
     adapter: markdown
+    directory: ./specs
 """)
         cfg = load_config(config_file)
-        assert cfg.templates == {}
+        assert cfg.artifacts["spec"].template is None
+
+
+class TestAdapterMerging:
+    def test_shared_adapter_config_merges_into_artifact(self, tmp_path):
+        config_file = _write_yaml(tmp_path, """\
+adapters:
+  confluence:
+    base_url: https://example.atlassian.net
+    email: user@example.com
+    api_token_env: CONFLUENCE_API_TOKEN
+    space_key: PROJ
+
+artifacts:
+  product_spec:
+    adapter: confluence
+    location_id: "12345"
+""")
+        cfg = load_config(config_file)
+        art = cfg.artifacts["product_spec"]
+        assert art.config["base_url"] == "https://example.atlassian.net"
+        assert art.config["email"] == "user@example.com"
+        assert art.config["space_key"] == "PROJ"
+        assert art.config["location_id"] == "12345"
+
+    def test_artifact_fields_override_shared(self, tmp_path):
+        config_file = _write_yaml(tmp_path, """\
+adapters:
+  confluence:
+    base_url: https://shared.atlassian.net
+    space_key: SHARED
+
+artifacts:
+  product_spec:
+    adapter: confluence
+    space_key: OVERRIDE
+""")
+        cfg = load_config(config_file)
+        assert cfg.artifacts["product_spec"].config["space_key"] == "OVERRIDE"
+        assert cfg.artifacts["product_spec"].config["base_url"] == "https://shared.atlassian.net"
+
+    def test_no_shared_adapter_config(self, tmp_path):
+        config_file = _write_yaml(tmp_path, """\
+artifacts:
+  transcript:
+    adapter: markdown
+    directory: ./transcripts
+""")
+        cfg = load_config(config_file)
+        assert cfg.artifacts["transcript"].config["directory"] == "./transcripts"
+
+    def test_adapters_section_stored_on_config(self, tmp_path):
+        config_file = _write_yaml(tmp_path, """\
+adapters:
+  confluence:
+    base_url: https://example.atlassian.net
+
+artifacts:
+  spec:
+    adapter: markdown
+    directory: ./specs
+""")
+        cfg = load_config(config_file)
+        assert cfg.adapters["confluence"]["base_url"] == "https://example.atlassian.net"
+
+    def test_reserved_keys_excluded_from_config(self, tmp_path):
+        config_file = _write_yaml(tmp_path, """\
+artifacts:
+  spec:
+    adapter: confluence
+    template: ./t.md
+    location_id: "999"
+""")
+        cfg = load_config(config_file)
+        assert "adapter" not in cfg.artifacts["spec"].config
+        assert "template" not in cfg.artifacts["spec"].config
+        assert cfg.artifacts["spec"].config["location_id"] == "999"

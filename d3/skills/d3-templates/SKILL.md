@@ -9,7 +9,7 @@ This skill provides canonical templates for D3 artifact creation. These template
 
 ## Default Template Lookup
 
-When no custom template path is configured in `d3.config.md`, commands resolve templates by artifact type name:
+When no custom template path is configured in the artifact's `template` field in `d3.config.yaml`, commands resolve templates by artifact type name:
 
 | Artifact Type | Template File |
 |---------------|---------------|
@@ -19,7 +19,7 @@ When no custom template path is configured in `d3.config.md`, commands resolve t
 | ADR | `references/adr.md` |
 | Meeting Transcript | `references/meeting-transcript.md` |
 
-Commands match the artifact type name from the config's `### Artifacts` section against this table (case-insensitive). If no match is found, the command asks the user to provide a template path.
+Commands match the artifact type name against this table (case-insensitive). If no match is found, the command asks the user to provide a template path.
 
 ## Available Templates
 
@@ -83,13 +83,13 @@ Templates are located in this skill's `references/` directory:
 ## How D3 Commands Use These Templates
 
 ### d3:create
-1. Reads artifact type from config's `### Artifacts` section
-2. Resolves template: custom path from `### Templates` or default from this skill's lookup table
+1. Reads artifact type from config's `artifacts` section
+2. Resolves template: artifact's `template` field or default from this skill's lookup table
 3. Uses template structure to ensure all sections present in the generated artifact
 4. Fills only what was discussed, marks uncertainties
 
 ### d3:refine
-1. Detects artifact type from the existing artifact's provider
+1. Detects artifact type from the existing artifact's adapter
 2. Resolves template for that type (same lookup as create)
 3. Uses template to validate structure is maintained during updates
 4. Ensures non-greedy updates — only sections with new information change
@@ -108,9 +108,9 @@ Templates are located in this skill's `references/` directory:
 D3 commands follow this loading pattern:
 
 ```
-1. Read `d3.config.md` for D3 Configuration section
+1. Read `d3.config.yaml` for artifact configuration
 2. Determine artifact type
-3. Check `### Templates` section for custom path matching the artifact type name
+3. Check artifact's `template` field for a custom path
 4. If custom path found → Read that file
 5. If no custom path → Look up artifact type in this skill's Default Template Lookup table
 6. If no default match → Ask user for template path

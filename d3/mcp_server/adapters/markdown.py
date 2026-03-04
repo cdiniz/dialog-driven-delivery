@@ -7,6 +7,8 @@ from pathlib import Path
 
 import yaml
 
+from d3_config import _project_root
+
 from .base import BaseAdapter
 
 
@@ -43,7 +45,10 @@ class MarkdownAdapter(BaseAdapter):
 
     @property
     def directory(self) -> Path:
-        return Path(self.config.get("directory", "./specs"))
+        raw = Path(self.config.get("directory", "./specs"))
+        if raw.is_absolute():
+            return raw
+        return _project_root() / raw
 
     @property
     def mode(self) -> str:

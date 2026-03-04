@@ -4,7 +4,7 @@
 
 **This repository provides tooling that implements D3's workflow across multiple AI coding platforms.** It turns the methodology's principles into a flexible toolkit: capture conversations, create structured artifacts from templates, refine them with new information, and decompose features into implementable stories.
 
-Works with your existing tools. Built-in providers for Atlassian (Confluence + Jira) and Markdown (local files + git). Expandable to any specification storage or work tracking system through pluggable provider skills.
+Works with your existing tools. Built-in adapters for Confluence and Markdown (local files + git). Expandable to any specification storage or work tracking system through pluggable adapters.
 
 ### Supported Platforms
 
@@ -41,7 +41,7 @@ Or copy files manually from `dist/<platform>/` into your project.
 
 ### 2. Configure Your Artifact Catalog
 
-Edit `d3.config.md` in your project root to configure artifact types and providers. See the [Configuration](#configuration) section for details.
+Edit `d3.config.yaml` in your project root to configure artifact types and adapters. See the [Configuration](#configuration) section for details.
 
 ### 3. Use D3 Commands
 
@@ -89,7 +89,7 @@ This tooling applies those principles through a flexible toolkit:
 - **Transcript-first**: Commands accept meeting transcripts as primary input
 - **Incremental delivery**: Artifacts grow through refinement, features decompose into stories
 - **Explicit over implicit**: Uncertainties are marked, not assumed — prevents AI hallucination
-- **Tool-agnostic**: Provider architecture works with whatever tools your team already uses
+- **Tool-agnostic**: Adapter architecture works with whatever tools your team already uses
 
 ---
 
@@ -153,71 +153,87 @@ cp -r dist/cursor/.cursor your-project/
 - **Git** for version control
 - One of the supported AI coding platforms installed and configured
 
-**Provider-specific (choose one or more):**
+**Adapter-specific (choose one or more):**
 
-| Provider | Requirements | Best for |
-|----------|-------------|----------|
+| Adapter | Requirements | Best for |
+|---------|-------------|----------|
 | **Markdown** | No external services | Lightweight, git-native teams |
-| **Atlassian** | Confluence + Jira + Atlassian MCP Server | Enterprise teams |
+| **Confluence** | Confluence API token | Enterprise teams |
 
 ---
 
 ## Configuration
 
-D3 configuration tells the agent which artifact types are available, which providers to use, and where to store artifacts. Edit `d3.config.md` in your project root.
+D3 configuration tells the agent which artifact types are available, which adapters to use, and where to store artifacts. Edit `d3.config.yaml` in your project root.
 
-### Artifact Catalog
+### Markdown (Local Files)
 
-The `### Artifacts` section defines what artifact types your project uses. Each `####` entry is an artifact type with its provider and configuration:
+```yaml
+artifacts:
+  product_spec:
+    adapter: markdown
+    directory: ./specs
+  tech_spec:
+    adapter: markdown
+    directory: ./specs
+  adr:
+    adapter: markdown
+    directory: ./adrs
+  meeting_transcript:
+    adapter: markdown
+    directory: ./transcripts
 
-```markdown
-## D3 Configuration
-
-### Artifacts
-
-#### Product Spec
-- Provider: d3-markdown:markdown-spec-provider
-- Provider Config:
-  - Directory: ./specs
-  - Default Location: .
-
-#### Tech Spec
-- Provider: d3-markdown:markdown-spec-provider
-- Provider Config:
-  - Directory: ./specs
-
-#### ADR
-- Provider: d3-markdown:markdown-spec-provider
-- Provider Config:
-  - Directory: ./docs/adrs
-
-#### Meeting Transcript
-- Provider: d3-markdown:markdown-transcript-provider
-- Provider Config:
-  - Directory: ./transcripts
+settings:
+  quiet_mode: false
 ```
 
-### Atlassian Provider (Enterprise)
+### Confluence
 
-```markdown
-### Artifacts
+Shared connection config goes in the `adapters:` section. Each artifact references the adapter by name and adds its own fields (like `location_id` for the parent page):
 
-#### Product Spec
-- Provider: d3-atlassian:atlassian-spec-provider
-- Provider Config:
-  - Cloud ID: your-cloud-id
-  - Default Location: PROJ
-  - spaceId: 1234567
-  - Default parent page: https://yoursite.atlassian.net/wiki/spaces/PROJ/pages/123456
+```yaml
+adapters:
+  confluence:
+    base_url: https://yoursite.atlassian.net
+    email: you@example.com
+    space_key: PROJ
 
-#### User Story
-- Provider: d3-atlassian:atlassian-story-provider
-- Provider Config:
-  - Cloud ID: your-cloud-id
-  - Default Project: PROJ
+artifacts:
+  product_spec:
+    adapter: confluence
+    location_id: "123456789"
+  tech_spec:
+    adapter: confluence
+    location_id: "123456789"
+  adr:
+    adapter: confluence
+    location_id: "123456790"
+
+settings:
+  quiet_mode: false
 ```
 
-Providers can be mixed freely — product specs in Confluence, tech specs in local markdown, or any other combination.
+The `CONFLUENCE_API_TOKEN` environment variable must be set (or added to a `.env` file in the project root).
+
+### Mixed Adapters
+
+Adapters can be mixed freely — product specs in Confluence, tech specs in local markdown, or any other combination:
+
+```yaml
+adapters:
+  confluence:
+    base_url: https://yoursite.atlassian.net
+    email: you@example.com
+    space_key: PROJ
+
+artifacts:
+  product_spec:
+    adapter: confluence
+    location_id: "123456789"
+  tech_spec:
+    adapter: markdown
+    directory: ./specs
+```
 
 ---
 
@@ -227,14 +243,14 @@ By default, D3 commands are conversational — they ask clarifying questions, co
 
 For automated pipelines or scripted workflows, enable quiet mode to suppress all prompts:
 
-```markdown
-### Settings
-- Quiet Mode: true
+```yaml
+settings:
+  quiet_mode: true
 ```
 
 In quiet mode:
 - Input must be passed directly in the command (transcript text, spec name, etc.)
-- Location selection is skipped — the provider's `Default Location` is used
+- Location selection is skipped — the artifact's `location_id` is used
 - Titles are inferred automatically without confirmation
 - Changes are applied immediately without a review step
 - Uncertainties are marked inline rather than surfaced interactively
@@ -260,19 +276,22 @@ D3 includes default templates via the `d3-templates` skill that work out of the 
    # Copy from the d3-templates skill references directory
    ```
 
-2. Configure custom paths in your config file:
-   ```markdown
-   ### Templates
-   - Product Spec: ./.d3/templates/feature-product-spec.md
-   - Tech Spec: ./.d3/templates/feature-tech-spec.md
-   - User Story: ./.d3/templates/user-story.md
-   - Meeting Transcript: ./.d3/templates/meeting-transcript.md
-   - ADR: ./.d3/templates/adr.md
+2. Add a `template` field to each artifact in `d3.config.yaml`:
+   ```yaml
+   artifacts:
+     product_spec:
+       adapter: markdown
+       directory: ./specs
+       template: ./.d3/templates/feature-product-spec.md
+     tech_spec:
+       adapter: markdown
+       directory: ./specs
+       template: ./.d3/templates/feature-tech-spec.md
    ```
 
 **To create a new template type:**
 
-Use `/d3:create-template` to interactively design a new template, then add the artifact type to your config's `### Artifacts` section.
+Use `/d3:create-template` to interactively design a new template, then add the artifact type to your config's `artifacts` section.
 
 ---
 
@@ -366,55 +385,45 @@ The core technique is **inputs + template → artifact**. Templates define the s
 
 Commands ask for meeting transcripts (preferred input), work conversationally if none available, propose options with pros/cons, and confirm before creating artefacts.
 
-### Provider Architecture
+### Adapter Architecture
+
+An MCP server exposes a uniform set of tools (`create_artifact`, `read_artifact`, `update_artifact`, `search_artifacts`) that dispatch to the configured adapter for each artifact type.
 
 ```
 D3 Core Commands (Tool-Agnostic)
-    ├── create             → Uses any artifact provider
-    ├── refine             → Uses any artifact provider
+    ├── create             → Uses any artifact adapter
+    ├── refine             → Uses any artifact adapter
     ├── create-template    → Generates template files
-    ├── decompose          → Uses Spec Provider + Story Provider
-    └── align-spec         → Uses Spec Provider + Codebase
+    ├── decompose          → Uses artifact adapter
+    └── align-spec         → Uses artifact adapter + Codebase
 
-Providers (Pluggable)
-    ├── Atlassian (Confluence + Jira)   — built-in
-    ├── Markdown (local files + git)    — built-in
-    └── Custom (Notion, Linear, etc.)   — expandable
+Adapters (Pluggable)
+    ├── Confluence         — built-in
+    ├── Markdown           — built-in (local files + git)
+    └── Custom             — expandable
 ```
-
-### Creating Custom Providers
-
-1. Review an existing provider (e.g. `d3-markdown/skills/markdown-spec-provider/SKILL.md`)
-2. Implement the provider operations for your tool
-3. Configure your config file to reference the new provider
-4. D3 commands work automatically with any provider
-
-**Provider operations:**
-- **Spec**: `list_locations`, `create_spec`, `get_spec`, `update_spec`, `search_specs`
-- **Story**: `list_projects`, `get_issue_types`, `create_epic`, `create_story`, `link_issues`
-- **Transcript**: `list_locations`, `store_transcript`, `get_transcript`, `list_transcripts`, `search_transcripts`
 
 ---
 
 ## Repository Structure
 
-The Claude Code plugin files (`d3/`, `d3-markdown/`, `d3-atlassian/`) are the source of truth. They use platform-agnostic natural language (e.g. "the read tool") and reference `d3.config.md` directly. The generator copies these to other platforms, transforming frontmatter and directory structure. Each platform gets a `d3-platform` reference that maps generic tool terms to platform-specific values.
+The Claude Code plugin files (`d3/`) are the source of truth. They use platform-agnostic natural language (e.g. "the read tool") and reference `d3.config.yaml` directly. The generator copies these to other platforms, transforming frontmatter and directory structure. Each platform gets a `d3-platform` reference that maps generic tool terms to platform-specific values.
 
 ```
 dialog-driven-delivery/
-├── d3/                              # Core plugin — commands, skills, templates
-├── d3-markdown/                     # Markdown provider plugin (local files + git)
-├── d3-atlassian/                    # Atlassian provider plugin (Confluence + Jira)
+├── d3/                              # Core plugin — commands, skills, templates, MCP server
 ├── d3.platform.yaml                 # Platform tool/config mappings
-├── metadata/                        # Plugin metadata (d3.yaml, d3-markdown.yaml, d3-atlassian.yaml)
+├── metadata/                        # Plugin metadata
 ├── config/
-│   └── example-config.md            # Default provider configuration
+│   ├── example-config-markdown.yaml # Markdown adapter example
+│   ├── example-config-atlassian.yaml# Confluence adapter example
+│   └── example-config-mixed.yaml    # Mixed adapter example
 ├── generate.py                      # Generator — copies source to other platforms
 ├── install.sh                       # Install script for non-Claude platforms
 └── dist/                            # Generated — other platforms
-    ├── codex/                       # .agents/skills/ + d3.config.md
-    ├── copilot/                     # .github/prompts/ + .github/agents/ + d3.config.md
-    └── cursor/                      # .cursor/rules/ + d3.config.md
+    ├── codex/                       # .agents/skills/ + d3.config.yaml
+    ├── copilot/                     # .github/prompts/ + .github/agents/ + d3.config.yaml
+    └── cursor/                      # .cursor/rules/ + d3.config.yaml
 ```
 
 ### How It Works
@@ -465,7 +474,7 @@ pip install pre-commit
 pre-commit install
 ```
 
-The hook runs `python generate.py --all` when you commit changes to `d3/`, `d3-markdown/`, `d3-atlassian/`, `d3.platform.yaml`, `metadata/`, or `config/`.
+The hook runs `python generate.py --all` when you commit changes to `d3/`, `d3.platform.yaml`, `metadata/`, or `config/`.
 
 ### Install Script
 
@@ -490,8 +499,7 @@ The script creates config files with sensible defaults if they don't already exi
 ```bash
 # Test in another project using local plugins
 cd /path/to/test-project
-claude --plugin-dir /path/to/dialog-driven-delivery/d3 \
-       --plugin-dir /path/to/dialog-driven-delivery/d3-markdown
+claude --plugin-dir /path/to/dialog-driven-delivery/d3
 ```
 
 **Other platforms** (copy to test project):
@@ -507,7 +515,7 @@ cp dist/codex/AGENTS.md /path/to/your-project/
 
 ### Making Changes
 
-1. Edit source files in `d3/`, `d3-markdown/`, or `d3-atlassian/`
+1. Edit source files in `d3/`
 2. Commit — the pre-commit hook regenerates `dist/` automatically
 3. Test with your target platform
 
@@ -540,7 +548,7 @@ All commands work conversationally — select "Describe conversationally" and an
 
 ### "Can I use this with other tools?"
 
-Yes. D3 is tool-agnostic through its provider architecture. Use Confluence + Jira, Markdown + Git, or create custom providers for Notion, Linear, GitHub Issues, etc.
+Yes. D3 is tool-agnostic through its adapter architecture. Use Confluence, Markdown + Git, or create custom adapters for Notion, Linear, GitHub Issues, etc.
 
 ### "How do I implement the stories?"
 

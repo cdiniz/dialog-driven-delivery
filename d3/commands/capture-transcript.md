@@ -12,20 +12,11 @@ Transcripts are standalone artifacts. Their relationship to specs is established
 
 ## Workflow
 
-### 1. Detect Provider, Template, and Settings
-- Read `d3.config.md` for D3 config
-- Search for `### Transcript Provider` section
-- If no Transcript Provider configured, guide user to add one to `d3.config.md`:
-  ```markdown
-  ### Transcript Provider
-  **Skill:** d3-markdown:markdown-transcript-provider
-  **Configuration:**
-  - Transcripts Directory: ./transcripts
-  - Default Location: .
-  ```
-- Read `Quiet Mode` from Settings (default: `false` when absent)
-- Load meeting transcript template from d3-templates skill (or custom path if configured)
-- Store provider, template, and quiet mode for later steps
+### 1. Load Configuration and Templates
+- Read `d3.config.md`
+- From the Storage table, find the row matching "Transcripts"
+- Read Quiet Mode from Settings
+- Load meeting transcript template from d3-templates skill (or custom path if configured in Templates section)
 
 ### 2. Get Transcript Input
 
@@ -138,14 +129,12 @@ The raw transcript will be preserved in full.
 Ready to save? Or would you like to adjust anything?
 ```
 
-### 8. Store via Provider
+### 8. Store Transcript
 
-Invoke the [provider-name] skill (see platform reference for invocation syntax):
-```
-store_transcript title="[Title]" meeting_type="[type]" meeting_date="[YYYY-MM-DD]" participants="[comma-separated list]" body="[FULL_CONTENT]"
-```
+Follow the Instructions column from the Storage table for "Transcripts".
+Write the artifact to the Location specified.
 
-The body includes:
+The content includes:
 - Template header (title, date, type, participants)
 - Summary section
 - Key Decisions section
@@ -156,7 +145,7 @@ The body includes:
 ### 9. Provide Summary & Next Steps
 
 ```
-✅ Transcript captured: [Title] - [path]
+Transcript captured: [Title] - [path]
 
 Extracted:
 - Decisions: [N]
@@ -165,7 +154,7 @@ Extracted:
 
 Next steps:
 - Create a spec from this transcript: /d3:create-spec (paste the transcript path when asked)
-- Refine an existing spec: /d3:refine-spec PAGE-ID (reference this transcript)
+- Refine an existing spec: /d3:refine-spec [spec-path] (reference this transcript)
 - View transcript: [path]
 ```
 
@@ -175,14 +164,12 @@ Next steps:
 
 | Issue | Action |
 |-------|--------|
-| No provider configured | Guide user to add Transcript Provider to `d3.config.md` |
 | Empty transcript | Ask user to paste the transcript content |
 | No date in transcript | Ask user for the meeting date, default to today |
 | Very short transcript (<100 words) | Warn that the transcript is very short and extracted content may be minimal. Confirm before proceeding |
 | No decisions extractable | Normal — set Key Decisions section to "No decisions were made during this meeting." |
 | No action items found | Normal — set Action Items section to "No action items were assigned during this meeting." |
 | Storage fails | Provide full structured transcript text for manual saving |
-| Location not found | List available locations |
 
 ---
 

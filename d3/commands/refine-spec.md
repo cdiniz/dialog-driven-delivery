@@ -14,49 +14,35 @@ Automatically detect which sections need updating - Product, Technical, or both.
 
 ## Workflow
 
-### 1. Detect Providers, Templates, and Settings
-- Read `d3.config.md` for D3 config
-- Search for ### D3 Config  ### Templates
-- Detect spec mode from provider configuration:
-  - If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. Store each provider's skill and configuration independently.
-  - If only `### Spec Provider` exists → **combined mode**. Store single provider config.
-- Read `Quiet Mode` from Settings (default: `false` when absent)
-- If templates (tech and product spec templates) are not configure use skill d3-templates
-- Store for later steps
+### 1. Load Configuration and Templates
+- Read `d3.config.md`
+- From the Storage table, find the rows matching "Specs" and "Stories"
+- Read Quiet Mode from Settings
+- Load templates from d3-templates skill (or custom paths if configured in Templates section)
 
 ### 2. Fetch Specification
-Command accepts spec identifier, URL, or title in `$ARGUMENTS`.
+Command accepts spec identifier, path, or title in `$ARGUMENTS`.
 
-Determine which provider owns the spec:
-- **Combined mode:** Use the single spec provider's `get_spec`
-- **Separated mode:** Detect whether the identifier refers to a product or tech spec (from title suffix, filename, or content). Use the matching provider's `get_spec`.
-
-Use provider's `get_spec`:
-- Identifier → Use directly
-- URL → Extract identifier
-- Title → Search, then get_spec
-
-**If separated mode:**
-After fetching, note the spec type (product or tech) and the feature title (strip the "- Product Spec" / "- Tech Spec" suffix).
-Do NOT fetch the companion yet — wait until Step 6 determines whether changes affect both sections.
+Read the spec from the Storage location for "Specs":
+- Path → Read directly
+- Title → Search in the Specs location, then read
 
 ### 3. Detect Existing Stories
-Find the epic matching the spec title and list all its children (stories, tasks, or any issue type).
-- Store epic key and child list for later impact analysis
-- If no epic or no children found, skip story impact steps later
+Search the Storage location for "Stories" for stories matching the spec title.
+- Store list for later impact analysis
+- If no stories found, skip story impact steps later
 
 ### 4. Analyze Current State
 Display coverage:
 ```
-**Specification:** [Title] - [URL]
-**Last Modified:** [Date]
+**Specification:** [Title] - [path]
 
 Current Coverage:
 - Product: ~[X]% ([sections with content])
 - Technical: ~[Y]% ([sections with content])
 - Open Questions: [Z] product, [W] technical
 
-Linked Stories: [None / Epic KEY-123 with N stories]
+Linked Stories: [None / N stories found]
 ```
 
 ### 5. Request Refinement Input
@@ -102,18 +88,13 @@ Update ONLY sections explicitly addressed in new input.
 2. YES → Update with actual content
 3. NO → Leave unchanged (existing content OR placeholder)
 
-**If separated mode — Companion Fetch Optimisation:**
-After analysing the new information, determine if changes affect Product sections, Technical sections, or both.
-- If changes affect only the fetched spec type → proceed with just that spec, no companion fetch needed
-- If changes affect both → derive the companion title by swapping the suffix ("Product Spec" ↔ "Tech Spec") and fetch it from the other provider via `search_specs` or `get_spec`
-
 ### 7. Show Proposed Changes
 
 Present clear before/after:
 ```
 Proposed Changes:
 
-## 📋 Product Specification Changes
+## Product Specification Changes
 
 ### [Section Name]
 BEFORE: [Current content]
@@ -121,7 +102,7 @@ AFTER: [Proposed content]
 Rationale: [Why]
 Type: [Addition/Modification/Clarification/Resolution]
 
-## 🔧 Technical Specification Changes
+## Technical Specification Changes
 
 ### [Section Name]
 [Same pattern]
@@ -140,7 +121,7 @@ Does this look correct?
 
 ### 8. Analyze Story Impact (if stories exist)
 
-**Skip this step if no epic/stories were found in Step 3.**
+**Skip this step if no stories were found in Step 3.**
 
 For each spec change, determine if it affects existing stories:
 
@@ -159,7 +140,7 @@ For each spec change, determine if it affects existing stories:
 
 **Present story impact:**
 ```
-## 📌 Story Impact Analysis
+## Story Impact Analysis
 
 ### Affected Stories:
 
@@ -188,7 +169,7 @@ Proceed with spec + story updates?
 - [ ] Before/after shows enough context
 - [ ] Uncertainty markers properly updated
 - [ ] No hallucination - only documented changes
-- [ ] Both specs remain internally consistent
+- [ ] Spec remains internally consistent
 - [ ] Updates maintain template structure
 - [ ] Story updates match spec changes (no drift)
 - [ ] New stories follow INVEST principles
@@ -200,45 +181,26 @@ Proceed with spec + story updates?
 
 ### 10. Apply Updates
 
-**If combined mode:**
-
-Invoke the [spec-provider] skill (see platform reference for invocation syntax):
-```
-update_spec page_id="[spec-id]" body="[UPDATED_SPEC]" version_message="[description]"
-```
-
-**If separated mode:**
-
-For each affected spec, invoke the owning provider's skill:
-```
-[product-spec-provider] update_spec page_id="[product-spec-id]" body="[UPDATED_PRODUCT_SPEC]" version_message="[description]"
-[tech-spec-provider] update_spec page_id="[tech-spec-id]" body="[UPDATED_TECH_SPEC]" version_message="[description]"
-```
-
-Only update specs that had changes — skip the companion if it was unaffected.
+Follow the Instructions column from the Storage table for "Specs".
+Write the updated spec to the Location specified.
 
 **Apply story updates (if stories are affected):**
 
-For each affected story, invoke the [story-provider] skill:
-```
-update_story issue_key="[STORY-KEY]" description="[UPDATED_DESCRIPTION]"
-```
+Follow the Instructions column from the Storage table for "Stories".
+Update affected stories at the Location specified.
 
-For new stories needed, invoke the [story-provider] skill:
-```
-create_story project_key="[PROJECT]" epic_id="[EPIC-KEY]" story_data="{summary: '...', description: '...', labels: [...]}"
-```
+For new stories needed, create them at the Stories location following the Instructions.
 
 For obsolete stories (after user confirmation):
-- Add a comment explaining why the story is no longer needed
-- Do NOT close or delete — let the user decide the final disposition
+- Add a note explaining why the story is no longer needed
+- Do NOT delete — let the user decide the final disposition
 
 ### 11. Provide Summary
 
 ```
-✅ Specification refined!
+Specification refined!
 
-**Specification:** [Title] - [URL]
+**Specification:** [Title] - [path]
 
 What Was Updated:
 - Product: [Status per section]
@@ -256,9 +218,9 @@ Coverage Improvement:
 - After: Product ~[X]% | Technical ~[Y]%
 
 Story Updates:
-- Updated: [N stories] ([STORY-KEY], [STORY-KEY], ...)
-- Created: [N new stories] ([STORY-KEY], ...)
-- Flagged obsolete: [N stories] ([STORY-KEY], ...)
+- Updated: [N stories]
+- Created: [N new stories]
+- Flagged obsolete: [N stories]
 - Unchanged: [N stories]
 
 Remaining Gaps: [Empty sections if any]
@@ -270,13 +232,12 @@ Next: Review → /d3:refine-spec (continue) → /d3:decompose (when ready)
 
 ## Key Principles
 
-1. **Smart detection** - Content determines which spec(s) and stories update
+1. **Smart detection** - Content determines which sections and stories update
 2. **Preserve existing** - Only change what needs changing
-3. **One input, both specs** - Product and technical info often intermixed
-4. **Track resolution** - Remove resolved uncertainty markers
-5. **Add new uncertainties** - New info may raise questions
-6. **Spec-story sync** - Stories must reflect the current spec, not a stale version
-7. **Minimal story churn** - Only update stories directly affected by spec changes
+3. **Track resolution** - Remove resolved uncertainty markers
+4. **Add new uncertainties** - New info may raise questions
+5. **Spec-story sync** - Stories must reflect the current spec, not a stale version
+6. **Minimal story churn** - Only update stories directly affected by spec changes
 
 **Spec Change Types:**
 - Addition: New content in empty section
@@ -302,23 +263,23 @@ Next: Review → /d3:refine-spec (continue) → /d3:decompose (when ready)
 **Examples:**
 
 New input mentions "user can filter by date":
-- ✅ Update spec: User Journey, Requirements
-- ✅ Update stories: Stories covering search/listing workflows → add filter AC
-- ❌ Don't touch: API Contracts, Data Models (not discussed)
+- Update spec: User Journey, Requirements
+- Update stories: Stories covering search/listing workflows → add filter AC
+- Don't touch: API Contracts, Data Models (not discussed)
 
 New input mentions "use PostgreSQL for storage":
-- ✅ Update spec: Technical Approach, Data Models
-- ✅ Update stories: Stories with technical notes referencing data layer
-- ❌ Don't touch: User Journey, Requirements (not discussed)
+- Update spec: Technical Approach, Data Models
+- Update stories: Stories with technical notes referencing data layer
+- Don't touch: User Journey, Requirements (not discussed)
 
 New input removes a feature ("we decided not to support bulk export"):
-- ✅ Update spec: Remove from Requirements, User Journey
-- ✅ Flag story: Story covering bulk export → mark as potentially obsolete
-- ❌ Don't auto-close: Let user decide
+- Update spec: Remove from Requirements, User Journey
+- Flag story: Story covering bulk export → mark as potentially obsolete
+- Don't auto-close: Let user decide
 
 New input adds a new workflow ("we also need an admin approval step"):
-- ✅ Update spec: Add to User Journey, Requirements
-- ✅ New story needed: Admin approval workflow not covered by existing stories
+- Update spec: Add to User Journey, Requirements
+- New story needed: Admin approval workflow not covered by existing stories
 
 ---
 
@@ -330,7 +291,7 @@ Each session adds only what was discussed. Empty sections remain empty until exp
 **Typical refinement:**
 - Input about product features → Product spec grows
 - Input about technical decisions → Technical spec grows
-- Mixed input → Both specs grow
+- Mixed input → Both parts grow
 
 This is CORRECT. Don't try to "complete" sections by guessing.
 
@@ -346,6 +307,5 @@ This is CORRECT. Don't try to "complete" sections by guessing.
 | Major scope change | Warn about impact on spec and stories, confirm |
 | Spec update fails | Provide full updated text for manual update |
 | Story update fails | Provide updated story content for manual update |
-| Spec not found | Verify identifier/URL, suggest search |
-| Epic not found | Skip story impact analysis, proceed with spec-only refinement |
-| Story provider unavailable | Warn, apply spec changes only, list story impacts for manual action |
+| Spec not found | Verify identifier/path, suggest search |
+| Stories not found | Skip story impact analysis, proceed with spec-only refinement |

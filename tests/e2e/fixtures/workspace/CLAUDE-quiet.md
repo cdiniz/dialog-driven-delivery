@@ -5,18 +5,22 @@
 ### Settings
 - Quiet Mode: true
 
-### Spec Provider
-**Skill:** d3-markdown:markdown-spec-provider
-**Configuration:**
-- Specs Directory: ./specs
-- Default Location: .
+### Templates
+Uses default D3 templates. Override by adding paths:
+- Product Spec Template: (default)
+- Tech Spec Template: (default)
+- User Story Template: (default)
+- ADR Template: (default)
+- Meeting Transcript Template: (default)
 
-### Story Provider
-**Skill:** d3-markdown:markdown-story-provider
-**Configuration:**
-- Stories Directory: ./stories
-- Epic Prefix: epic-
-- Story Prefix: story-
+### Storage
+
+| Artifact      | Location          | Instructions                    |
+|---------------|-------------------|---------------------------------|
+| Specs         | ./specs/          | Write as markdown files         |
+| Stories       | ./stories/        | Write as markdown files         |
+| ADRs          | ./adrs/           | Write as markdown files         |
+| Transcripts   | ./transcripts/    | Write as markdown files         |
 
 ## Project Information
 **Project Name:** E2E Test Project

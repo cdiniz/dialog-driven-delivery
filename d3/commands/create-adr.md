@@ -12,13 +12,11 @@ ADRs are immutable records following [MADR v4](https://adr.github.io/madr/) form
 
 ## Workflow
 
-### 1. Detect Provider, Templates, and Settings
-- Read `d3.config.md` for D3 config
-- Search for `### ADR Provider` section first
-- If no ADR Provider configured, fall back to `### Spec Provider`
-- Read `Quiet Mode` from Settings (default: `false` when absent)
-- Load ADR template from d3-templates skill (or custom path if configured)
-- Store provider, template, and quiet mode for later steps
+### 1. Load Configuration and Templates
+- Read `d3.config.md`
+- From the Storage table, find the row matching "ADRs"
+- Read Quiet Mode from Settings
+- Load ADR template from d3-templates skill (or custom path if configured in Templates section)
 
 ### 2. Get Input Context
 
@@ -33,22 +31,13 @@ B) Paste existing document
 C) Describe conversationally
 ```
 
-### 3. Get Location
-
-**If quiet mode:** Use Default Location from ADR Provider (or Spec Provider) configuration in `d3.config.md`. If no default is configured, use the provider's root location (`.`).
-
-**Otherwise:**
-Ask where to create the ADR. If needed, use provider's `list_locations`.
-
-Use the location from ADR Provider config if available, otherwise Spec Provider's location.
-
-### 4. Auto-Number
-Search existing ADRs using provider's `search_specs` to determine the next number:
+### 3. Auto-Number
+Search existing ADRs in the Storage location for "ADRs" to determine the next number:
 - Search for "ADR-" prefix in the configured location
 - Parse existing numbers and determine the next sequential number
 - If no existing ADRs found, start with ADR-001
 
-### 5. Analyze Input & Extract Decision
+### 4. Analyze Input & Extract Decision
 
 Extract from context (following MADR v4 structure):
 - **Context and Problem Statement:** The situation and problem driving the decision
@@ -63,7 +52,7 @@ Extract from context (following MADR v4 structure):
 
 **Otherwise:** Propose title (short, representative of solved problem and found solution), wait for confirmation.
 
-### 6. Determine Status & Metadata
+### 5. Determine Status & Metadata
 
 - If a clear decision was made → Status: **Accepted**
 - If still under discussion or pending approval → Status: **Proposed** with `[DECISION PENDING: ...]` markers
@@ -74,20 +63,20 @@ Extract from context (following MADR v4 structure):
 
 - Identify decision-makers, consulted, and informed parties from context
 
-### 7. Handle Superseding
+### 6. Handle Superseding
 
-**If quiet mode:** Assume this ADR does not supersede an existing one. Skip to Step 8.
+**If quiet mode:** Assume this ADR does not supersede an existing one. Skip to Step 7.
 
 **Otherwise:** Ask: "Does this ADR supersede an existing one?"
 
 If yes:
-- Fetch the old ADR using provider's `get_spec`
-- Update old ADR status to "Superseded by ADR-[NEW_NUMBER]" using provider's `update_spec`
+- Read the old ADR from the Storage location for "ADRs"
+- Update old ADR status to "Superseded by ADR-[NEW_NUMBER]"
 - Add `Supersedes: ADR-[OLD_NUMBER]` metadata to new ADR
 
 If no: Continue without cross-references.
 
-### 8. Generate ADR
+### 7. Generate ADR
 
 **CRITICAL RULES:**
 
@@ -116,7 +105,7 @@ If no: Continue without cross-references.
 
 Invoke uncertainty-markers skill for detailed guidance.
 
-### 9. Validate Before Creation
+### 8. Validate Before Creation
 
 **Structure validation (MADR v4):**
 - [ ] ALL template headings present (Context and Problem Statement, Decision Drivers, Considered Options, Decision Outcome, Consequences, Confirmation, Pros and Cons of the Options, More Information)
@@ -144,17 +133,15 @@ Uncertainty markers: [N]
 Ready to create? Or would you like to adjust anything?
 ```
 
-### 10. Create ADR
+### 9. Create ADR
 
-Invoke the [provider-name] skill (see platform reference for invocation syntax):
-```
-create_spec location_id="[LOCATION]" title="ADR-[NUMBER]: [Title]" body="[FULL_ADR]"
-```
+Follow the Instructions column from the Storage table for "ADRs".
+Write the artifact to the Location specified.
 
-### 11. Provide Summary & Next Steps
+### 10. Provide Summary & Next Steps
 
 ```
-✅ ADR created: ADR-[NUMBER]: [Title] - [URL]
+ADR created: ADR-[NUMBER]: [Title] - [path]
 
 Status: [Proposed/Accepted]
 Decision: [Chosen option summary]
@@ -171,13 +158,11 @@ into relevant specifications' "Architectural Context > Relevant ADRs" section.
 
 | Issue | Action |
 |-------|--------|
-| No provider configured | Guide user to add ADR Provider or Spec Provider to `d3.config.md` |
 | No decision found in input | Ask clarifying questions to identify the decision |
 | Minimal context | Warn ADR will be sparse, confirm before creating |
 | Conflicting information | Mark `[DECISION PENDING]` with conflicting options listed |
 | Old ADR not found for superseding | Warn, create new ADR without cross-reference |
 | Creation fails | Provide full ADR text for manual creation |
-| Location not found | List available locations |
 
 ---
 

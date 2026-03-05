@@ -1,26 +1,22 @@
 ---
-description: Create comprehensive feature specification from any input context (meeting transcripts, documents, or conversational discussion). Creates a unified specification containing both Product and Technical specifications. Use when starting a new feature, documenting a planning meeting, or when user asks to create/write a spec, specification, or feature documentation. Fills only known information and marks uncertainties.
+description: Create comprehensive feature specification from any input context (meeting transcripts, documents, or conversational discussion). Creates a unified specification containing both Product and Technical sections. Use when starting a new feature, documenting a planning meeting, or when user asks to create/write a spec, specification, or feature documentation. Fills only known information and marks uncertainties.
 ---
 
 ## Core Principle
 
 **Fill only what you know. Empty sections are better than hallucinated content.**
 
-Create a specification with BOTH Product and Technical sections. When a single `### Spec Provider` is configured, creates a single unified document. When `### Product Spec Provider` and `### Tech Spec Provider` are both configured, creates two separate documents — one for product, one for technical — using their respective providers. Specs grow progressively through refinement.
+Create a single unified specification with BOTH Product and Technical sections. Specs grow progressively through refinement.
 
 ---
 
 ## Workflow
 
-### 1. Detect Providers, Templates, and Settings
-- Read `d3.config.md` for D3 config
-- Search for ### D3 Config  ### Templates
-- Detect spec mode from provider configuration:
-  - If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. Store each provider's skill and configuration independently.
-  - If only `### Spec Provider` exists → **combined mode**. Store single provider config.
-- Read `Quiet Mode` from Settings (default: `false` when absent)
-- If templates (tech and product spec templates) are not configure use skill d3-templates
-- Store for later steps
+### 1. Load Configuration and Templates
+- Read `d3.config.md`
+- From the Storage table, find the row matching "Specs"
+- Read Quiet Mode from Settings
+- Load templates from d3-templates skill (or custom paths if configured in Templates section)
 
 ### 2. Get Input Context
 
@@ -35,14 +31,7 @@ B) Paste existing document
 C) Describe conversationally
 ```
 
-### 3. Get Location
-
-**If quiet mode:** Use Default Location from provider configuration in `d3.config.md`. If no default is configured, use the provider's root location (`.`).
-
-**Otherwise:**
-Ask where to create spec. If needed, use provider's `list_locations`.
-
-### 4. Analyze & Propose Title
+### 3. Analyze & Propose Title
 Extract from context:
 - Product: Users, workflows, requirements, business value
 - Technical: Architecture, APIs, data models, integrations
@@ -52,7 +41,7 @@ Extract from context:
 
 **Otherwise:** Propose title, wait for confirmation.
 
-### 5. Generate Specification
+### 4. Generate Specification
 
 **CRITICAL RULES:**
 
@@ -78,7 +67,7 @@ Extract from context:
 
 Invoke uncertainty-markers skill for detailed guidance.
 
-### 6. Validate Before Creation
+### 5. Validate Before Creation
 
 **Structure validation:**
 - [ ] ALL template headings present (with numbering)
@@ -104,47 +93,15 @@ Specification ready with [N] uncertainty markers:
 Resolve now, leave marked, or review first?
 ```
 
-### 7. Create Specification
+### 6. Create Specification
 
-**If combined mode (single Spec Provider):**
+Follow the Instructions column from the Storage table for "Specs".
+Write the artifact to the Location specified.
 
-Invoke the [spec-provider] skill (see platform reference for invocation syntax):
+### 7. Provide Summary
+
 ```
-create_spec location_id="[LOCATION]" title="[Title]" body="[FULL_SPEC]"
-```
-
-**If separated mode (Product Spec Provider + Tech Spec Provider):**
-
-Split the generated specification into two documents:
-
-1. **Product Spec** — contains only the Product Specification sections from the product template
-2. **Tech Spec** — contains only the Technical Specification sections from the tech template
-
-Invoke each provider's skill:
-```
-[product-spec-provider] create_spec location_id="[LOCATION]" title="[Title] - Product Spec" body="[PRODUCT_SPEC]"
-[tech-spec-provider] create_spec location_id="[LOCATION]" title="[Title] - Tech Spec" body="[TECH_SPEC]"
-```
-
-### 8. Provide Summary
-
-**If combined mode:**
-```
-✅ Specification created: [Title] - [URL]
-
-Coverage:
-- Product Spec: [40-70% typical]
-- Technical Spec: [10-30% typical]
-- Uncertainties: [N] markers
-
-Next: Review → /d3:refine-spec → /d3:decompose
-```
-
-**If separated mode:**
-```
-✅ Specification created:
-- Product Spec: [Title] - Product Spec - [URL]
-- Tech Spec: [Title] - Tech Spec - [URL]
+Specification created: [Title] - [path]
 
 Coverage:
 - Product Spec: [40-70% typical]
@@ -177,4 +134,3 @@ This is CORRECT. Don't try to complete sections by guessing.
 | Minimal technical discussion | Normal - use placeholders, don't invent |
 | Conflicting info | Mark `[DECISION PENDING]` |
 | Creation fails | Provide full spec text for manual creation |
-| Location not found | List available locations |

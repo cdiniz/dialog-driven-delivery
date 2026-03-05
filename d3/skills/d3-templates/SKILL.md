@@ -5,7 +5,7 @@ description: Provides standard templates for Dialog-Driven Delivery (D3) specifi
 
 # D3 Standard Templates
 
-This skill provides canonical templates for D3 specification, story, ADR, and transcript creation. These templates are used by d3:create-spec, d3:refine-spec, d3:decompose, d3:create-adr, and d3:capture-transcript commands.
+This skill provides canonical templates for D3 artifact creation. These templates are used by d3:create-spec, d3:refine-spec, d3:decompose, d3:create-adr, and d3:capture-transcript commands.
 
 ## Available Templates
 
@@ -66,51 +66,11 @@ Templates are located in this skill's `references/` directory:
   - Raw Transcript (Full unedited transcript)
 - **Metadata:** Title, Date, Type (Planning/Technical/Standup/Retro/Other), Participants
 
-## How D3 Commands Use These Templates
+## Template Loading
 
-### d3:create-spec
-1. Loads user spec templates feature-product-spec and feature-tech-spec from `d3.config.md` or this skill
-2. Creates unified spec with both Product and Technical sections
-3. Uses template structure to ensure all sections present
+D3 commands load templates as follows:
 
-### d3:refine-spec
-1. Loads user spec templates feature-product-spec and feature-tech-spec from `d3.config.md` or this skill
-2. Loads existing spec
-3. Uses templates to validate structure
-4. Ensures all required sections present when updating
-
-### d3:decompose
-1. Loads user story template from `d3.config.md` or this skill
-2. Creates stories following template structure
-3. Ensures consistent Given-When-Then acceptance criteria format
-
-### d3:create-adr
-1. Loads ADR template from `d3.config.md` or this skill
-2. Extracts decision context, alternatives, rationale, and consequences from input
-3. Auto-numbers by searching existing ADRs
-4. Creates ADR using template structure
-5. Handles superseding (cross-references old and new ADRs)
-
-### d3:capture-transcript
-1. Loads meeting transcript template from `d3.config.md` or this skill
-2. Asks user to paste raw transcript
-3. Extracts decisions, action items, and open questions
-4. Generates structured summary using template
-5. Stores via transcript provider
-
-## Template Loading Pattern
-
-D3 commands follow this loading pattern:
-
-```
-1. Read `d3.config.md` for D3 Configuration section
-2. Extract template paths:
-   - feature_spec_template
-   - technical_spec_template
-   - user_story_template
-   - adr_template
-   - meeting_transcript_template
-3. For each template:
+1. Read `d3.config.md` Templates section
+2. For each template:
    - If custom path specified → Read that file
-   - If no custom path → Read from this skill's references/
-```
+   - If "(default)" or not specified → Read from this skill's `references/` directory

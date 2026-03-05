@@ -20,48 +20,27 @@ Every story must follow INVEST:
 
 ## Workflow
 
-### 1. Detect Providers, Templates, and Settings
-- Read `d3.config.md` for D3 config
-- Search for ### D3 Config  ### Templates
-- Detect spec mode from provider configuration:
-  - If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. Store each provider's skill and configuration independently.
-  - If only `### Spec Provider` exists → **combined mode**. Store single provider config.
-- Read `Quiet Mode` from Settings (default: `false` when absent)
-- If user story template are not configure use skill d3-templates
-- Store for later steps
+### 1. Load Configuration and Templates
+- Read `d3.config.md`
+- From the Storage table, find the rows matching "Specs" and "Stories"
+- Read Quiet Mode from Settings
+- Load user story template from d3-templates skill (or custom path if configured in Templates section)
 
 ### 2. Fetch Specification
-Parse spec identifier from `$ARGUMENTS` (ID, URL, or title).
+Parse spec identifier from `$ARGUMENTS` (path, or title).
 
-**If combined mode:** Use the single spec provider's `get_spec`.
-
-**If separated mode:**
-Detect whether the identifier refers to a product or tech spec (from title suffix, filename, or content). Use the matching provider's `get_spec`.
-After fetching, derive the companion title by swapping the suffix ("Product Spec" ↔ "Tech Spec") and fetch it from the other provider via `search_specs` or `get_spec`.
-Decomposition always needs both product and technical context.
-Use content from both specs — product for workflows, technical for implementation notes.
+Read the spec from the Storage location for "Specs".
 
 Display:
 ```
-**Specification:** [Title] - [URL]
-**Product Spec:** [✅ Found / ⏳ Minimal / ❌ Not found]
-**Technical Spec:** [✅ Found / ⏳ Minimal / ❌ Not found]
+**Specification:** [Title] - [path]
+**Product Spec:** [Found / Minimal / Not found]
+**Technical Spec:** [Found / Minimal / Not found]
 ```
 
-If no Product Spec: Warn but continue.
+If no Product Spec sections: Warn but continue.
 
-### 3. Detect Project and Capabilities
-Use story provider's `list_projects`:
-- If single project returned → use it automatically (no prompt needed)
-- If multiple projects:
-
-  **If quiet mode:** Use Default Project from Story Provider configuration in `d3.config.md`. If no default is configured, ask the user.
-
-  **Otherwise:** Ask user to choose.
-
-Call `get_issue_types` for the chosen project. Store whether Epic type is available (used in step 8).
-
-### 4. Request Decomposition Input
+### 3. Request Decomposition Input
 
 **If quiet mode:** Default to conversational decomposition (Option B below). Skip the question.
 
@@ -75,7 +54,7 @@ B) No - Let's decompose it together conversationally
 
 If Option A: Extract proposed stories, boundaries, priorities, concerns from transcript.
 
-### 5. Propose Workflow-Based Stories
+### 4. Propose Workflow-Based Stories
 
 Analyze user workflows from Product Spec. **Default: One workflow = one full-stack story**
 
@@ -88,16 +67,16 @@ Story 1: [Workflow Name]
 - Size: [Small/Medium/Large] - [Est. days based on AC count]
 - Key ACs: [3-12 main scenarios]
 - INVEST Check:
-  ✅ Independent: [Can be built standalone]
-  ✅ Valuable: [Delivers complete workflow]
-  ✅ Estimable: [Clear scope, X ACs]
-  ✅ Small: [1-X days]
-  ✅ Testable: [Observable user behavior]
+  Independent: [Can be built standalone]
+  Valuable: [Delivers complete workflow]
+  Estimable: [Clear scope, X ACs]
+  Small: [1-X days]
+  Testable: [Observable user behavior]
 
 [Continue for all workflows]
 ```
 
-### 6. Ask Clarifying Questions (Only When Needed)
+### 5. Ask Clarifying Questions (Only When Needed)
 
 **If quiet mode:** Skip clarifying questions. Proceed with reasonable assumptions and mark any uncertainties using uncertainty markers.
 
@@ -111,12 +90,12 @@ Story 1: [Workflow Name]
 3. **Dependencies (only if non-obvious):** Sequential or parallel?
 
 **DO NOT ask about:**
-- ❌ Team structure (assume cross-functional)
-- ❌ Error handling (always include in ACs)
-- ❌ Priority order (obvious from workflow sequence)
-- ❌ Edge cases (include in ACs unless genuinely complex)
+- Team structure (assume cross-functional)
+- Error handling (always include in ACs)
+- Priority order (obvious from workflow sequence)
+- Edge cases (include in ACs unless genuinely complex)
 
-### 7. Validate Stories Against INVEST
+### 6. Validate Stories Against INVEST
 
 **CRITICAL - Run before creation:**
 
@@ -138,41 +117,18 @@ INVEST Validation Checklist:
 
 **Only create stories that pass all INVEST checks.**
 
-### 8. Create Epic (if supported)
+### 7. Create Epic (if target supports epics)
 
-**Skip this step if Epic type was not available in step 3.**
-
-If Epic type is available, invoke the [story-provider] skill (see platform reference for invocation syntax):
-```
-create_epic project_key="[PROJECT]" summary="[Feature name]" description="[Epic description]" labels="feature,epic"
-```
+If the Storage Instructions for "Stories" indicate a tool that supports epics (e.g. Jira), create an epic first:
 
 **Epic Description:**
-
-If combined mode:
 ```
 Feature specification: [Spec Title]
 
 [Brief overview from Product Spec]
 
 ## Reference
-- Specification: [Spec URL]
-- Location: [Location name]
-
-## User Stories
-This Epic contains [N] INVEST-compliant user stories.
-```
-
-If separated mode:
-```
-Feature specification: [Spec Title]
-
-[Brief overview from Product Spec]
-
-## Reference
-- Product Specification: [Product Spec URL]
-- Technical Specification: [Tech Spec URL]
-- Location: [Location name]
+- Specification: [Spec path]
 
 ## User Stories
 This Epic contains [N] INVEST-compliant user stories.
@@ -180,7 +136,7 @@ This Epic contains [N] INVEST-compliant user stories.
 
 Store Epic key for linking stories.
 
-### 9. Create User Stories
+### 8. Create User Stories
 
 **CRITICAL - Check Uncertainties:**
 
@@ -190,8 +146,8 @@ Before creating, scan specs for uncertainty markers. If critical uncertainties:
 - Flag with "needs-clarification" label
 
 **Load Story Template:**
-1. Use `user_story_template` from config
-2. Read template using the read tool
+1. Use story template from config or d3-templates skill
+2. Read template
 3. Use template structure for story content
 
 **Story Structure:**
@@ -202,49 +158,39 @@ Before creating, scan specs for uncertainty markers. If critical uncertainties:
 - Dependencies: List story keys if dependencies exist
 - References: Link to specification
 
-**Create each story.** Invoke the [story-provider] skill (see platform reference for invocation syntax):
-- If epic was created → pass `epic_id`
-- If no epic → pass `spec_id` instead (lets provider group stories by spec)
+**Create each story.** Follow the Instructions column from the Storage table for "Stories".
+Write the stories to the Location specified.
+
+If an epic was created, link each story to the epic.
+
+### 9. Provide Summary
 
 ```
-create_story project_key="[PROJECT]" epic_id="[EPIC-KEY]" story_data="{summary: '...', description: '...', labels: [...]}"
-```
-or (when no epic):
-```
-create_story project_key="[PROJECT]" spec_id="[SPEC-ID]" story_data="{summary: '...', description: '...', labels: [...]}"
-```
+Feature decomposed successfully!
 
-### 10. Provide Summary
-
-Use whatever keys/URLs the provider returned (don't assume format). Only show Epic line if one was created.
-
-```
-✅ Feature decomposed successfully!
-
-**Epic:** [EPIC-KEY]: [Feature Name] - [URL]  ← only if epic was created
 **Stories:** [N] INVEST-compliant stories
 
 Story Breakdown:
-1. [Story Key/ID]: [Title] - [URL if available]
+1. [Story Title]
    - Scope: [Full-stack/Backend/Frontend]
    - ACs: [N] scenarios
-   - Dependencies: [None / "Blocked by [KEY]"]
-   - INVEST: ✅ All criteria met
+   - Dependencies: [None / "Blocked by [Story]"]
+   - INVEST: All criteria met
 
 Implementation Order:
-1. [Story Key/ID]: [Title] - Start here (no dependencies)
-2. [Story Key/ID]: [Title] - Depends on #1
-3. [Story Key/ID]: [Title] - Can run parallel
+1. [Story Title] - Start here (no dependencies)
+2. [Story Title] - Depends on #1
+3. [Story Title] - Can run parallel
 
 INVEST Compliance:
-✅ Independent: [X/N stories] have no blocking dependencies
-✅ Negotiable: Adapted to team structure
-✅ Valuable: Each story delivers complete workflow
-✅ Estimable: [N] total ACs, [avg] per story
-✅ Small: All stories sized 1-10 days
-✅ Testable: All stories have Given-When-Then ACs
+Independent: [X/N stories] have no blocking dependencies
+Negotiable: Adapted to team structure
+Valuable: Each story delivers complete workflow
+Estimable: [N] total ACs, [avg] per story
+Small: All stories sized 1-10 days
+Testable: All stories have Given-When-Then ACs
 
-Next: Review stories → Estimate → Start with [Story Key/ID]
+Next: Review stories → Estimate → Start with [Story Title]
 ```
 
 ---
@@ -276,10 +222,8 @@ Next: Review stories → Estimate → Start with [Story Key/ID]
 | Issue | Action |
 |-------|--------|
 | No specs | Warn, continue with available content |
-| Project not found | List available projects |
-| Epic linking fails | Provide manual instructions |
 | Unclear boundaries | Ask clarifying questions |
-| Provider fails | Fall back to providing story content |
+| Creation fails | Provide story content for manual creation |
 
 ---
 

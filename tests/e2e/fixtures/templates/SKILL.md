@@ -31,12 +31,12 @@ Templates are in this skill's `references/` directory.
 
 ## How D3 Commands Use These Templates
 
-### d3:create-spec
+### d3:create
 1. Loads templates from CLAUDE.md config or this skill
-2. Creates unified spec with both Product and Technical sections
+2. Creates artifact (spec, ADR, or transcript) using matching template
 3. Uses template structure to ensure all sections present
 
-### d3:refine-spec
+### d3:refine
 1. Loads templates from CLAUDE.md config or this skill
 2. Uses templates to validate structure
 

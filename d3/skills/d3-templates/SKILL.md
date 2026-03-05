@@ -5,7 +5,7 @@ description: Provides standard templates for Dialog-Driven Delivery (D3) specifi
 
 # D3 Standard Templates
 
-This skill provides canonical templates for D3 artifact creation. These templates are used by d3:create-spec, d3:refine-spec, d3:decompose, d3:create-adr, and d3:capture-transcript commands.
+This skill provides canonical templates for D3 artifact creation. These templates are used by d3:create, d3:refine, d3:decompose, and d3:align-spec commands.
 
 ## Available Templates
 

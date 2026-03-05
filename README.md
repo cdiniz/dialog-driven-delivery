@@ -64,11 +64,9 @@ For Atlassian teams, the table changes to point at Confluence and Jira:
 
 | Command | Purpose |
 |---------|---------|
-| `/d3:create-spec` | Create feature specification from conversation, transcript, or document |
-| `/d3:refine-spec` | Update specifications with new information |
+| `/d3:create` | Create any D3 artifact — specs, ADRs, or structured transcripts |
+| `/d3:refine` | Update any existing artifact with new information |
 | `/d3:decompose` | Break feature into INVEST-compliant user stories |
-| `/d3:capture-transcript` | Capture and structure a meeting transcript |
-| `/d3:create-adr` | Record architectural decisions as immutable ADRs (MADR v4) |
 | `/d3:align-spec` | Compare specification against codebase to detect drift |
 
 ### Complete Feature Development Flow
@@ -76,18 +74,16 @@ For Atlassian teams, the table changes to point at Confluence and Jira:
 ```
 Cross-functional Meeting/Discussion
         |
-capture-transcript (optional -- capture and structure the meeting)
+create (transcript) → Structured Transcript artifact
         |
-create-spec (paste transcript/document/description)
-        |
-Specification with BOTH Product & Technical Specs
+create (spec) → Specification with BOTH Product & Technical Specs
 (fills what's known, leaves rest empty)
         |
 [Progressive Refinement as information becomes available]
         |
-refine-spec (paste any new information)
+refine (paste any new information)
         |
-Updated Specification (product, technical, or both)
+Updated Artifact (spec, ADR, or transcript)
         |
 [Continue refining until ready]
         |
@@ -208,7 +204,7 @@ Commands ask for meeting transcripts (preferred input), work conversationally if
 ```
 dialog-driven-delivery/
 ├── d3/                              # Core plugin
-│   ├── commands/                    # 6 commands (create-spec, refine-spec, decompose, etc.)
+│   ├── commands/                    # 4 commands (create, refine, decompose, align-spec)
 │   └── skills/
 │       ├── d3-templates/            # 5 reference templates
 │       └── uncertainty-markers/     # Uncertainty marking standards

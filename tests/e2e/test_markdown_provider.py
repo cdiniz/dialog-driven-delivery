@@ -31,7 +31,7 @@ def _find_specs(workspace):
 
 def _create_spec_messages(transcript: str) -> list[str]:
     return [
-        "/d3:create-spec\n\nI want to provide a meeting transcript.",
+        "/d3:create\n\nI want to create a Spec from a meeting transcript.",
         f"Here is the transcript:\n---\n{transcript}\n---\n\n"
         f"Use the default root location.\n"
         f'For the title, use "About Page".',
@@ -41,7 +41,7 @@ def _create_spec_messages(transcript: str) -> list[str]:
 
 def _refine_spec_messages(spec_name: str, refinement: str) -> list[str]:
     return [
-        f"/d3:refine-spec {spec_name}\n\nI want to describe changes.",
+        f"/d3:refine {spec_name}\n\nI want to describe changes.",
         f"Here are the updates from our follow-up meeting:\n---\n{refinement}\n---",
         "The proposed changes look correct, please apply them.",
     ]
@@ -195,7 +195,7 @@ class TestQuietModeWorkflow:
     def test_create_spec_quiet(self, quiet_workflow_workspace, plugin_dirs):
         transcript = _read_fixture("sample_transcript.txt")
         run_claude_conversation(
-            [f"/d3:create-spec {transcript}"],
+            [f"/d3:create {transcript}"],
             cwd=quiet_workflow_workspace,
             plugin_dirs=plugin_dirs,
         )
@@ -223,7 +223,7 @@ class TestQuietModeWorkflow:
         refinement = _read_fixture("refinement_input.txt")
 
         run_claude_conversation(
-            [f"/d3:refine-spec {spec_name}\n\n{refinement}"],
+            [f"/d3:refine {spec_name}\n\n{refinement}"],
             cwd=quiet_workspace_with_spec,
             plugin_dirs=plugin_dirs,
         )

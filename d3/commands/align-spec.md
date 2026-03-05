@@ -159,7 +159,7 @@ Well-Aligned Areas:
 Exploration Gaps:
 - [Any anchors that found no code matches — may indicate missing implementation or incorrect search terms]
 
-Next: /d3:refine-spec (update spec) → /d3:decompose (new stories)
+Next: /d3:refine (update spec) → /d3:decompose (new stories)
 ```
 
 ---

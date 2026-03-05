@@ -4,28 +4,32 @@
 
 The configuration format has changed from markdown (`d3.config.md`) to YAML (`d3.config.yaml`) with a flatter, cleaner structure.
 
-### Before (old format)
+### Before (old format — `d3.config.md`)
 
-```yaml
-artifacts:
-  product_spec:
-    adapter: markdown
-    config:
-      directory: ./specs
-  tech_spec:
-    adapter: confluence
-    config:
-      base_url: https://yoursite.atlassian.net
-      email: you@example.com
-      space_key: PROJ
-      parent_page_id: "123456789"
+```markdown
+## D3 Configuration
 
-templates:
-  product_spec: ./templates/custom-product-spec.md
-  tech_spec: ./templates/custom-tech-spec.md
+### Settings
+- Quiet Mode: false
 
-settings:
-  quiet_mode: false
+### Spec Provider
+**Skill:** d3-markdown:markdown-spec-provider
+**Configuration:**
+- Specs Directory: ./specs
+
+### Story Provider
+**Skill:** d3-markdown:markdown-story-provider
+**Configuration:**
+- Stories Directory: ./stories
+
+### Transcript Provider
+**Skill:** d3-markdown:markdown-transcript-provider
+**Configuration:**
+- Transcripts Directory: ./transcripts
+
+### Templates
+- feature_spec_template: ./templates/custom-product-spec.md
+- technical_spec_template: ./templates/custom-tech-spec.md
 ```
 
 ### After (new format)
@@ -53,19 +57,21 @@ settings:
 
 ### Migration checklist
 
-1. **Rename** `d3.config.md` to `d3.config.yaml` (if still using the markdown format)
-2. **Remove nested `config:` blocks** — move adapter-specific fields (`directory`, `location_id`, `mode`) directly under each artifact
-3. **Move shared connection details** (`base_url`, `email`, `space_key`) into a top-level `adapters:` section
-4. **Move templates into artifacts** — replace the separate `templates:` section with a `template:` field on each artifact that needs a custom template
-5. **Rename `parent_page_id`** to `location_id` on Confluence artifacts
-6. **Remove `api_token_env`** — the Confluence adapter now reads `CONFLUENCE_API_TOKEN` from the environment directly. Add it to a `.env` file in your project root if needed
+1. **Rename** `d3.config.md` → `d3.config.yaml` and convert to YAML syntax
+2. **Map provider sections** (`### Spec Provider`, `### Story Provider`, etc.) → `artifacts:` entries with artifact type keys (`product_spec`, `user_story`, etc.)
+3. **Map `**Skill:**` values** → `adapter:` field (`d3-markdown:markdown-spec-provider` → `adapter: markdown`, `d3-atlassian:atlassian-spec-provider` → `adapter: confluence`)
+4. **Map `**Configuration:**` bullet points** → flat YAML fields under each artifact (`Specs Directory: ./specs` → `directory: ./specs`)
+5. **Extract shared Atlassian connection details** (Cloud ID, space key, etc.) into a top-level `adapters.confluence:` section
+6. **Map `Default parent page`** (URL) → `location_id` (page ID only)
+7. **Add `template:` field** per artifact if using custom templates (replaces the `### Templates` section)
 
 ### Quick reference
 
-| Old | New |
-|-----|-----|
-| `config:` block under artifact | Fields directly under artifact |
-| `templates:` top-level section | `template:` field per artifact |
-| `parent_page_id` | `location_id` |
-| `api_token_env: MY_VAR` | Set `CONFLUENCE_API_TOKEN` env var |
-| Connection details per artifact | Shared `adapters:` section |
+| Old (markdown) | New (YAML) |
+|---|---|
+| `### Spec Provider` section | `product_spec:` under `artifacts:` |
+| `**Skill:** d3-markdown:...` | `adapter: markdown` |
+| `**Configuration:**` bullet list | Flat YAML fields under artifact |
+| `### Templates` section | `template:` field per artifact |
+| `Default parent page: <URL>` | `location_id: "<page-id>"` |
+| Connection details per provider | Shared `adapters:` section |

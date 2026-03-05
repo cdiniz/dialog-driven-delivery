@@ -212,7 +212,9 @@ dialog-driven-delivery/
 │   └── skills/
 │       ├── d3-templates/            # 5 reference templates
 │       └── uncertainty-markers/     # Uncertainty marking standards
-├── d3.config.md                     # Storage configuration (customise per project)
+├── samples/                         # Example configurations
+│   ├── d3.config.markdown.md        # Local markdown storage (default)
+│   └── d3.config.atlassian.md       # Confluence + Jira storage
 ├── metadata/
 │   └── d3.yaml                      # Plugin metadata
 └── tests/                           # E2E tests

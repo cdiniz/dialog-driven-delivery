@@ -1,7 +1,5 @@
 import os
 import shutil
-import subprocess
-
 import pytest
 
 from .claude_runner import REPO_ROOT
@@ -60,7 +58,6 @@ def _init_workspace(workspace_dir, d3_config_name="d3.config.md"):
         FIXTURES_DIR / "workspace" / d3_config_name,
         os.path.join(workspace_dir, "d3.config.md"),
     )
-    subprocess.run(["git", "init"], cwd=workspace_dir, capture_output=True)
     return workspace_dir
 
 

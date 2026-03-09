@@ -21,7 +21,7 @@ claude plugin install d3@d3-marketplace
 
 ### 2. Configure Storage
 
-Edit `d3.config.md` in your project root. The Storage table tells D3 where to put each artifact type and how to write it:
+Edit `d3.config.md` in your project root. The Storage table tells D3 where to put each artifact type and how to write it. See [`config-samples/`](config-samples/) for ready-made examples.
 
 ```markdown
 ## D3 Configuration
@@ -69,21 +69,21 @@ For Atlassian teams, the table changes to point at Confluence and Jira:
 | `/d3:decompose` | Break feature into INVEST-compliant user stories |
 | `/d3:align-spec` | Compare specification against codebase to detect drift |
 
-### Complete Feature Development Flow
+Commands can be used independently or combined in whatever order fits your team's process. Here's one possible flow:
 
 ```
 Cross-functional Meeting/Discussion
         |
 create (transcript) → Structured Transcript artifact
         |
-create (spec) → Specification with BOTH Product & Technical Specs
+create (spec) → Specification with Product & Technical Specs
 (fills what's known, leaves rest empty)
         |
 [Progressive Refinement as information becomes available]
         |
 refine (paste any new information)
         |
-Updated Artifact (spec, ADR, or transcript)
+Updated Artifact (spec)
         |
 [Continue refining until ready]
         |

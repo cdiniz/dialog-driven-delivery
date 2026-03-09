@@ -21,49 +21,19 @@ claude plugin install d3@d3-marketplace
 
 ### 2. Configure Storage
 
-Edit `d3.config.md` in your project root. The Storage table tells D3 where to put each artifact type and how to write it. See [`config-samples/`](config-samples/) for ready-made examples.
+Run the init command to generate `d3.config.md` in your project root:
 
-```markdown
-## D3 Configuration
-
-### Settings
-- Quiet Mode: false
-
-### Templates
-Uses default D3 templates. Override by adding paths:
-- Product Spec Template: (default)
-- Tech Spec Template: (default)
-- User Story Template: (default)
-- ADR Template: (default)
-- Meeting Transcript Template: (default)
-
-### Storage
-
-| Artifact      | Location          | Instructions                    |
-|---------------|-------------------|---------------------------------|
-| Specs         | ./specs/          | Write as markdown files         |
-| Stories       | ./stories/        | Write as markdown files         |
-| ADRs          | ./adrs/           | Write as markdown files         |
-| Transcripts   | ./transcripts/    | Write as markdown files         |
+```
+/d3:init
 ```
 
-For Atlassian teams, the table changes to point at Confluence and Jira:
-
-```markdown
-### Storage
-
-| Artifact      | Location                      | Instructions                                              |
-|---------------|-------------------------------|-----------------------------------------------------------|
-| Specs         | Confluence space PROJ         | Use mcp__atlassian tool to create pages under parent 12345 |
-| Stories       | Jira project PROJ             | Use mcp__atlassian tool to create issues                   |
-| ADRs          | Confluence space PROJ         | Use mcp__atlassian tool to create pages under parent 67890 |
-| Transcripts   | ./transcripts/                | Write as markdown files                                    |
-```
+This walks you through choosing a storage backend (local markdown, Atlassian, Linear, or custom) and generates the configuration file. You can also create `d3.config.md` manually — see [`config-samples/`](config-samples/) for ready-made examples.
 
 ### 3. Use D3 Commands
 
 | Command | Purpose |
 |---------|---------|
+| `/d3:init` | Generate `d3.config.md` — choose storage backend and create configuration |
 | `/d3:create` | Create any D3 artifact — specs, ADRs, or structured transcripts |
 | `/d3:refine` | Update any existing artifact with new information |
 | `/d3:decompose` | Break feature into INVEST-compliant user stories |
@@ -204,7 +174,7 @@ Commands ask for meeting transcripts (preferred input), work conversationally if
 ```
 dialog-driven-delivery/
 ├── d3/                              # Core plugin
-│   ├── commands/                    # 4 commands (create, refine, decompose, align-spec)
+│   ├── commands/                    # 5 commands (init, create, refine, decompose, align-spec)
 │   └── skills/
 │       ├── d3-templates/            # 5 reference templates
 │       └── uncertainty-markers/     # Uncertainty marking standards

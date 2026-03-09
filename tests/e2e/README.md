@@ -29,7 +29,7 @@ uv run pytest tests/e2e -n0 -s -k test_create_spec_from_transcript
 
 ## How it works
 
-1. **Plugin isolation** — plugins (`d3`, `d3-markdown`) are copied to `tests/e2e/.workspaces/plugin-fixtures/<worker>/` with template files swapped for simplified e2e versions
+1. **Plugin isolation** — the `d3` plugin is copied to `tests/e2e/.workspaces/plugin-fixtures/<worker>/` with template files swapped for simplified e2e versions
 2. **Workspaces** — each test gets its own directory under `tests/e2e/.workspaces/<test_name>/`
 3. **Parallelism** — `pytest-xdist` with `-n auto` runs tests concurrently across workers
 

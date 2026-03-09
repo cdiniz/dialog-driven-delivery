@@ -12,38 +12,28 @@ Systematically compare what the specification says should exist against what the
 
 ## Workflow
 
-### 1. Detect Providers, Templates, and Settings
-- Read `d3.config.md` for D3 config
-- Search for ### D3 Config  ### Templates
-- Detect spec mode from provider configuration:
-  - If `### Product Spec Provider` AND `### Tech Spec Provider` both exist → **separated mode**. Store each provider's skill and configuration independently.
-  - If only `### Spec Provider` exists → **combined mode**. Store single provider config.
-- Store for later steps
+### 1. Load Configuration and Templates
+- Read `d3.config.md`
+- From the Storage table, find the rows matching "Specs" and "Stories"
 
 ### 2. Fetch Specification
-Command accepts spec identifier, URL, or title in `$ARGUMENTS`.
+Command accepts spec identifier, path, or title in `$ARGUMENTS`.
 
-Determine which provider owns the spec:
-- **Combined mode:** Use the single spec provider's `get_spec`
-- **Separated mode:** Detect whether the identifier refers to a product or tech spec (from title suffix, filename, or content). Use the matching provider's `get_spec`.
-
-**If separated mode:**
-After fetching, derive the companion title by swapping the suffix ("Product Spec" ↔ "Tech Spec") and fetch it from the other provider via `search_specs` or `get_spec`.
-Alignment always needs both product and technical context.
+Read the spec from the Storage location for "Specs".
 
 Display:
 ```
-**Specification:** [Title] - [URL]
-**Product Spec:** [✅ Found / ⏳ Minimal / ❌ Not found]
-**Technical Spec:** [✅ Found / ⏳ Minimal / ❌ Not found]
+**Specification:** [Title] - [path]
+**Product Spec:** [Found / Minimal / Not found]
+**Technical Spec:** [Found / Minimal / Not found]
 ```
 
-If either spec is missing or minimal: Warn but continue with available content.
+If either part is missing or minimal: Warn but continue with available content.
 
 ### 3. Detect Existing Stories
-Find the epic matching the spec title and list all its children (stories, tasks, or any issue type).
-- Store epic key and child list for later story drift analysis
-- If no epic or no children found, skip story drift in Step 6
+Search the Storage location for "Stories" for stories matching the spec title.
+- Store list for later story drift analysis
+- If no stories found, skip story drift in Step 6
 
 ### 4. Extract Search Anchors
 Parse the specification for concrete, searchable implementation clues:
@@ -153,9 +143,9 @@ For each story found in Step 3, check:
 ### 8. Provide Summary
 
 ```
-✅ Specification alignment complete!
+Specification alignment complete!
 
-**Specification:** [Title] - [URL]
+**Specification:** [Title] - [path]
 
 Deviation Summary:
 - Critical: [N] deviations
@@ -169,7 +159,10 @@ Well-Aligned Areas:
 Exploration Gaps:
 - [Any anchors that found no code matches — may indicate missing implementation or incorrect search terms]
 
-Next: /d3:refine-spec (update spec) → /d3:decompose (new stories)
+Next steps (based on findings):
+- Spec outdated? → /d3:refine (update spec to match reality)
+- Missing implementation? → /d3:decompose (create stories for gaps)
+- Behaviour mismatch? → Decide: fix code or /d3:refine the spec
 ```
 
 ---
@@ -178,13 +171,12 @@ Next: /d3:refine-spec (update spec) → /d3:decompose (new stories)
 
 | Issue | Action |
 |-------|--------|
-| Spec not found | Verify identifier/URL, suggest search |
+| Spec not found | Verify identifier/path, suggest search |
 | Spec lacks technical detail | Warn about limited alignment accuracy, proceed with available anchors |
 | No search anchors extracted | Inform user the spec may be too high-level for code alignment, suggest refining tech spec first |
 | Codebase too large / too many matches | Tighten search to exact matches, increase specificity, note gaps |
 | No code found for anchor | Report as potential "Missing Implementation" with caveat that search may have missed it |
-| Epic/stories not found | Skip story drift analysis, proceed with spec-vs-code only |
-| Story provider unavailable | Skip story drift analysis, proceed with spec-vs-code only |
+| Stories not found | Skip story drift analysis, proceed with spec-vs-code only |
 
 ---
 

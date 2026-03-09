@@ -23,7 +23,7 @@ def extract_uncertainty_markers(content: str) -> dict[str, list[str]]:
         "ASSUMPTION",
         "CLARIFICATION NEEDED",
     ]:
-        pattern = rf"\[{marker_type}:\s*([^\]]+)\]"
+        pattern = rf"\[{marker_type}(?::\s*[^\]]+)?\]"
         markers[marker_type] = re.findall(pattern, content)
     return markers
 

@@ -1,13 +1,11 @@
 import os
 import shutil
-import subprocess
-
 import pytest
 
 from .claude_runner import REPO_ROOT
 
 FIXTURES_DIR = REPO_ROOT / "tests" / "e2e" / "fixtures"
-PLUGIN_DIRS = [REPO_ROOT / "d3", REPO_ROOT / "d3-markdown"]
+PLUGIN_DIRS = [REPO_ROOT / "d3"]
 TEMPLATES_DIR = FIXTURES_DIR / "templates"
 FILE_SWAPS = {
     "skills/d3-templates/references/feature-product-spec.md": "product-spec.md",
@@ -48,15 +46,18 @@ def _init_plugins(worker_id):
     return plugin_paths
 
 
-def _init_workspace(workspace_dir, claude_md_name="CLAUDE.md"):
+def _init_workspace(workspace_dir, d3_config_name="d3.config.md"):
     if os.path.exists(workspace_dir):
         shutil.rmtree(workspace_dir)
     os.makedirs(workspace_dir)
     shutil.copy(
-        FIXTURES_DIR / "workspace" / claude_md_name,
+        FIXTURES_DIR / "workspace" / "CLAUDE.md",
         os.path.join(workspace_dir, "CLAUDE.md"),
     )
-    subprocess.run(["git", "init"], cwd=workspace_dir, capture_output=True)
+    shutil.copy(
+        FIXTURES_DIR / "workspace" / d3_config_name,
+        os.path.join(workspace_dir, "d3.config.md"),
+    )
     return workspace_dir
 
 
@@ -74,7 +75,7 @@ def markdown_workflow_workspace(request):
 def markdown_custom_template_workspace(request):
     workspace = _init_workspace(
         str(E2E_TMP / request.node.name),
-        claude_md_name="CLAUDE-custom-templates.md",
+        d3_config_name="d3.config-custom-templates.md",
     )
     templates_dest = os.path.join(workspace, "templates")
     os.makedirs(templates_dest, exist_ok=True)
@@ -90,7 +91,7 @@ def markdown_workspace_with_spec(request):
     specs_dir = os.path.join(workspace, "specs")
     os.makedirs(specs_dir, exist_ok=True)
     shutil.copy(
-        FIXTURES_DIR / "specs" / "about-page-base.md",
+        FIXTURES_DIR / "specs" / "about-page-product-spec-base.md",
         os.path.join(specs_dir, "about-page.md")
     )
     yield workspace
@@ -102,7 +103,7 @@ def markdown_workspace_with_refined_spec(request):
     specs_dir = os.path.join(workspace, "specs")
     os.makedirs(specs_dir, exist_ok=True)
     shutil.copy(
-        FIXTURES_DIR / "specs" / "about-page-refined-base.md",
+        FIXTURES_DIR / "specs" / "about-page-product-spec-refined-base.md",
         os.path.join(specs_dir, "about-page.md")
     )
     yield workspace
@@ -112,7 +113,7 @@ def markdown_workspace_with_refined_spec(request):
 def quiet_workflow_workspace(request):
     yield _init_workspace(
         str(E2E_TMP / request.node.name),
-        claude_md_name="CLAUDE-quiet.md",
+        d3_config_name="d3.config-quiet.md",
     )
 
 
@@ -120,12 +121,12 @@ def quiet_workflow_workspace(request):
 def quiet_workspace_with_spec(request):
     workspace = _init_workspace(
         str(E2E_TMP / request.node.name),
-        claude_md_name="CLAUDE-quiet.md",
+        d3_config_name="d3.config-quiet.md",
     )
     specs_dir = os.path.join(workspace, "specs")
     os.makedirs(specs_dir, exist_ok=True)
     shutil.copy(
-        FIXTURES_DIR / "specs" / "about-page-base.md",
+        FIXTURES_DIR / "specs" / "about-page-product-spec-base.md",
         os.path.join(specs_dir, "about-page.md"),
     )
     yield workspace
@@ -135,58 +136,14 @@ def quiet_workspace_with_spec(request):
 def quiet_workspace_with_refined_spec(request):
     workspace = _init_workspace(
         str(E2E_TMP / request.node.name),
-        claude_md_name="CLAUDE-quiet.md",
-    )
-    specs_dir = os.path.join(workspace, "specs")
-    os.makedirs(specs_dir, exist_ok=True)
-    shutil.copy(
-        FIXTURES_DIR / "specs" / "about-page-refined-base.md",
-        os.path.join(specs_dir, "about-page.md"),
-    )
-    yield workspace
-
-
-@pytest.fixture
-def separated_workflow_workspace(request):
-    yield _init_workspace(
-        str(E2E_TMP / request.node.name),
-        claude_md_name="CLAUDE-separated.md",
-    )
-
-
-@pytest.fixture
-def separated_workspace_with_specs(request):
-    workspace = _init_workspace(
-        str(E2E_TMP / request.node.name),
-        claude_md_name="CLAUDE-separated.md",
-    )
-    specs_dir = os.path.join(workspace, "specs")
-    os.makedirs(specs_dir, exist_ok=True)
-    shutil.copy(
-        FIXTURES_DIR / "specs" / "about-page-product-spec-base.md",
-        os.path.join(specs_dir, "about-page-product-spec.md"),
-    )
-    shutil.copy(
-        FIXTURES_DIR / "specs" / "about-page-tech-spec-base.md",
-        os.path.join(specs_dir, "about-page-tech-spec.md"),
-    )
-    yield workspace
-
-
-@pytest.fixture
-def separated_workspace_with_refined_specs(request):
-    workspace = _init_workspace(
-        str(E2E_TMP / request.node.name),
-        claude_md_name="CLAUDE-separated.md",
+        d3_config_name="d3.config-quiet.md",
     )
     specs_dir = os.path.join(workspace, "specs")
     os.makedirs(specs_dir, exist_ok=True)
     shutil.copy(
         FIXTURES_DIR / "specs" / "about-page-product-spec-refined-base.md",
-        os.path.join(specs_dir, "about-page-product-spec.md"),
-    )
-    shutil.copy(
-        FIXTURES_DIR / "specs" / "about-page-tech-spec-refined-base.md",
-        os.path.join(specs_dir, "about-page-tech-spec.md"),
+        os.path.join(specs_dir, "about-page.md"),
     )
     yield workspace
+
+

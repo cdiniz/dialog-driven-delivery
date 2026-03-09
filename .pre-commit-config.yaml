@@ -1,9 +1,0 @@
-repos:
-  - repo: local
-    hooks:
-      - id: generate-platform-files
-        name: regenerate platform files
-        entry: .venv/bin/python generate.py --all
-        language: system
-        pass_filenames: false
-        files: ^(d3/|d3-markdown/|d3-atlassian/|d3\.platform\.yaml|metadata/|config/)

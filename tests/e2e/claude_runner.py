@@ -27,7 +27,7 @@ def run_claude_conversation(
     cwd: str,
     plugin_dirs: list[str],
     timeout_per_turn: int = 300,
-    model: str = "sonnet",
+    model: str = "haiku",
     debug: bool = True,
 ) -> str:
     plugin_flags = []

@@ -35,7 +35,7 @@ B) Yes — commands skip prompts, infer titles automatically, and apply changes 
 ### 4. Gather Backend-Specific Details
 
 **A) Local markdown:**
-No additional questions needed. Use default directories: `./specs/`, `./stories/`, `./adrs/`, `./transcripts/`.
+No additional questions needed. Use default directories: `./specs/product/`, `./specs/tech/`, `./stories/`, `./adrs/`, `./transcripts/`.
 
 **B) Atlassian:**
 Before gathering details, warn the user:
@@ -98,12 +98,13 @@ The file must follow this exact structure:
 
 ### Storage
 
-| Artifact      | Location          | Instructions                    |
-|---------------|-------------------|---------------------------------|
-| Specs         | {location}        | {instructions}                  |
-| Stories       | {location}        | {instructions}                  |
-| ADRs          | {location}        | {instructions}                  |
-| Transcripts   | {location}        | {instructions}                  |
+| Artifact       | Location          | Instructions                    |
+|----------------|-------------------|---------------------------------|
+| Product Specs  | {location}        | {instructions}                  |
+| Tech Specs     | {location}        | {instructions}                  |
+| Stories        | {location}        | {instructions}                  |
+| ADRs           | {location}        | {instructions}                  |
+| Transcripts    | {location}        | {instructions}                  |
 ```
 
 Fill `{location}` and `{instructions}` based on the chosen backend and details gathered.
@@ -112,4 +113,4 @@ Fill `{location}` and `{instructions}` based on the chosen backend and details g
 
 Show the generated configuration and the list of copied templates to the user. Write `d3.config.md`.
 
-Report what was created and suggest next steps: `/d3:create` to start creating artifacts. Mention that templates in `.d3/templates/` can be customized.
+Report what was created and suggest next steps: `/d3:create` to start creating artifacts. Mention that templates in `.d3/templates/` can be customized. Note that the default config separates Product Specs and Tech Specs into distinct rows — teams can merge them into a single "Specs" row with a combined template if preferred.

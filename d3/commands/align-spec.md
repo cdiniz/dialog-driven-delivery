@@ -14,21 +14,21 @@ Systematically compare what the specification says should exist against what the
 
 ### 1. Load Configuration and Templates
 - Read `d3.config.md`
-- From the Storage table, find the rows matching "Specs" and "Stories"
+- From the Storage table, find all rows whose Artifact name contains "Spec" (these are the spec rows) and the row matching "Stories"
 
 ### 2. Fetch Specification
 Command accepts spec identifier, path, or title in `$ARGUMENTS`.
 
-Read the spec from the Storage location for "Specs".
+Read specs from the Storage locations for all matched spec rows.
 
 Display:
 ```
-**Specification:** [Title] - [path]
-**Product Spec:** [Found / Minimal / Not found]
-**Technical Spec:** [Found / Minimal / Not found]
+**Feature:** [Title]
+[For each matched spec row:]
+**[Artifact name]:** [Found / Minimal / Not found] - [path]
 ```
 
-If either part is missing or minimal: Warn but continue with available content.
+If any spec is missing or minimal: Warn but continue with available content.
 
 ### 3. Detect Existing Stories
 Search the Storage location for "Stories" for stories matching the spec title.

@@ -22,23 +22,23 @@ Every story must follow INVEST:
 
 ### 1. Load Configuration and Templates
 - Read `d3.config.md`
-- From the Storage table, find the rows matching "Specs" and "Stories"
+- From the Storage table, find all rows whose Artifact name contains "Spec" (these are the spec rows) and the row matching "Stories"
 - Read Quiet Mode from Settings
 - Load user story template from path configured in Templates section
 
 ### 2. Fetch Specification
 Parse spec identifier from `$ARGUMENTS` (path, or title).
 
-Read the spec from the Storage location for "Specs".
+Read specs from the Storage locations for all matched spec rows.
 
 Display:
 ```
-**Specification:** [Title] - [path]
-**Product Spec:** [Found / Minimal / Not found]
-**Technical Spec:** [Found / Minimal / Not found]
+**Feature:** [Title]
+[For each matched spec row:]
+**[Artifact name]:** [Found / Minimal / Not found] - [path]
 ```
 
-If no Product Spec sections: Warn but continue.
+If no spec content found: Warn but continue.
 
 ### 3. Request Decomposition Input
 

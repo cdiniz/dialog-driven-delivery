@@ -71,7 +71,13 @@ Ask for:
 - MCP or CLI tool name (e.g. `mcp__notion`, `mcp__github`, `gh`)
 - Location for all artifacts (e.g. project name, repository, folder)
 
-### 5. Generate Configuration
+### 5. Copy Templates
+
+**If `.d3/templates/` already exists:** Warn the user and ask if they want to overwrite the templates. If they decline, skip this step and keep existing templates. In quiet mode, always overwrite.
+
+Read each template file from the d3-templates skill's `references/` directory and write it to `.d3/templates/` in the project root, preserving filenames. The skill's references are already available — read them directly, do not search the filesystem for them. Create the `.d3/templates/` directory if it doesn't exist.
+
+### 6. Generate Configuration
 
 Generate `d3.config.md` in the project root using the gathered details.
 
@@ -84,12 +90,11 @@ The file must follow this exact structure:
 - Quiet Mode: false
 
 ### Templates
-Uses default D3 templates. Override by adding paths:
-- Product Spec Template: (default)
-- Tech Spec Template: (default)
-- User Story Template: (default)
-- ADR Template: (default)
-- Meeting Transcript Template: (default)
+- Product Spec Template: .d3/templates/feature-product-spec.md
+- Tech Spec Template: .d3/templates/feature-tech-spec.md
+- User Story Template: .d3/templates/user-story.md
+- ADR Template: .d3/templates/adr.md
+- Meeting Transcript Template: .d3/templates/meeting-transcript.md
 
 ### Storage
 
@@ -103,8 +108,8 @@ Uses default D3 templates. Override by adding paths:
 
 Fill `{location}` and `{instructions}` based on the chosen backend and details gathered.
 
-### 6. Confirm
+### 7. Confirm
 
-Show the generated configuration to the user and write it to `d3.config.md`.
+Show the generated configuration and the list of copied templates to the user. Write `d3.config.md`.
 
-Report what was created and suggest next steps: `/d3:create` to start creating artifacts.
+Report what was created and suggest next steps: `/d3:create` to start creating artifacts. Mention that templates in `.d3/templates/` can be customized.

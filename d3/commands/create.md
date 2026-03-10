@@ -15,7 +15,7 @@ Create artifacts using the appropriate template. Artifacts grow progressively th
 ### 1. Load Configuration and Templates
 - Read `d3.config.md`
 - Read Quiet Mode from Settings
-- Load templates from d3-templates skill (or custom paths if configured in Templates section)
+- Load templates from paths configured in Templates section
 
 ### 2. Determine Artifact Type
 

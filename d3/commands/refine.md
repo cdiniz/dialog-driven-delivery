@@ -15,7 +15,7 @@ Automatically detect which sections need updating. Don't fill empty sections jus
 ### 1. Load Configuration and Templates
 - Read `d3.config.md`
 - Read Quiet Mode from Settings
-- Load templates from d3-templates skill (or custom paths if configured in Templates section)
+- Load templates from paths configured in Templates section
 
 ### 2. Fetch Artifact
 Command accepts artifact identifier, path, or title in `$ARGUMENTS`.

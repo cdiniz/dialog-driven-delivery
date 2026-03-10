@@ -24,7 +24,7 @@ Every story must follow INVEST:
 - Read `d3.config.md`
 - From the Storage table, find the rows matching "Specs" and "Stories"
 - Read Quiet Mode from Settings
-- Load user story template from d3-templates skill (or custom path if configured in Templates section)
+- Load user story template from path configured in Templates section
 
 ### 2. Fetch Specification
 Parse spec identifier from `$ARGUMENTS` (path, or title).
@@ -146,7 +146,7 @@ Before creating, scan specs for uncertainty markers. If critical uncertainties:
 - Flag with "needs-clarification" label
 
 **Load Story Template:**
-1. Use story template from config or d3-templates skill
+1. Use story template path from config
 2. Read template
 3. Use template structure for story content
 

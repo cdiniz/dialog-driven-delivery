@@ -1,5 +1,5 @@
 ---
-description: Generate a d3.config.md file in the project root. Asks the user about their storage preferences (local markdown, Atlassian, Linear, or custom MCP backend) and creates the appropriate configuration.
+description: Generate a d3.config.md file in the project root. Asks the user about their storage preferences (local markdown, Atlassian, Linear, or custom backend) and creates the appropriate configuration.
 ---
 
 ## Workflow
@@ -19,7 +19,7 @@ Where do you want D3 to store artifacts?
 A) Local markdown files (simplest — everything in local directories)
 B) Atlassian (Confluence for specs/ADRs, Jira for stories)
 C) Linear (project documents and issues)
-D) Custom (any other MCP-compatible tool — GitHub Issues, Notion, Google Drive, etc.)
+D) Custom (any other MCP or CLI tool — GitHub Issues, Notion, Google Drive, etc.)
 ```
 
 ### 3. Choose Mode
@@ -64,13 +64,12 @@ Ask for:
 **D) Custom:**
 Before gathering details, warn the user:
 ```
-⚠ Custom integration requires the corresponding MCP server to be configured.
-Make sure the MCP tool is available before using D3 commands.
+⚠ Custom integration requires the corresponding MCP or CLI tool to be available.
+Make sure the tool is installed and accessible before using D3 commands.
 ```
 Ask for:
-- MCP tool name (e.g. `mcp__notion`, `mcp__github`)
+- MCP or CLI tool name (e.g. `mcp__notion`, `mcp__github`, `gh`)
 - Location for all artifacts (e.g. project name, repository, folder)
-- Instructions for writing artifacts (e.g. "Use mcp__notion tool to create pages in workspace X")
 
 ### 5. Generate Configuration
 

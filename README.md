@@ -181,8 +181,6 @@ dialog-driven-delivery/
 ├── config-samples/                  # Example configurations
 │   ├── d3.config.markdown.md        # Local markdown storage (default)
 │   └── d3.config.atlassian.md       # Confluence + Jira storage
-├── metadata/
-│   └── d3.yaml                      # Plugin metadata
 └── tests/                           # E2E tests
 ```
 

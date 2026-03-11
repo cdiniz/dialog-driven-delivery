@@ -12,10 +12,9 @@ Automatically detect which sections need updating. Don't fill empty sections jus
 
 ## Workflow
 
-### 1. Load Configuration and Templates
+### 1. Load Configuration
 - Read `d3.config.md`
 - Read Quiet Mode from Settings
-- Load templates from paths configured in Templates section
 
 ### 2. Fetch Artifact
 Command accepts artifact identifier, path, or title in `$ARGUMENTS`.
@@ -25,6 +24,8 @@ Determine artifact type by matching the artifact's path or content against the S
 - If ambiguous, check content structure against the matching template
 
 If the type cannot be determined, ask the user which artifact type this is (presenting options from the Storage table).
+
+Once determined, load the template from the matching row's Template column.
 
 Read the artifact from the Storage location.
 

@@ -12,10 +12,9 @@ Create artifacts using the appropriate template. Artifacts grow progressively th
 
 ## Workflow
 
-### 1. Load Configuration and Templates
+### 1. Load Configuration
 - Read `d3.config.md`
 - Read Quiet Mode from Settings
-- Load templates from paths configured in Templates section
 
 ### 2. Determine Artifact Type
 
@@ -25,7 +24,7 @@ Read the Storage table from `d3.config.md`. Each row in the Artifact column is a
 
 **Otherwise:** Present the available artifact types from the Storage table and ask the user to pick one.
 
-Once determined, use the matching row's Location and Instructions for storage.
+Once determined, load the template from the matching row's Template column. Use the row's Location and Instructions for storage.
 
 ### 3. Get Input Context
 

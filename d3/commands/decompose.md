@@ -20,11 +20,10 @@ Every story must follow INVEST:
 
 ## Workflow
 
-### 1. Load Configuration and Templates
+### 1. Load Configuration
 - Read `d3.config.md`
 - From the Storage table, find all rows whose Artifact name contains "Spec" (these are the spec rows) and the row matching "Stories"
 - Read Quiet Mode from Settings
-- Load user story template from path configured in Templates section
 
 ### 2. Fetch Specification
 Parse spec identifier from `$ARGUMENTS` (path, or title).
@@ -146,9 +145,8 @@ Before creating, scan specs for uncertainty markers. If critical uncertainties:
 - Flag with "needs-clarification" label
 
 **Load Story Template:**
-1. Use story template path from config
-2. Read template
-3. Use template structure for story content
+1. Read the template from the Template column of the "Stories" Storage row
+2. Use template structure for story content
 
 **Story Structure:**
 - User Story: As [persona], I want [capability], so that [benefit]

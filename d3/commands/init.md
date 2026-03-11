@@ -89,22 +89,15 @@ The file must follow this exact structure:
 ### Settings
 - Quiet Mode: false
 
-### Templates
-- Product Spec Template: .d3/templates/feature-product-spec.md
-- Tech Spec Template: .d3/templates/feature-tech-spec.md
-- User Story Template: .d3/templates/user-story.md
-- ADR Template: .d3/templates/adr.md
-- Meeting Transcript Template: .d3/templates/meeting-transcript.md
-
 ### Storage
 
-| Artifact       | Location          | Instructions                    |
-|----------------|-------------------|---------------------------------|
-| Product Specs  | {location}        | {instructions}                  |
-| Tech Specs     | {location}        | {instructions}                  |
-| Stories        | {location}        | {instructions}                  |
-| ADRs           | {location}        | {instructions}                  |
-| Transcripts    | {location}        | {instructions}                  |
+| Artifact       | Location          | Instructions                    | Template                                  |
+|----------------|-------------------|---------------------------------|-------------------------------------------|
+| Product Specs  | {location}        | {instructions}                  | .d3/templates/feature-product-spec.md     |
+| Tech Specs     | {location}        | {instructions}                  | .d3/templates/feature-tech-spec.md        |
+| Stories        | {location}        | {instructions}                  | .d3/templates/user-story.md               |
+| ADRs           | {location}        | {instructions}                  | .d3/templates/adr.md                      |
+| Transcripts    | {location}        | {instructions}                  | .d3/templates/meeting-transcript.md       |
 ```
 
 Fill `{location}` and `{instructions}` based on the chosen backend and details gathered.

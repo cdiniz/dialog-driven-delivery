@@ -12,7 +12,7 @@ Systematically compare what the specification says should exist against what the
 
 ## Workflow
 
-### 1. Load Configuration and Templates
+### 1. Load Configuration
 - Read `d3.config.md`
 - From the Storage table, find all rows whose Artifact name contains "Spec" (these are the spec rows) and the row matching "Stories"
 

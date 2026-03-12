@@ -41,6 +41,12 @@
 
 ---
 
-## Raw Transcript
+## Distilled Transcript
 
-[Full unedited transcript content goes here. Preserve original formatting, speaker labels, and timestamps if available.]
+[Cleaned transcript with noise removed. Preserve speaker labels, timestamps, and chronological order.]
+
+[REMOVE: greetings, goodbyes, pleasantries, filler words (um, like, you know, so basically), off-topic tangents, meta-discussion (you're on mute, can you share your screen), repeated or restated points — keep the clearest version only.]
+
+[PRESERVE: all substantive dialogue, exact phrasing of decisions and commitments, disagreements and alternative viewpoints, context that explains why something was said.]
+
+[NEVER: summarise or paraphrase the dialogue, reorder the conversation, invent speaker attributions.]

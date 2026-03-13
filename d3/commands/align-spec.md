@@ -31,7 +31,7 @@ Display:
 If any spec is missing or minimal: Warn but continue with available content.
 
 ### 3. Detect Existing Stories
-Search the Storage location for "Stories" for stories matching the spec title.
+Search the Storage location for "Stories" for items matching the spec title. Match by relationship (parent, epic, folder) rather than by item type — projects may use different type names.
 - Store list for later story drift analysis
 - If no stories found, skip story drift in Step 6
 

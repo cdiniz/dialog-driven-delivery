@@ -79,7 +79,7 @@ Write the artifact to the Location specified.
 
 ### 8. Provide Summary
 
-Report what was created: title, path, coverage stats relevant to the artifact type, uncertainty marker count, and suggest next steps (`/d3:refine` to iterate, `/d3:decompose` when ready for stories).
+Report what was created: title, path, coverage stats relevant to the artifact type, uncertainty marker count, and suggest next steps appropriate to the artifact type (e.g. `/d3:refine` to iterate).
 
 ---
 

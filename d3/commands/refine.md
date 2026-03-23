@@ -47,7 +47,16 @@ A) Paste meeting transcript
 B) Paste updated documentation
 C) Describe changes
 D) Paste review feedback
+E) Resolve open questions & assumptions
 ```
+
+### 5b. Resolve Open Questions & Assumptions (Option E)
+
+If the user selects option E:
+1. Scan the artifact for uncertainty markers (`⚠️`, `_To be defined_`, open questions sections, assumptions)
+2. Present each unresolved item one at a time
+3. For each item, ask the user to provide a resolution or confirm the assumption
+4. Collect all resolutions, then proceed to Step 6 treating them as the new information
 
 ### 6. Analyze New Information
 

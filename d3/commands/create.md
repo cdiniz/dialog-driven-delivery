@@ -13,9 +13,10 @@ Create artifacts using the appropriate template. Artifacts grow progressively th
 ## Workflow
 
 ### 1. Load Configuration
+- Load the d3:uncertainty-markers skill
 - Read `d3.config.md`
 - Read Quiet Mode from Settings
-
+  
 ### 2. Determine Artifact Type
 
 Read the Storage table from `d3.config.md`. Each row in the Artifact column is a supported artifact type.
@@ -56,7 +57,7 @@ Generate the artifact following the matching template structure.
 1. **Create FULL structure** — ALL section headings from the template. Never skip sections.
 2. **Fill ONLY what was discussed** — Discussed → real content. NOT discussed → `_To be defined - not yet discussed_`
 3. **NEVER invent** — Template examples are structure guides, NOT content. When in doubt: placeholder, not guess.
-4. **Mark uncertainties** — Invoke the uncertainty-markers skill for detailed guidance.
+4. **Mark uncertainties** — Invoke the d3:uncertainty-markers skill for detailed guidance.
 
 ### 6. Validate Before Creation
 

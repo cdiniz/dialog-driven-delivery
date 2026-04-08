@@ -1,0 +1,52 @@
+{
+  "skill_name": "uncertainty-markers",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a feature spec for the product recommendations feature based on this kickoff meeting transcript. The team discussed adding recommendations to the product page.",
+      "expected_output": "A feature spec that marks unknowns from the kickoff (selection logic not defined, mobile layout not discussed, fallback for small categories unclear) using uncertainty markers, while capturing what was decided (bottom of page, max 3, category-based for MVP).",
+      "files": ["evals/files/kickoff-transcript.md"],
+      "expectations": [
+        "Contains at least one [OPEN QUESTION: ...] marker for information that was not discussed",
+        "Contains at least one [ASSUMPTION: ...] marker for inferred details not explicitly stated in the transcript",
+        "Contains at least one [CLARIFICATION NEEDED: ...] marker for vague or underspecified requirements",
+        "Has an 'Open Questions' section that tracks inline OPEN QUESTION and CLARIFICATION NEEDED markers",
+        "Has an 'Assumptions' section that tracks inline ASSUMPTION markers",
+        "Does NOT silently decide on a selection algorithm — the transcript says 'category' but not how items within a category are picked",
+        "Correctly captures decided items without marking them: recommendations at bottom of page, max 3, category-based for MVP",
+        "Addresses the small category concern (drinkware has only 4 products) as an open question or clarification needed"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I had a kickoff and then a refinement meeting for the product recommendations feature. Create a feature spec using both transcripts. Some things were decided, some were left ambiguous — make sure to mark what's still unclear.",
+      "expected_output": "A feature spec that integrates both meetings, correctly distinguishes decided items from unresolved ones. Cold-start/fallback behavior was never discussed and should be marked. Image on card is ambiguous. Cross-sell rate definition is vague.",
+      "files": ["evals/files/kickoff-transcript.md", "evals/files/refine-transcript.md"],
+      "expectations": [
+        "Marks the cold-start/fallback behavior when purchase history is insufficient (e.g., new products, sparse co-purchase data) as an uncertainty — this was never discussed in either meeting",
+        "Marks the inclusion of images on recommendation cards as an assumption or open question — the refine transcript mentions 'name and price' but does not explicitly confirm images",
+        "Contains a [CLARIFICATION NEEDED: ...] marker for the cross-sell rate metric definition (how to measure, what threshold means success)",
+        "Correctly captures without marking: clickable cards, name and price shown, click navigates to product detail page",
+        "Correctly captures without marking: recommendations at bottom of page, max 3 items",
+        "Has an 'Open Questions' section with entries that correspond to inline markers",
+        "Has an 'Assumptions' section listing assumptions made",
+        "Does NOT hallucinate features or requirements not discussed in either transcript"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Based on these two meeting transcripts about the product recommendations feature, create a technical spec. Include data models, API contracts, and component design. Mark any technical decisions that weren't discussed in the meetings.",
+      "expected_output": "A technical spec with data models, API design, and component structure. Since the meetings only covered product-level decisions, most technical implementation details should be marked as assumptions or pending decisions rather than silently chosen.",
+      "files": ["evals/files/kickoff-transcript.md", "evals/files/refine-transcript.md"],
+      "expectations": [
+        "Contains [ASSUMPTION: ...] or [DECISION PENDING: ...] markers for database/storage choice since it was never discussed",
+        "Contains uncertainty markers for the recommendation algorithm implementation (the meetings were vague on selection logic)",
+        "Contains uncertainty markers for API authentication or authorization approach",
+        "Has both 'Open Questions' and 'Assumptions' sections with entries corresponding to inline markers",
+        "Does NOT present specific tech stack choices (e.g., PostgreSQL, Redis, React) as decided facts without marking them as assumptions",
+        "Correctly incorporates the decided product requirements (max 3, bottom of page, category-based, clickable cards with name and price) into the technical design without marking them as uncertain",
+        "Contains at least 3 different marker types across the spec"
+      ]
+    }
+  ]
+}

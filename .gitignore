@@ -3,3 +3,4 @@ context/d3-brand-guidelines.md
 .DS_Store
 __pycache__/
 tests/e2e/.workspaces/
+d3/skills/uncertainty-markers-workspace

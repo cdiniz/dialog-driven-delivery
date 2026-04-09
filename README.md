@@ -21,47 +21,54 @@ claude plugin install d3@d3-marketplace
 
 ### 2. Configure Storage
 
-Run the init command to generate `d3.config.md` in your project root:
+Ask Claude to initialize D3 — the **d3:init** skill will walk you through it:
 
 ```
-/d3:init
+"set up D3 in this repo"
 ```
 
-This walks you through choosing a storage backend (local markdown, Atlassian, Linear, or custom) and generates the configuration file. You can also create `d3.config.md` manually — see [`config-samples/`](config-samples/) for ready-made examples.
+This walks you through choosing a storage backend (local markdown, Atlassian, Linear, or custom) and generates `d3.config.md` in your project root. You can also create `d3.config.md` manually — see [`config-samples/`](config-samples/) for ready-made examples.
 
-### 3. Use D3 Commands
+### 3. Use D3 Skills
 
-| Command | Purpose |
-|---------|---------|
-| `/d3:init` | Generate `d3.config.md` — choose storage backend and create configuration |
-| `/d3:create` | Create any D3 artifact — specs, ADRs, or structured transcripts |
-| `/d3:refine` | Update any existing artifact with new information |
-| `/d3:decompose` | Break feature into INVEST-compliant user stories |
-| `/d3:align-spec` | Compare specification against codebase to detect drift |
+D3 is delivered as a set of Claude Code **skills** — they trigger from natural intent rather than slash commands. Just describe what you want to do.
 
-Commands can be used independently or combined in whatever order fits your team's process. Here's one possible flow:
+| Skill | Purpose | Trigger examples |
+|---|---|---|
+| `d3:init` | Generate `d3.config.md` and copy default templates | "set up D3", "configure D3 storage" |
+| `d3:create` | Create any D3 artifact — specs, ADRs, stories, transcripts | "turn this transcript into a spec", "document this ADR" |
+| `d3:refine` | Update any existing artifact with new information | "update the spec with these notes", "resolve the open questions" |
+| `d3:decompose` | Break a feature spec into INVEST-compliant user stories | "decompose this spec", "break this feature into stories" |
+| `d3:align-spec` | Compare specification against codebase to detect drift | "does the spec still match the code", "audit drift" |
+| `d3:distill` | Clean a raw transcript and split it by topic | "clean this transcript", "split this meeting by topic" |
+
+Skills can be used independently or combined in whatever order fits your team's process. Here's one possible flow:
 
 ```
 Cross-functional Meeting/Discussion
         |
-create (transcript) → Structured Transcript artifact
+d3:distill (optional, for multi-topic meetings) → per-topic cleaned transcripts
         |
-create (spec) → Specification with Product & Technical Specs
+d3:create (transcript) → Structured Transcript artifact
+        |
+d3:create (spec) → Specification with Product & Technical Specs
 (fills what's known, leaves rest empty)
         |
 [Progressive Refinement as information becomes available]
         |
-refine (paste any new information)
+d3:refine (paste any new information)
         |
 Updated Artifact (spec)
         |
 [Continue refining until ready]
         |
-decompose (discuss or paste transcript)
+d3:decompose (discuss or paste transcript)
         |
 User Stories (with acceptance criteria)
         |
 [Implementation using your team's workflow]
+        |
+d3:align-spec (after development) → drift report spec vs code
 ```
 
 ---
@@ -77,7 +84,7 @@ D3 is grounded in [three principles](https://dialogdrivendelivery.com/) observed
 This tooling applies those principles through a concrete workflow:
 
 - **Feature-centric**: Specifications at feature level, not task level
-- **Transcript-first**: Commands accept meeting transcripts as primary input
+- **Transcript-first**: Skills accept meeting transcripts as primary input
 - **Incremental delivery**: Features decompose into independently deliverable stories
 - **Explicit over implicit**: Uncertainties are marked, not assumed — prevents AI hallucination
 
@@ -95,11 +102,11 @@ The Storage table in `d3.config.md` has three columns:
 | **Location** | Where to store it (a directory path, Confluence space, Jira project, etc.) |
 | **Instructions** | How to write it (write as markdown, use an MCP tool, etc.) |
 
-Commands read the matching row and follow the instructions. This makes D3 work with any storage backend without code changes — just update the table.
+Skills read the matching row and follow the instructions. This makes D3 work with any storage backend without code changes — just update the table.
 
 ### Quiet Mode
 
-By default, D3 commands are conversational — they ask clarifying questions, confirm titles, and present proposed changes before applying them. This is the recommended mode for teams.
+By default, D3 skills are conversational — they ask clarifying questions, confirm titles, and present proposed changes before applying them. This is the recommended mode for teams.
 
 For automated pipelines or scripted workflows, enable quiet mode to suppress all prompts:
 
@@ -109,14 +116,14 @@ For automated pipelines or scripted workflows, enable quiet mode to suppress all
 ```
 
 In quiet mode:
-- Input must be passed directly in the command (transcript text, spec name, etc.)
+- Input must be passed directly in the prompt (transcript text, spec name, etc.)
 - Titles are inferred automatically without confirmation
 - Changes are applied immediately without a review step
 - Uncertainties are marked inline rather than surfaced interactively
 
 ### Template Customisation
 
-D3 includes default templates via the `d3-templates` skill that work out of the box. Only customise if you need domain-specific sections, compliance requirements, or team conventions.
+D3 ships default templates inside the `init` skill's `references/` directory. They're copied into your project at `.d3/templates/` when you run `d3:init`. Only customise if you need domain-specific sections, compliance requirements, or team conventions.
 
 **Default templates included:**
 - Feature Product Spec (5 sections)
@@ -127,7 +134,7 @@ D3 includes default templates via the `d3-templates` skill that work out of the 
 
 **To customise:**
 
-1. Copy default templates to your repo from `d3/skills/d3-templates/references/`
+1. Copy default templates to your repo from `d3/skills/init/references/`
 2. Configure custom paths in the Templates section of `d3.config.md`:
    ```markdown
    ### Templates
@@ -165,7 +172,7 @@ Feature specs use a **streamlined 5-section product template** and **8-section t
 
 ### Conversational Workflow
 
-Commands ask for meeting transcripts (preferred input), work conversationally if none available, propose options with pros/cons, and confirm before creating artefacts.
+Skills ask for meeting transcripts (preferred input), work conversationally if none available, propose options with pros/cons, and confirm before creating artefacts.
 
 ---
 
@@ -174,9 +181,13 @@ Commands ask for meeting transcripts (preferred input), work conversationally if
 ```
 dialog-driven-delivery/
 ├── d3/                              # Core plugin
-│   ├── commands/                    # 5 commands (init, create, refine, decompose, align-spec)
 │   └── skills/
-│       ├── d3-templates/            # 5 reference templates
+│       ├── init/                    # Bootstrap d3.config.md; bundles default templates
+│       ├── create/                  # Draft new artifacts
+│       ├── refine/                  # Update existing artifacts
+│       ├── decompose/               # Break specs into INVEST stories
+│       ├── align-spec/              # Detect spec/code drift
+│       ├── distill/                 # Clean and split transcripts
 │       └── uncertainty-markers/     # Uncertainty marking standards
 ├── config-samples/                  # Example configurations
 │   ├── d3.config.markdown.md        # Local markdown storage (default)
@@ -209,11 +220,11 @@ dialog-driven-delivery/
 
 ### "I don't have meeting transcripts"
 
-All commands work conversationally — select "Describe conversationally" and answer the agent's questions.
+All skills work conversationally — select "Describe conversationally" and answer the skill's questions.
 
 ### "Can I use this with Confluence/Jira/Notion/Linear?"
 
-Yes. Update the Storage table in `d3.config.md` with the location and instructions for your tools. If an MCP server is available for the tool (e.g. mcp__atlassian), reference it in the Instructions column.
+Yes. Update the Storage table in `d3.config.md` with the location and instructions for your tools. If an MCP server is available for the tool (e.g. `mcp__atlassian`), reference it in the Instructions column — the D3 skills read that column literally and use whatever tool you name.
 
 ### "How do I implement the stories?"
 

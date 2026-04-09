@@ -8,10 +8,9 @@ FIXTURES_DIR = REPO_ROOT / "tests" / "e2e" / "fixtures"
 PLUGIN_DIRS = [REPO_ROOT / "d3"]
 TEMPLATES_DIR = FIXTURES_DIR / "templates"
 FILE_SWAPS = {
-    "skills/d3-templates/references/feature-product-spec.md": "product-spec.md",
-    "skills/d3-templates/references/feature-tech-spec.md": "tech-spec.md",
-    "skills/d3-templates/references/user-story.md": "user-story.md",
-    "skills/d3-templates/SKILL.md": "SKILL.md",
+    "skills/init/references/feature-product-spec.md": "product-spec.md",
+    "skills/init/references/feature-tech-spec.md": "tech-spec.md",
+    "skills/init/references/user-story.md": "user-story.md",
 }
 CUSTOM_TEMPLATE_FILES = [
     "custom-product-spec.md",

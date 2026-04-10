@@ -1,0 +1,133 @@
+{
+  "skill_name": "refine",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Refine the existing product spec at ./specs/product/recommendations-spec.md with the new information from this refinement meeting transcript (./refine-transcript.md). Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "The recommendations spec is updated in place: Q1 (selection algorithm) is resolved to bestsellers (top 3 by 30-day sales, excluding the current product), Q2 (small-category fallback) is resolved to 'show what we have, hide the slot if zero others', and the inline [OPEN QUESTION] markers tied to those questions are removed. Q3 (mobile layout), the Success Metrics section, and Constraints & Dependencies are NOT touched — they remain as they were. The final assistant response reports which sections changed and which open questions were resolved.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/specs/product/recommendations-spec.md",
+        "evals/files/refine-transcript.md"
+      ],
+      "expectations": [
+        "The spec file at ./specs/product/recommendations-spec.md is updated in place — no new spec file is created at a different path",
+        "Q1 in the Open Questions section is removed (or marked resolved) — the bestsellers decision is reflected in Requirements > Must Have for the category-based selection bullet",
+        "The category-based selection bullet's inline [OPEN QUESTION: ...] marker about how items are picked is removed and replaced with the bestsellers rule (top 3 by 30-day sales, excluding the current product)",
+        "Q2 in the Open Questions section is removed (or marked resolved) — the small-category rule is reflected in the User Journey > Edge Cases or Requirements section",
+        "The Edge Cases inline [OPEN QUESTION: ...] marker about fewer-than-3 items is removed and replaced with the agreed rule: show what we have, hide the slot if zero others",
+        "Q3 about mobile layout is preserved unchanged in the Open Questions section — the meeting did not address it",
+        "The Success Metrics subsection is still '_To be defined_' — the meeting did not provide metrics, and the skill must not invent any",
+        "The Constraints & Dependencies section is still '_To be defined_' — the meeting did not address constraints",
+        "The Assumptions section's existing 'Catalog data' assumption is preserved",
+        "The Out of Scope items (cross-category recommendations, personalized recommendations) are preserved exactly as before",
+        "Does NOT invent new acceptance criteria, success metrics, mobile layout details, or constraints that the transcript did not contain",
+        "Does NOT rewrite the Overview section for style — the existing What & Why text is preserved",
+        "The final assistant response reports which sections were updated and which open questions were resolved",
+        "The final assistant response does NOT claim it updated sections that were left untouched"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Refine ADR-0001 at ./adrs/0001-use-postgres-for-events.md — architecture review approved the decision. Update the status accordingly. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "The ADR file is updated in place. The Status field changes from 'Proposed' to 'Accepted'. Nothing else changes — the Date stays as 2026-03-15 (NOT silently updated to today), Consequences still reads '_To be confirmed after implementation._', Confirmation still reads '_To be defined._', More Information still reads '_To be defined._', Decision Drivers / Considered Options / Decision Outcome / Pros and Cons are byte-identical to the fixture, and no new sections are added.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/adrs/0001-use-postgres-for-events.md"
+      ],
+      "expectations": [
+        "The ADR file at ./adrs/0001-use-postgres-for-events.md is updated in place — no new ADR file is created",
+        "The Status field is now 'Accepted' (was 'Proposed')",
+        "The Date field is still '2026-03-15' — NOT auto-updated to today's date or to the architecture review date (invention)",
+        "The Consequences subsection still reads '_To be confirmed after implementation._' — NOT silently filled with elaborated consequences",
+        "The Confirmation subsection still reads '_To be defined._' — NOT filled in",
+        "The More Information section still reads '_To be defined._' — NOT filled in",
+        "The Context and Problem Statement section is byte-identical to the fixture — no style rewrites",
+        "The Decision Drivers list is byte-identical to the fixture — no new drivers added, none removed",
+        "The Considered Options still lists only Postgres and DynamoDB — no third option invented",
+        "The Decision Outcome sentence is byte-identical to the fixture",
+        "The Pros and Cons of the Options section (both Postgres and DynamoDB sub-sections) is byte-identical — no new bullets added or existing ones reworded",
+        "The Decision-makers / Consulted / Informed header fields are unchanged — no new names added",
+        "Does NOT add a 'Supersedes' or 'Superseded by' line, 'Approved by' line, or any other header field that was not in the fixture",
+        "The final assistant response notes that only the Status field changed from Proposed to Accepted"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Refine the checkout fees spec at ./specs/product/checkout-fees-spec.md — we decided that taxes should be displayed as a single 'Tax' line, not itemized by jurisdiction. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "The spec is updated to reflect the single-line tax decision: Q1 is resolved and removed from Open Questions, the inline marker on the Tax display bullet is replaced with the decision. The related story at ./stories/show-checkout-fees-story.md contains a concrete AC2 that currently contradicts the new decision (it says tax is shown per jurisdiction on separate lines). A careful refiner must detect this contradiction, update the story's AC2 to match the single-line decision, and mention the story update in the final report. A lazy refiner that only updates the spec and leaves the story alone should fail this eval.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/specs/product/checkout-fees-spec.md",
+        "evals/files/stories/show-checkout-fees-story.md"
+      ],
+      "expectations": [
+        "The spec file at ./specs/product/checkout-fees-spec.md is updated in place",
+        "The Tax display bullet in Requirements > Must Have no longer contains the [OPEN QUESTION: ...] marker about itemization",
+        "The Tax display bullet reflects the single-line decision (a single 'Tax' line, not itemized by jurisdiction)",
+        "Q1 in the Open Questions section is removed (or explicitly marked resolved) — it has been answered",
+        "The related story at ./stories/show-checkout-fees-story.md is detected as related and updated — the skill did not stop at the spec",
+        "The story's AC2 no longer says tax is shown itemized per jurisdiction on separate lines — that concrete behaviour now contradicts the decision and must be corrected",
+        "The story's AC2 now reflects the single-line tax decision (e.g. 'shows tax as a single \"Tax\" line')",
+        "The story's AC2 heading is updated to match the new behaviour (no longer 'Tax is shown itemized by jurisdiction')",
+        "The story's AC1 (subtotal and shipping) and AC3 (final total) are preserved unchanged",
+        "The spec's Subtotal display, Shipping fee line, and Final total bullets are preserved unchanged — they were not affected by the decision",
+        "The spec's Out of Scope items (editing fees from checkout, currency conversion) are preserved unchanged",
+        "The spec's Success Metrics ('_To be defined_') and Constraints & Dependencies ('_To be defined_') sections are NOT silently filled",
+        "The final assistant response explicitly mentions that BOTH the spec file and the related story file were updated",
+        "The final assistant response explicitly acknowledges the contradiction between the prior story AC and the new decision (or otherwise makes it clear the story was updated because of the spec change, not just reworded)",
+        "Does NOT invent new requirements, ACs, or open questions that the user did not state"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Refine my product spec — we decided to launch with 5 recommendations instead of 3. The working directory is a normal project — there is no d3.config.md fixture provided this time.",
+      "expected_output": "The skill detects that d3.config.md is missing and stops. It tells the user to run d3:init first and does NOT proceed to update or invent an artifact. No file is written.",
+      "files": [],
+      "expectations": [
+        "No artifact file is written or modified anywhere in the working directory",
+        "The final assistant response explicitly states that d3.config.md is missing or that the user must run d3:init first",
+        "The skill does NOT fall back to drafting/updating a spec without a config",
+        "The skill does NOT silently invent its own storage location, template structure, or guess where the spec might live"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Refine the existing recommendations spec at ./specs/product/recommendations-spec.md. Marketing ran a CTR test against a competitor and wants us to show 5 recommendations instead of 3 to maximize click-through. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "The skill detects that the new information ('show 5 recommendations') directly contradicts an existing decided requirement in the spec ('Maximum 3 recommendations'). Rather than silently overwriting, it surfaces the conflict to the user — showing both the existing value (3) and the proposed value (5) — and asks how to resolve. The spec file should NOT be silently changed to 5 without the user's explicit confirmation.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/specs/product/recommendations-spec.md"
+      ],
+      "expectations": [
+        "The final assistant response explicitly identifies the conflict between the existing 'Maximum 3 recommendations' requirement and the proposed 'show 5 recommendations'",
+        "The final assistant response presents BOTH values (3 and 5) so the user can see what they're choosing between",
+        "The final assistant response asks the user how to resolve the conflict (or otherwise explicitly defers the decision to the user) — it does NOT silently pick one",
+        "The spec file is either left unchanged with the original 'Maximum 3 recommendations' value, OR the assistant clearly states it will only write the change after confirmation — it does NOT overwrite 3 with 5 without acknowledging the conflict",
+        "Unrelated sections are preserved: Out of Scope, Q1 (selection algorithm), Q3 (mobile layout), Success Metrics ('_To be defined_'), and Constraints & Dependencies ('_To be defined_') are byte-identical to the fixture. Q2 (small-category) and the Edge Cases marker MAY be reworded to reference the now-contested threshold (e.g. 'fewer than the maximum count' instead of 'fewer than 3'), since the hardcoded '3' becomes stale — but their semantic intent (asking about the small-category case) must be preserved and they must not be resolved, deleted, or filled with invented answers",
+        "Does NOT invent a justification (e.g. 'marketing data shows 5 is better') beyond what the user actually stated",
+        "Does NOT silently move the original 'Maximum 3' to Out of Scope or quietly delete it"
+      ]
+    }
+  ]
+}

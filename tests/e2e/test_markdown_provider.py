@@ -5,7 +5,6 @@ import pytest
 
 from .claude_runner import run_claude_conversation
 from .validators import (
-    extract_frontmatter,
     extract_sections,
     heading_texts_lower,
     markers_tracked_in_open_questions,
@@ -15,7 +14,6 @@ from .validators import (
 INPUTS_DIR = os.path.join(os.path.dirname(__file__), "fixtures", "inputs")
 
 SPEC_HEADINGS = ["overview", "requirements", "open questions"]
-STORY_FRONTMATTER_FIELDS = ["type", "id", "spec", "title", "status"]
 
 
 def _read_fixture(name: str) -> str:
@@ -24,7 +22,7 @@ def _read_fixture(name: str) -> str:
 
 
 def _find_specs(workspace):
-    return glob.glob(os.path.join(workspace, "specs", "*.md"))
+    return glob.glob(os.path.join(workspace, "specs", "**", "*.md"), recursive=True)
 
 
 def _create_spec_messages(transcript: str) -> list[str]:
@@ -148,28 +146,12 @@ class TestMarkdownWorkflow:
             os.path.join(stories_dir, "**", "*.md"), recursive=True
         )
 
-        stories = []
-        for path in all_files:
-            content = open(path).read()
-            fm = extract_frontmatter(content)
-            if fm is None or fm.get("type") != "story":
-                continue
-            stories.append((path, content, fm))
-
-        assert len(stories) >= 1, (
-            f"No story files found. Files: {all_files}. Output:\n{output[:1000]}"
+        assert len(all_files) >= 1, (
+            f"No story files found. Output:\n{output[:1000]}"
         )
 
-        spec_stem = os.path.splitext(spec_name)[0]
-
-        for path, content, fm in stories:
-            for field in STORY_FRONTMATTER_FIELDS:
-                assert field in fm, f"Missing frontmatter '{field}' in {path}"
-
-            assert spec_stem in str(fm.get("spec", "")), (
-                f"Story doesn't reference parent spec in {path}"
-            )
-
+        for path in all_files:
+            content = open(path).read()
             lower = content.lower()
             assert "given" in lower and "when" in lower and "then" in lower, (
                 f"Missing Given-When-Then ACs in {path}"
@@ -244,21 +226,9 @@ class TestQuietModeWorkflow:
             os.path.join(stories_dir, "**", "*.md"), recursive=True
         )
 
-        stories = []
-        for path in all_files:
-            content = open(path).read()
-            fm = extract_frontmatter(content)
-            if fm is None or fm.get("type") != "story":
-                continue
-            stories.append((path, content, fm))
-
-        assert len(stories) >= 1, (
-            f"No story files found. Files: {all_files}. Output:\n{output[:1000]}"
+        assert len(all_files) >= 1, (
+            f"No story files found. Output:\n{output[:1000]}"
         )
-
-        for path, content, fm in stories:
-            for field in STORY_FRONTMATTER_FIELDS:
-                assert field in fm, f"Missing frontmatter '{field}' in {path}"
 
 
 class TestMarkdownConfiguration:

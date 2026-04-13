@@ -1,0 +1,96 @@
+{
+  "skill_name": "create",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a feature spec for the product recommendations idea from this kickoff meeting transcript. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "A feature spec file written under ./specs/product/, derived from the feature-product-spec template, that captures the decided items (max 3 recommendations, bottom of page, category-based for MVP) and explicitly marks everything not discussed (selection algorithm within a category, mobile layout, fallback for tiny categories, success metrics, performance targets) using uncertainty markers. The final assistant message should report the artifact path, a coverage stat, and a suggested next step.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/kickoff-transcript.md"
+      ],
+      "expectations": [
+        "Picks the Product Specs row from the Storage table — the artifact file is written under ./specs/product/, not under ./specs/tech/, ./adrs/, or ./stories/",
+        "Uses the feature-product-spec.md template — the output contains the template's top-level sections: Overview, User Journey, Requirements, Open Questions",
+        "The Overview > What & Why subsection contains real content extracted from the kickoff transcript (recommendations on the product page), not template placeholder text like '[One clear paragraph...]'",
+        "Requirements > Must Have captures the firmly decided items without uncertainty markers: bottom of the product page, maximum 3 recommendations, category-based selection for MVP",
+        "Sections that the kickoff did not cover (e.g. Success Metrics with concrete targets, Non-Functional Requirements, Constraints & Dependencies) are either left as a 'To be defined' placeholder or filled with [OPEN QUESTION:] / [CLARIFICATION NEEDED:] markers — they are NOT silently invented",
+        "Contains at least one uncertainty marker for the algorithm question (how items within a category get picked) — this was explicitly raised but not resolved",
+        "Contains an Open Questions and an Assumptions tracking section, populated with entries that correspond to the inline markers",
+        "The drinkware concern (category with only 4 products) appears either as a captured requirement or as an open question / clarification — it is NOT silently dropped",
+        "Does NOT copy template example phrases verbatim into the output as if they were real content (e.g. 'OAuth2', 'GDPR', or other items that the kickoff never mentioned)",
+        "The final assistant response reports the path of the created artifact",
+        "The final assistant response includes a coverage stat (e.g. 'X of Y sections filled' or a count of open questions/assumptions)",
+        "The final assistant response suggests a next step — typically d3:refine or d3:decompose"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create an ADR for the database choice from this discussion. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "An ADR file written under ./adrs/, derived from the adr.md template, that captures Postgres as the chosen option with the actual reasons given in the discussion (existing operational experience, access pattern flexibility, transaction support, write volume well within Postgres capacity), lists ONLY the two options actually discussed (Postgres and DynamoDB), and marks parked items (schema design, retention strategy) as deferred rather than inventing answers.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/db-decision-transcript.md"
+      ],
+      "expectations": [
+        "Picks the ADRs row from the Storage table — the artifact file is written under ./adrs/, not under ./specs/product/ or ./specs/tech/",
+        "Uses the adr.md template — the output contains the template's sections: Context and Problem Statement, Decision Drivers, Considered Options, Decision Outcome, Consequences",
+        "Considered Options lists ONLY Postgres and DynamoDB — no third option (e.g. MySQL, MongoDB, Cassandra) is invented",
+        "Decision Outcome names Postgres as the chosen option",
+        "Decision Drivers / Pros and Cons capture the actual reasons from the discussion: existing operational experience with Postgres, flexibility around future access patterns, transaction support for billing, projected write volume (~200 writes/sec) within Postgres capacity",
+        "Schema design (one big table vs partition by event type) and retention policy are present as uncertainty markers or as 'parked' / deferred items — they are NOT silently decided",
+        "Status field is set to a sensible value like 'Proposed' or 'Accepted' — not invented as something the discussion did not establish",
+        "Does NOT silently invent details like specific Postgres version, instance class, exact migration plan, or benchmark numbers that were not in the transcript",
+        "The final assistant response reports the path of the created ADR file",
+        "The final assistant response suggests a next step (e.g. d3:refine for the parked items)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a user story for the following: customers should be able to filter products by price range on the catalog page. Min and max should both be required. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "A user story file written under ./stories/, derived from the user-story.md template, with a Description and at least two acceptance criteria in Given/When/Then form. One AC covers the happy-path filter behaviour and one covers the validation rule that both min and max are required. Everything not stated by the user (specific min/max bounds, error message wording, default values, sort behaviour, currency, what happens when no products match) is marked with uncertainty markers rather than silently invented.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md"
+      ],
+      "expectations": [
+        "Picks the Stories row from the Storage table — the artifact file is written under ./stories/, not under ./specs/product/ or ./specs/tech/",
+        "Uses the user-story.md template — the output contains a Description section and Acceptance Criteria with at least one AC in Given/When/Then form",
+        "Contains an acceptance criterion covering the happy path: filtering products by a valid min and max price range",
+        "Contains an acceptance criterion covering the stated validation rule: both min and max are required",
+        "Does NOT invent specific numeric bounds (e.g. min=0, max=10000), specific error message text, default values, or currency symbols that the user did not state — these are either omitted, left as placeholders, or marked with [CLARIFICATION NEEDED:] / [OPEN QUESTION:]",
+        "Does NOT invent unrelated requirements like sort order, pagination behaviour, URL parameters, or analytics events that the user did not mention",
+        "Contains at least one uncertainty marker for an aspect that was not specified (e.g. error message wording, behaviour when no products match the range, currency)",
+        "The final assistant response reports the path of the created story file"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create a feature spec for product recommendations from this kickoff transcript. The working directory is a normal project — there is no d3.config.md fixture provided this time.",
+      "expected_output": "The skill detects that d3.config.md is missing and stops. It tells the user to run d3:init first and does NOT proceed to draft an artifact anyway. No spec file is written.",
+      "files": [
+        "evals/files/kickoff-transcript.md"
+      ],
+      "expectations": [
+        "No artifact file is written under ./specs/product/, ./specs/tech/, ./adrs/, ./stories/, or ./transcripts/",
+        "The final assistant response explicitly states that d3.config.md is missing or that the user must run d3:init first",
+        "The skill does NOT fall back to drafting a spec from the transcript without a config",
+        "The skill does NOT silently invent its own storage location or template structure"
+      ]
+    }
+  ]
+}

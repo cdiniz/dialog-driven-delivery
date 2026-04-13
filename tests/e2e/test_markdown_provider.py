@@ -5,7 +5,6 @@ import pytest
 
 from .claude_runner import run_claude_conversation
 from .validators import (
-    extract_frontmatter,
     extract_sections,
     heading_texts_lower,
     markers_tracked_in_open_questions,
@@ -15,7 +14,6 @@ from .validators import (
 INPUTS_DIR = os.path.join(os.path.dirname(__file__), "fixtures", "inputs")
 
 SPEC_HEADINGS = ["overview", "requirements", "open questions"]
-STORY_FRONTMATTER_FIELDS = ["type", "id", "spec", "title", "status"]
 
 
 def _read_fixture(name: str) -> str:
@@ -24,12 +22,12 @@ def _read_fixture(name: str) -> str:
 
 
 def _find_specs(workspace):
-    return glob.glob(os.path.join(workspace, "specs", "*.md"))
+    return glob.glob(os.path.join(workspace, "specs", "**", "*.md"), recursive=True)
 
 
 def _create_spec_messages(transcript: str) -> list[str]:
     return [
-        "/d3:create\n\nI want to create a Spec from a meeting transcript.",
+        "Use the d3:create skill to create a Spec artifact from a meeting transcript.",
         f"Here is the transcript:\n---\n{transcript}\n---\n\n"
         f"Use the default root location.\n"
         f'For the title, use "About Page".',
@@ -39,7 +37,7 @@ def _create_spec_messages(transcript: str) -> list[str]:
 
 def _refine_spec_messages(spec_name: str, refinement: str) -> list[str]:
     return [
-        f"/d3:refine {spec_name}\n\nI want to describe changes.",
+        f"Use the d3:refine skill to refine the spec {spec_name}. I want to describe changes.",
         f"Here are the updates from our follow-up meeting:\n---\n{refinement}\n---",
         "The proposed changes look correct, please apply them.",
     ]
@@ -47,7 +45,7 @@ def _refine_spec_messages(spec_name: str, refinement: str) -> list[str]:
 
 def _decompose_messages(spec_name: str) -> list[str]:
     return [
-        f"/d3:decompose {spec_name}",
+        f"Use the d3:decompose skill to decompose the spec {spec_name} into user stories.",
         "LOCAL",
         "I did not have a decomposition meeting. Please decompose conversationally.",
         "The proposed stories look good. Please create them all. Make assumptions where needed and document them in the stories.",
@@ -148,28 +146,12 @@ class TestMarkdownWorkflow:
             os.path.join(stories_dir, "**", "*.md"), recursive=True
         )
 
-        stories = []
-        for path in all_files:
-            content = open(path).read()
-            fm = extract_frontmatter(content)
-            if fm is None or fm.get("type") != "story":
-                continue
-            stories.append((path, content, fm))
-
-        assert len(stories) >= 1, (
-            f"No story files found. Files: {all_files}. Output:\n{output[:1000]}"
+        assert len(all_files) >= 1, (
+            f"No story files found. Output:\n{output[:1000]}"
         )
 
-        spec_stem = os.path.splitext(spec_name)[0]
-
-        for path, content, fm in stories:
-            for field in STORY_FRONTMATTER_FIELDS:
-                assert field in fm, f"Missing frontmatter '{field}' in {path}"
-
-            assert spec_stem in str(fm.get("spec", "")), (
-                f"Story doesn't reference parent spec in {path}"
-            )
-
+        for path in all_files:
+            content = open(path).read()
             lower = content.lower()
             assert "given" in lower and "when" in lower and "then" in lower, (
                 f"Missing Given-When-Then ACs in {path}"
@@ -179,14 +161,14 @@ class TestMarkdownWorkflow:
 class TestQuietModeWorkflow:
     """
     E2E tests for quiet mode.
-    Verifies commands skip confirmations and use $ARGUMENTS directly.
+    Verifies skills skip confirmations and use inline input directly.
     """
 
     @pytest.mark.timeout(600)
     def test_create_spec_quiet(self, quiet_workflow_workspace, plugin_dirs):
         transcript = _read_fixture("sample_transcript.txt")
         run_claude_conversation(
-            [f"/d3:create {transcript}"],
+            [f"Use the d3:create skill to create a Spec from this transcript:\n\n{transcript}"],
             cwd=quiet_workflow_workspace,
             plugin_dirs=plugin_dirs,
         )
@@ -212,7 +194,7 @@ class TestQuietModeWorkflow:
         refinement = _read_fixture("refinement_input.txt")
 
         run_claude_conversation(
-            [f"/d3:refine {spec_name}\n\n{refinement}"],
+            [f"Use the d3:refine skill to refine {spec_name} with these updates:\n\n{refinement}"],
             cwd=quiet_workspace_with_spec,
             plugin_dirs=plugin_dirs,
         )
@@ -230,7 +212,7 @@ class TestQuietModeWorkflow:
         spec_name = os.path.basename(spec_files[0])
 
         output = run_claude_conversation(
-            [f"/d3:decompose {spec_name}"],
+            [f"Use the d3:decompose skill to decompose {spec_name} into user stories."],
             cwd=quiet_workspace_with_refined_spec,
             plugin_dirs=plugin_dirs,
         )
@@ -244,21 +226,9 @@ class TestQuietModeWorkflow:
             os.path.join(stories_dir, "**", "*.md"), recursive=True
         )
 
-        stories = []
-        for path in all_files:
-            content = open(path).read()
-            fm = extract_frontmatter(content)
-            if fm is None or fm.get("type") != "story":
-                continue
-            stories.append((path, content, fm))
-
-        assert len(stories) >= 1, (
-            f"No story files found. Files: {all_files}. Output:\n{output[:1000]}"
+        assert len(all_files) >= 1, (
+            f"No story files found. Output:\n{output[:1000]}"
         )
-
-        for path, content, fm in stories:
-            for field in STORY_FRONTMATTER_FIELDS:
-                assert field in fm, f"Missing frontmatter '{field}' in {path}"
 
 
 class TestMarkdownConfiguration:

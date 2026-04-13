@@ -1,6 +1,6 @@
 {
   "name": "d3",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Dialog Driven Delivery - A pragmatic toolkit for building software through conversational, transcript-first documentation and development. Create artifacts (specs, ADRs, transcripts), refine them, and decompose into user stories.",
   "author": {
     "name": "D3 Team"

@@ -10,7 +10,7 @@ Working branch: `llm-wiki`. Design & rationale: see [`DESIGN.md`](./DESIGN.md).
 - [x] Write 5 seed transcripts under `team-brain/raw/meetings/`
 - [x] Ingest transcripts → brain produced summaries, decisions, concepts, project hub
 - [x] Fix D3 retrieval flow in SKILL.md — current wording assumes flat topic tags, real brain is hub-and-spoke with keyword-bearing titles
-- [ ] Create fake product repo at `/Users/asier/dev/play/team-wiki-d3/fake-product`
+- [x] Create fake product repo at `/Users/asier/dev/play/team-wiki-d3/pageturner`
 - [ ] Install local D3 plugin in fake product repo
 - [ ] Run `/d3:init` and set `Brain Source: ../team-brain`
 - [ ] Validate: `/d3:create product-spec catalog-browse` pulls the 2 browse decisions + 2 relevant summaries + concept; ignores ceremonies/people; reflects the 2026-04-06 supersession

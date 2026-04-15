@@ -14,7 +14,7 @@ Working branch: `llm-wiki`. Design & rationale: see [`DESIGN.md`](./DESIGN.md).
 - [x] Install local D3 plugin in fake product repo
 - [x] Run `/d3:init` and set `Brain Source: ../team-brain`
 - [x] Validate: `/d3:create product-spec catalog-browse` pulls the 2 browse decisions + 2 relevant summaries + concept; ignores ceremonies/people; reflects the 2026-04-06 supersession
-- [ ] Validate: `/d3:create product-spec checkout` pulls fee + mechanics decisions + refinement summary; ignores browse-specific files
+- [x] Validate: `/d3:create product-spec checkout` pulls fee + mechanics decisions + refinement summary; ignores browse-specific files
 - [ ] Validate: `/d3:refine` option F applies delta-only updates from a new ingested transcript
 - [ ] Validate failure case: remove `wiki/index.md` → D3 falls back to paste flow without hard-failing
 - [ ] Bump plugin version in `d3/.claude-plugin/plugin.json`

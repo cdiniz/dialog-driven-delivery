@@ -37,6 +37,19 @@ Quiet mode turns off D3's conversational prompts — titles are inferred, clarif
 
 Default: **false**. Only flip it on if the user explicitly asks for automation, scripted pipelines, or "no prompts".
 
+### 3b. Ask about Brain Source (optional)
+
+The Brain Source setting points D3 at a team knowledge repo (an "llm-wiki" or "team brain") — a separate location where raw inputs like meeting transcripts and slack threads are ingested and distilled into a navigable wiki. When set, `create` and `refine` gain a "pull from brain" input option that reads context from there instead of requiring a pasted transcript.
+
+Ask:
+```
+Do you have a team brain / llm-wiki you want D3 to pull context from? (optional)
+- Leave blank / say "no" if you're not using one — D3 will keep working with pasted input.
+- Otherwise provide a path (e.g. ../team-brain) or URL.
+```
+
+Default: **_none_**. Only set it if the user gives a concrete value. Do not guess a path.
+
 ### 4. Gather backend-specific details
 
 **A) Local markdown:** no extra questions. Use these defaults:
@@ -107,6 +120,7 @@ Write `d3.config.md` at the repo root using this exact structure:
 
 ### Settings
 - Quiet Mode: false
+- Brain Source: _none_  <!-- Optional. Path or URL to a team knowledge repo (e.g. ../team-brain). When set, d3:create and d3:refine can pull context from it instead of pasted input. -->
 
 ### Storage
 

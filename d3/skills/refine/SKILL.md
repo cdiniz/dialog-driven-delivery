@@ -19,6 +19,7 @@ The new input is a delta, not a replacement. Detect which sections it actually a
 
 - Read `d3.config.md`. If missing, stop and tell the user to run **d3:init** first.
 - Read Quiet Mode from `### Settings`.
+- Read Brain Source from `### Settings`. If set to anything other than `_none_` (empty), option F in step 5 is enabled.
 
 ### 2. Locate and fetch the artifact
 
@@ -50,9 +51,20 @@ B) Paste updated documentation
 C) Describe the changes
 D) Paste review feedback
 E) Resolve open questions & assumptions (walk through them one at a time)
+F) Pull new information from the team brain  (only shown if Brain Source is set)
 ```
 
 **Quiet mode:** if the user's message already contains the new content, use it directly and skip the question.
+
+### 5c. Option F — pull new information from the team brain
+
+If the user picks F (or their request already names a brain topic, e.g. "refine the spec with the latest from the brain on product-recommendation"):
+
+1. Read `<Brain Source>/INDEX.md`. If missing, warn and fall back to options A–E.
+2. Match the requested topic against INDEX.md entries. If the user didn't give a topic, default to the current artifact's title and propose matches.
+3. Show the user the matched entries and ask for confirmation. In quiet mode, only auto-confirm a single unambiguous match.
+4. Read the confirmed files and use their concatenated content as the new information for step 6.
+5. The brain is read-only for this skill — never write back to Brain Source.
 
 ### 5b. Option E — walk through open questions one at a time
 

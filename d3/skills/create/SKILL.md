@@ -20,6 +20,7 @@ When AI drafts a spec from a sparse conversation, the tempting failure mode is t
 - Read `d3.config.md` at the repo root. If it doesn't exist, stop and tell the user to run the **d3:init** skill first.
 - Invoke the sibling **d3:uncertainty-markers** skill to load marker standards. These are used in step 5.
 - Read the Quiet Mode setting from the `### Settings` section.
+- Read the Brain Source setting from the `### Settings` section. If set to anything other than `_none_` (empty), option D in step 3 is enabled.
 
 ### 2. Determine the artifact type
 
@@ -39,9 +40,21 @@ How would you like to provide the information?
 A) Paste a meeting transcript
 B) Paste an existing document
 C) Describe it conversationally
+D) Pull context from the team brain  (only shown if Brain Source is set)
 ```
 
-**Quiet mode:** if the user's message already contains enough context (pasted text, a file reference), use it directly and skip the prompt.
+**Quiet mode:** if the user's message already contains enough context (pasted text, a file reference, or a `brain:<topic>` reference), use it directly and skip the prompt.
+
+**If the user picks D (or the request already names a brain topic, e.g. "create a product spec for product-recommendation from the brain"):**
+
+1. Treat the Brain Source value as a readable location (filesystem path, relative or absolute). Read `<Brain Source>/INDEX.md`. If it doesn't exist, warn the user that the brain has no index and fall back to options A/B/C.
+2. Match the requested topic against INDEX.md entries. Collect the referenced file paths.
+3. Show the user the matched entries (file paths + one-line labels from the index) and ask for confirmation before reading — this is the cheap sanity check that catches topic mismatches (e.g. "product recs" vs "recommendation engine").
+4. **Quiet mode:** skip confirmation only if there is a single unambiguous match. If multiple matches, always confirm.
+5. Read the confirmed files and use their concatenated content as the input context for step 4.
+6. If no entries match, tell the user and fall back to options A/B/C.
+
+The brain is read-only from this skill's perspective. Never write back to the Brain Source.
 
 ### 4. Analyze input and propose a title
 

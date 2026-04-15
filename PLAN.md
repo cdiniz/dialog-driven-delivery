@@ -12,7 +12,7 @@ Working branch: `llm-wiki`. Design & rationale: see [`DESIGN.md`](./DESIGN.md).
 - [x] Fix D3 retrieval flow in SKILL.md — current wording assumes flat topic tags, real brain is hub-and-spoke with keyword-bearing titles
 - [x] Create fake product repo at `/Users/asier/dev/play/team-wiki-d3/pageturner`
 - [x] Install local D3 plugin in fake product repo
-- [ ] Run `/d3:init` and set `Brain Source: ../team-brain`
+- [x] Run `/d3:init` and set `Brain Source: ../team-brain`
 - [ ] Validate: `/d3:create product-spec catalog-browse` pulls the 2 browse decisions + 2 relevant summaries + concept; ignores ceremonies/people; reflects the 2026-04-06 supersession
 - [ ] Validate: `/d3:create product-spec checkout` pulls fee + mechanics decisions + refinement summary; ignores browse-specific files
 - [ ] Validate: `/d3:refine` option F applies delta-only updates from a new ingested transcript

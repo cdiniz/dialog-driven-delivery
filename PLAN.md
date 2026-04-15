@@ -115,6 +115,31 @@ Kept small. Nothing removed. Teams not on the brain keep working unchanged.
 
 **Deliberately untouched:** `distill`, `capture-transcript` (if it exists), `init`. Old flows still work.
 
+## Brain ingest — scope
+
+Brain ingest is the wiki repo's own prompt, owned by that repo. It is **not** a reuse of D3's `distill` — the two jobs look similar but have different requirements, and coupling them would re-create the repo coupling this plan is trying to avoid.
+
+### Why brain ingest is not distill
+
+- **Different horizon.** `distill` cleans a transcript for immediate consumption by `create`. The brain stores knowledge for repeated retrieval over months. That changes what gets preserved.
+- **Different split rule.** `distill` splits aggressively so each output maps to one spec. The brain often wants to keep per-meeting chronology (same topic across 4 meetings = 4 files, not 1 merged file) because supersession matters.
+- **Different output shape.** `distill` optionally applies a D3 template. The brain should not know D3 templates exist — it produces raw-plus-metadata.
+- **Coupling risk.** If brain ingest "reuses distill logic," any D3 change to `distill` leaks into the brain.
+
+### What brain ingest does
+
+- Removes obvious noise (greetings, filler, meta-chatter).
+- Tags each file with source metadata: date, type (meeting / slack / doc), participants where available, link back to the original.
+- Labels each file with a topic slug for `INDEX.md` — does not necessarily split by topic.
+- Updates `INDEX.md` on every ingestion, using the pinned format (`- [topic-slug](path.md) — one-line hook`).
+- Idempotent: re-ingesting the same source doesn't create duplicates.
+
+### What brain ingest does NOT do
+
+- Apply D3 templates.
+- Merge multiple sources into a single synthesized file (that's a later, separate "synthesized" layer).
+- Generate specs, ADRs, or any D3 artifact — that is D3's job, downstream.
+
 ## Open design questions (to validate, not decide yet)
 
 1. **Should D3-generated artifacts be published back into the brain?**
@@ -139,7 +164,7 @@ Kept small. Nothing removed. Teams not on the brain keep working unchanged.
 
 Create `team-brain/` on the filesystem, sibling to a fake product repo.
 
-- `CLAUDE.md` with ingest instructions. Reuse the logic from `d3/skills/distill/SKILL.md` as a starting point (topic split, noise removal).
+- `CLAUDE.md` with ingest instructions (see "Brain ingest — scope" below). Written fresh for the brain's needs — not a copy of D3's `distill`.
 - `INDEX.md` at root — maintained by the ingest prompt.
 - Folders for content: `transcripts/`, `slack/`, `docs/`.
 

@@ -9,7 +9,7 @@ Working branch: `llm-wiki`. Design & rationale: see [`DESIGN.md`](./DESIGN.md).
 - [x] Draft fake product (Pageturner — used-book marketplace)
 - [x] Write 5 seed transcripts under `team-brain/raw/meetings/`
 - [x] Ingest transcripts → brain produced summaries, decisions, concepts, project hub
-- [ ] Fix D3 retrieval flow in SKILL.md — current wording assumes flat topic tags, real brain is hub-and-spoke with keyword-bearing titles
+- [x] Fix D3 retrieval flow in SKILL.md — current wording assumes flat topic tags, real brain is hub-and-spoke with keyword-bearing titles
 - [ ] Create fake product repo at `/Users/asier/dev/play/team-wiki-d3/fake-product`
 - [ ] Install local D3 plugin in fake product repo
 - [ ] Run `/d3:init` and set `Brain Source: ../team-brain`

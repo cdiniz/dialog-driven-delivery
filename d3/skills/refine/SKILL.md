@@ -58,13 +58,15 @@ F) Pull new information from the team brain  (only shown if Brain Source is set)
 
 ### 5c. Option F — pull new information from the team brain
 
-If the user picks F (or their request already names a brain topic, e.g. "refine the spec with the latest from the brain on product-recommendation"):
+If the user picks F (or their request already names a brain topic, e.g. "refine the spec with the latest from the brain on catalog-browse"):
 
-1. Read `<Brain Source>/INDEX.md`. If missing, warn and fall back to options A–E.
-2. Match the requested topic against INDEX.md entries. If the user didn't give a topic, default to the current artifact's title and propose matches.
-3. Show the user the matched entries and ask for confirmation. In quiet mode, only auto-confirm a single unambiguous match.
-4. Read the confirmed files and use their concatenated content as the new information for step 6.
-5. The brain is read-only for this skill — never write back to Brain Source.
+1. Find the brain's entry-point index — try `<Brain Source>/index.md` first, then `<Brain Source>/wiki/index.md`. If neither exists, warn and fall back to options A–E.
+2. Read the index. Assume nothing about its section names — D3 does not rely on specific categories. Each entry is a title plus a link.
+3. **Keyword-match the user's topic against the entry titles**, loosely (case/punctuation/whitespace tolerant; e.g. `catalog-browse` matches "Catalog browse: grid + pagination"). If the user didn't give a topic, default to the current artifact's title. Skip obviously irrelevant sections like "People" unless a person is the explicit subject.
+4. If the index links to hub pages (project overview, topic hubs) relevant to the topic, optionally follow them to discover further linked files.
+5. Show the user the matched files (paths + titles) and ask for confirmation. In quiet mode, only auto-confirm a single unambiguous match.
+6. Read the confirmed files and use their concatenated content as the new information for step 6 of this workflow.
+7. The brain is read-only. Never write back. Supersession / conflict resolution is the brain's responsibility — if two files conflict, trust the later-dated one.
 
 ### 5b. Option E — walk through open questions one at a time
 

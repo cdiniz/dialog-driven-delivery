@@ -1,6 +1,6 @@
 ---
 name: init
-description: Bootstrap a D3 project by generating d3.config.md and copying default templates into .d3/templates/. Use whenever the user wants to set up D3, initialize D3 in a new repo, configure storage for D3 artifacts (local markdown, Atlassian/Confluence+Jira, Linear, or any custom backend), or says things like "d3 init", "set up d3 here", "configure d3", or asks where D3 will store specs/stories/ADRs. This is the entry point for every D3 project — other D3 skills (create, refine, decompose, align-spec, distill) depend on d3.config.md existing.
+description: Bootstrap a D3 project by generating d3.config.md and copying default templates into .d3/templates/. Use whenever the user wants to set up D3, initialize D3 in a new repo, configure storage for D3 artifacts (local markdown, Atlassian/Confluence+Jira, Azure DevOps, Linear, or any custom backend), or says things like "d3 init", "set up d3 here", "configure d3", or asks where D3 will store specs/stories/ADRs. This is the entry point for every D3 project — other D3 skills (create, refine, decompose, align-spec, distill) depend on d3.config.md existing.
 ---
 
 # D3 — Initialize Project
@@ -21,12 +21,13 @@ Check if `d3.config.md` already exists at the repo root.
 
 ### 2. Choose storage backend
 
-Ask the user where D3 should store artifacts. The four common choices:
+Ask the user where D3 should store artifacts. The five common choices:
 
 - **A) Local markdown files** — simplest. Everything goes in local directories under the repo. Great for solo work, open-source projects, or teams that want artifacts in version control alongside the code.
 - **B) Atlassian** — Confluence for specs and ADRs, Jira for stories. Needs the `mcp__atlassian` MCP server.
-- **C) Linear** — Linear project documents for specs/ADRs and Linear issues for stories. Needs the `mcp__linear` MCP server.
-- **D) Custom** — any other tool (Notion, GitHub Issues, Google Drive, a bespoke CLI). Needs the corresponding MCP server or CLI on the user's path.
+- **C) Azure DevOps** — Azure DevOps Wiki for specs and ADRs, Azure DevOps Work Items for stories. Needs the `mcp__azure_devops` MCP server.
+- **D) Linear** — Linear project documents for specs/ADRs and Linear issues for stories. Needs the `mcp__linear` MCP server.
+- **E) Custom** — any other tool (Notion, GitHub Issues, Google Drive, a bespoke CLI). Needs the corresponding MCP server or CLI on the user's path.
 
 If the user already mentioned a backend in their request, skip the question and confirm briefly instead.
 
@@ -57,11 +58,25 @@ Then ask for:
 - Confluence parent page ID for ADRs
 - Jira project key (for stories)
 
-**C) Linear:** warn about the `mcp__linear` dependency, then ask for:
+**C) Azure DevOps:** before asking, warn:
+```
+Azure DevOps integration needs the Azure DevOps MCP server configured.
+Make sure mcp__azure_devops is available before using D3 skills.
+See: https://github.com/microsoft/azure-devops-mcp
+```
+Then ask for:
+- Azure DevOps organisation name
+- Project name
+- Wiki name (for specs and ADRs — defaults to the project wiki)
+- Wiki base paths for specs and ADRs (defaults: `/specs/product`, `/specs/tech`, `/adrs`)
+- Work item type for stories (`User Story` for Agile, `Product Backlog Item` for Scrum — ask which process template the project uses)
+- Area path (optional — defaults to project root)
+
+**D) Linear:** warn about the `mcp__linear` dependency, then ask for:
 - Linear project name
 - Linear team key
 
-**D) Custom:** warn that the corresponding tool must be installed, then ask for:
+**E) Custom:** warn that the corresponding tool must be installed, then ask for:
 - MCP or CLI tool name (e.g. `mcp__notion`, `mcp__github`, `gh`)
 - Location for artifacts (project name, repository, folder, etc.)
 
@@ -108,6 +123,7 @@ Fill `{location}` and `{instructions}` based on the backend:
 
 - **Local markdown** — Location is the default directory path from step 4. Instructions: `Write as markdown file. Filename from title in kebab-case.`
 - **Atlassian** — Location is the Confluence space/parent page (for specs/ADRs) or Jira project key (for stories). Instructions reference the `mcp__atlassian` tool explicitly, e.g. `Create Confluence page under parent {pageId} using mcp__atlassian__createConfluencePage.`
+- **Azure DevOps** — Location is the Azure DevOps Wiki (for specs/ADRs) or project name (for stories). Instructions reference `mcp__azure_devops` tools, e.g. `Use mcp__azure_devops tool to create wiki page at path /specs/product in wiki {wikiName}` or `Use mcp__azure_devops tool to create work items of type {workItemType} in project {project}, area path {areaPath}`. Stories use parent-child work item links (not epic links) — the epic is a parent work item of type Epic.
 - **Linear / custom** — analogous, referencing the relevant MCP server or CLI tool.
 
 The Instructions column is read literally by other D3 skills, so it needs to be actionable — it should name the tool to use and any parameters that matter.

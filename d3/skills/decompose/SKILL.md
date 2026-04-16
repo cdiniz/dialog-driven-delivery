@@ -122,7 +122,7 @@ Only create stories that pass every INVEST check.
 
 ### 7. Create the epic (if the backend supports epics)
 
-Read the Instructions column of the "Stories" row. If it indicates a backend that supports epics (Jira is the common case), create an epic first and store its key for linking.
+Read the Instructions column of the "Stories" row. If it indicates a backend that supports epics (Jira and Azure DevOps are the common cases), create an epic first and store its key for linking. In Azure DevOps, epics are work items of type "Epic" and stories are linked as children via parent-child relationships (not epic links).
 
 Epic description template:
 

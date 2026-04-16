@@ -95,6 +95,34 @@
       ]
     },
     {
+      "id": 6,
+      "prompt": "Refine ADR-0001 at ./adrs/0001-use-postgres-for-events.md with the following outcomes from the post-implementation review: Status moves to Accepted. Consequences: the events table is live on the existing Postgres primary, p99 write latency is 18ms at the observed 150 writes/sec peak, and the team added a nightly vacuum job to the existing maintenance window. Confirmation: confirmed by the 30-day production soak — no incidents, no capacity alarms, and the analytics team successfully ran the first join query against orders last week. More Information: see the implementation PR at internal/events-service#412 and the 30-day soak report at internal/runbooks/events-soak-2026-04. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "The ADR is updated in place. Status becomes Accepted. Consequences, Confirmation, and More Information are filled from the input — the three '_To be defined_' / '_To be confirmed_' placeholders are all replaced. After this refine pass the ADR has no uncertainty markers and no remaining placeholders. Because the artifact is fully resolved and is not a feature spec, the final response must NOT suggest d3:refine and must NOT suggest d3:decompose — it should state that no next step is needed, or omit a suggestion.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/adrs/0001-use-postgres-for-events.md"
+      ],
+      "expectations": [
+        "The ADR file at ./adrs/0001-use-postgres-for-events.md is updated in place — no new ADR file is created",
+        "The Status field is now 'Accepted' (was 'Proposed')",
+        "The Consequences subsection no longer reads '_To be confirmed after implementation._' — it now contains the stated outcomes (live on existing Postgres primary, p99 write latency ~18ms at 150 writes/sec peak, nightly vacuum job added)",
+        "The Confirmation subsection no longer reads '_To be defined._' — it now reflects the 30-day production soak with no incidents, no capacity alarms, and the successful analytics join",
+        "The More Information section no longer reads '_To be defined._' — it now references the implementation PR and the 30-day soak report",
+        "The ADR contains no [OPEN QUESTION:], [CLARIFICATION NEEDED:], [DECISION PENDING:], or [ASSUMPTION:] markers after the update",
+        "The ADR contains no remaining '_To be defined_' or '_To be confirmed_' placeholders",
+        "Unrelated sections are preserved byte-identical to the fixture: Date (2026-03-15), Decision-makers, Consulted, Informed, Context and Problem Statement, Decision Drivers, Considered Options, Decision Outcome sentence, and both Pros and Cons sub-sections",
+        "Does NOT invent additional details beyond what the input stated (e.g. specific Postgres version, new drivers, extra consequences, a different soak duration)",
+        "The final assistant response does NOT suggest d3:refine — the artifact has no open questions or placeholders left to resolve",
+        "The final assistant response does NOT suggest d3:decompose — this is an ADR, not a feature spec",
+        "The final assistant response either explicitly states that no next step is needed, or simply reports what changed without proposing a follow-up skill"
+      ]
+    },
+    {
       "id": 4,
       "prompt": "Refine my product spec — we decided to launch with 5 recommendations instead of 3. The working directory is a normal project — there is no d3.config.md fixture provided this time.",
       "expected_output": "The skill detects that d3.config.md is missing and stops. It tells the user to run d3:init first and does NOT proceed to update or invent an artifact. No file is written.",

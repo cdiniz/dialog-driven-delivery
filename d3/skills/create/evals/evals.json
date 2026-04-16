@@ -79,6 +79,30 @@
       ]
     },
     {
+      "id": 5,
+      "prompt": "Create a user story for the following: on the order history page, customers can page through their past orders. Page size is 25 orders. The page shows order number, date (DD/MM/YYYY), total in GBP (e.g. £42.50), and status (Placed, Shipped, Delivered, Cancelled). Pagination controls are Previous and Next buttons at the bottom of the list. Previous is disabled on page 1; Next is disabled on the last page. When a customer has zero orders, show the text 'You have no orders yet.' with no pagination controls. Orders are sorted most-recent first. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "A user story file written under ./stories/, derived from the user-story.md template, with every concrete detail from the brief captured. The user-story.md template has only three sections (Description, Acceptance Criteria, Relevant docs) — it has NO Open Questions section. The skill must respect the template structure and not invent an Open Questions section that the template doesn't define. Because the template has no section for uncertainty markers and the brief fully specifies the behaviour, the artifact should contain no markers and no invented sections. The final assistant response must NOT suggest d3:refine or d3:decompose.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md"
+      ],
+      "expectations": [
+        "Picks the Stories row from the Storage table — the artifact file is written under ./stories/",
+        "Uses the user-story.md template — the output contains only the template's three sections: Description, Acceptance Criteria, Relevant docs",
+        "Does NOT add an Open Questions, Assumptions, or Uncertainties section — the user-story.md template does not define one",
+        "Acceptance criteria capture the concrete details from the brief: page size 25, the four columns (order number, date DD/MM/YYYY, total in GBP, status with the four allowed values), Previous/Next behaviour, disabled states on first and last page, empty-state copy, most-recent-first sort order",
+        "Contains no [OPEN QUESTION:], [CLARIFICATION NEEDED:], [DECISION PENDING:], or [ASSUMPTION:] markers — the template has no section for them and the brief fully specified the behaviour",
+        "The final assistant response does NOT suggest d3:refine — the artifact has no open questions or markers to resolve",
+        "The final assistant response does NOT suggest d3:decompose — this is a story, not a feature spec",
+        "The final assistant response either explicitly states that no next step is needed, or simply reports the path and coverage without proposing a follow-up skill",
+        "The final assistant response reports the path of the created story file"
+      ]
+    },
+    {
       "id": 4,
       "prompt": "Create a feature spec for product recommendations from this kickoff transcript. The working directory is a normal project — there is no d3.config.md fixture provided this time.",
       "expected_output": "The skill detects that d3.config.md is missing and stops. It tells the user to run d3:init first and does NOT proceed to draft an artifact anyway. No spec file is written.",

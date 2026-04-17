@@ -105,13 +105,12 @@ Seed product: **Pageturner**, a used-book marketplace. 5 transcripts across kick
 
 ## Open questions
 
-- Publish D3-generated artifacts back to the brain? (risk: telephone-game drift)
+- ~~Publish D3-generated artifacts back to the brain?~~ **Decided: not D3's job.** D3 writes specs to the product repo (canonical, version-controlled with code). The *brain's* ingest gains a path-arg mode that reads a spec file and produces a `wiki/concepts/<feature>.md` page with a link back to the canonical spec. Keeps the product repo as source of truth, gives the brain discoverability, avoids the telephone-game loop (brain never becomes input to D3's own spec generation).
 - ~~Remove `distill` / drop Transcripts artifact row once brain flow is proven?~~ **Decided: keep.** Brain is an alternative path, not a replacement. Teams without a brain still need `distill` and `/d3:create transcript`.
 - Topic taxonomy discipline — how to prevent naming drift across ingestions?
 
 ## Out of scope / future
 
-- Publish D3 artifacts back to the brain.
 - MCP server / remote API integration for the brain.
 - Auth, access control, multi-tenant brains.
 - Embeddings / semantic search.

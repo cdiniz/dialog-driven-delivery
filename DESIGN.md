@@ -106,12 +106,11 @@ Seed product: **Pageturner**, a used-book marketplace. 5 transcripts across kick
 ## Open questions
 
 - Publish D3-generated artifacts back to the brain? (risk: telephone-game drift)
-- Remove `distill` / `capture-transcript` from D3 once the brain flow is proven?
+- ~~Remove `distill` / drop Transcripts artifact row once brain flow is proven?~~ **Decided: keep.** Brain is an alternative path, not a replacement. Teams without a brain still need `distill` and `/d3:create transcript`.
 - Topic taxonomy discipline — how to prevent naming drift across ingestions?
 
 ## Out of scope / future
 
-- Remove `distill` / `capture-transcript` (later, after validation).
 - Publish D3 artifacts back to the brain.
 - MCP server / remote API integration for the brain.
 - Auth, access control, multi-tenant brains.

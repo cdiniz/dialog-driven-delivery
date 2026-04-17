@@ -19,7 +19,7 @@ Working branch: `llm-wiki`. Design & rationale: see [`DESIGN.md`](./DESIGN.md).
 - [x] Validate failure case: remove `wiki/index.md` → D3 falls back to paste flow without hard-failing
 - [ ] Resolve open questions (from DESIGN.md)
   - [ ] Publish D3-generated artifacts back to the brain? (risk: telephone-game drift)
-  - [ ] Remove `distill` / `capture-transcript` from D3 once the brain flow is proven?
+  - [x] ~~Remove `distill` from D3 and drop the `Transcripts` artifact row?~~ **Decided: keep.** Brain is an alternative to D3's transcript handling, not a replacement. Teams without a brain still need `distill` and `/d3:create transcript`.
   - [ ] Topic taxonomy discipline — how to prevent naming drift across ingestions?
 - [ ] Remove `PLAN.md` and `DESIGN.md`
 - [ ] Bump plugin version in `d3/.claude-plugin/plugin.json`

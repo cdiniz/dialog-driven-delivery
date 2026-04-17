@@ -23,6 +23,6 @@ Working branch: `llm-wiki`. Design & rationale: see [`DESIGN.md`](./DESIGN.md).
   - [x] ~~Topic taxonomy discipline — how to prevent naming drift?~~ **Decided: use LLM judgment, not keyword match.** SKILL.md now says to match using LLM understanding (synonyms, rephrasings), always follow hub pages when relevant, and show a generous candidate set for the user to prune. No brain-side coupling — stays on the index-with-titles contract.
 - [ ] **Brain-side (team-brain repo, not D3):** extend `/ingest` to accept a spec file path. Detect spec-shape input, generate/update a `wiki/concepts/<feature>.md` page with summary + link back to canonical spec in product repo, update `wiki/index.md` and project hub. Idempotent by slug.
 - [x] Update main `README.md` to document the new brain / llm-wiki integration — `Brain Source` config, pull-from-brain options in `create`/`refine`, expected brain contract
-- [ ] Bump plugin version in `d3/.claude-plugin/plugin.json`
+- [x] Bump plugin version in `d3/.claude-plugin/plugin.json`
 - [ ] Create PR for `llm-wiki` branch — description should include `DESIGN.md` contents plus a "How this was tested" section covering the Pageturner fake-product validation runs (catalog-browse, checkout, refine, failure-case fallback)
 - [ ] Remove `PLAN.md` and `DESIGN.md`

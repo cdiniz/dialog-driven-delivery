@@ -15,6 +15,11 @@ Working branch: `llm-wiki`. Design & rationale: see [`DESIGN.md`](./DESIGN.md).
 - [x] Run `/d3:init` and set `Brain Source: ../team-brain`
 - [x] Validate: `/d3:create product-spec catalog-browse` pulls the 2 browse decisions + 2 relevant summaries + concept; ignores ceremonies/people; reflects the 2026-04-06 supersession
 - [x] Validate: `/d3:create product-spec checkout` pulls fee + mechanics decisions + refinement summary; ignores browse-specific files
-- [ ] Validate: `/d3:refine` option F applies delta-only updates from a new ingested transcript
-- [ ] Validate failure case: remove `wiki/index.md` → D3 falls back to paste flow without hard-failing
+- [x] Validate: `/d3:refine` option F applies delta-only updates from a new ingested transcript
+- [x] Validate failure case: remove `wiki/index.md` → D3 falls back to paste flow without hard-failing
+- [ ] Resolve open questions (from DESIGN.md)
+  - [ ] Publish D3-generated artifacts back to the brain? (risk: telephone-game drift)
+  - [ ] Remove `distill` / `capture-transcript` from D3 once the brain flow is proven?
+  - [ ] Topic taxonomy discipline — how to prevent naming drift across ingestions?
+- [ ] Remove `PLAN.md` and `DESIGN.md`
 - [ ] Bump plugin version in `d3/.claude-plugin/plugin.json`

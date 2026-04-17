@@ -62,9 +62,9 @@ If the user picks F (or their request already names a brain topic, e.g. "refine 
 
 1. Find the brain's entry-point index — try `<Brain Source>/index.md` first, then `<Brain Source>/wiki/index.md`. If neither exists, warn and fall back to options A–E.
 2. Read the index. Assume nothing about its section names — D3 does not rely on specific categories. Each entry is a title plus a link.
-3. **Keyword-match the user's topic against the entry titles**, loosely (case/punctuation/whitespace tolerant; e.g. `catalog-browse` matches "Catalog browse: grid + pagination"). If the user didn't give a topic, default to the current artifact's title. Skip obviously irrelevant sections like "People" unless a person is the explicit subject.
-4. If the index links to hub pages (project overview, topic hubs) relevant to the topic, optionally follow them to discover further linked files.
-5. Show the user the matched files (paths + titles) and ask for confirmation. In quiet mode, only auto-confirm a single unambiguous match.
+3. **Match the user's topic against entry titles using judgment, not strict string matching.** You are an LLM — recognise that `catalog-browse`, "Catalog browse: grid + pagination", and "Book grid layout" are the same concept. Consider synonyms, acronyms, rephrasings, and obviously-related concepts. If the user didn't give a topic, default to the current artifact's title. Skip obviously irrelevant sections like "People" unless a person is the explicit subject. Err toward a broader candidate set.
+4. **Follow hub pages.** If any matched entry is a hub (a project overview, a concept page, a topic overview — anything that aggregates links to other files), read it and merge its linked files into the candidate set. This is the main safety net against title drift. Always follow hubs when their title matches the topic; follow them even when you only suspect they might aggregate relevant links.
+5. Show the user the full candidate set (paths + titles) and ask for confirmation. Err on the side of showing too many. In quiet mode, only auto-confirm a single unambiguous match.
 6. Read the confirmed files and use their concatenated content as the new information for step 6 of this workflow.
 7. The brain is read-only. Never write back. Supersession / conflict resolution is the brain's responsibility — if two files conflict, trust the later-dated one.
 

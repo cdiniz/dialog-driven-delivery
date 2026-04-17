@@ -121,6 +121,19 @@ In quiet mode:
 - Changes are applied immediately without a review step
 - Uncertainties are marked inline rather than surfaced interactively
 
+### Brain Source (optional)
+
+If your team maintains a separate knowledge repository ("team brain" / [llm-wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)) where meeting transcripts, slack threads, and other raw context get ingested into a navigable wiki, D3 can pull context directly from it:
+
+```markdown
+### Settings
+- Brain Source: ../team-brain
+```
+
+When set, `d3:create` and `d3:refine` gain a "pull from the team brain" option as an alternative to pasting transcripts. D3 reads the brain's entry-point index (`index.md` at the root or under `wiki/`), matches entries to the topic you asked about, confirms the selection with you, then reads the matched files as context. D3 only reads — it never writes to the brain. Missing or unreadable index falls back to the usual paste flow.
+
+The brain is decoupled from D3's layout: D3 needs only an index file whose entries are topic-bearing titles with links to markdown files. Everything else (folder structure, section names, ingest tooling) is the brain repo's concern.
+
 ### Template Customisation
 
 D3 ships default templates inside the `init` skill's `references/` directory. They're copied into your project at `.d3/templates/` when you run `d3:init`. Only customise if you need domain-specific sections, compliance requirements, or team conventions.

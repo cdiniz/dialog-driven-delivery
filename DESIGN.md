@@ -67,6 +67,8 @@ flowchart LR
 
 Solid = writes. Dashed = reads. Brain is read-only from D3's side.
 
+On `/d3:create` (and `/d3:refine`): the plugin reads the index, keyword-matches the topic, reads the matched wiki files, and writes an artifact to the product repo. No `/ingest` involved — that's a separate flow, covered below.
+
 ## Retrieval flow (D3 side)
 
 1. Read the brain's entry-point index file.
@@ -83,6 +85,54 @@ Rules:
 Known limitations:
 - Retrieval quality depends entirely on ingest quality (topic keywords must appear in titles).
 - No alias layer — title drift between ingestions causes misses.
+
+## Publishing D3 outputs to the brain (brain side)
+
+The brain is discoverable team knowledge for any consumer — humans, other LLMs, other tools — not only D3. Without a way to surface D3-produced specs there, the brain only ever sees inputs (transcripts, slack threads) and never outputs (what the team decided to build). That's a gap.
+
+The fix is brain-side, not D3-side: the brain's `/ingest` command gains a path-arg mode that takes a spec file and registers it in the wiki.
+
+### Flow
+
+```mermaid
+flowchart LR
+    ART["spec in product repo<br/>(canonical)"]
+    USER([User])
+    INGEST["brain /ingest"]
+    CONCEPT["wiki/concepts/&lt;feature&gt;.md<br/>(summary + link back)"]
+
+    USER -->|"/ingest &lt;spec-path&gt;"| INGEST
+    INGEST -->|reads| ART
+    INGEST -->|writes| CONCEPT
+```
+
+Separate from `/d3:create` — this runs in the brain repo, initiated by a human, only when the spec is ready to be discoverable.
+
+### Workflow
+
+1. D3 writes a spec to the product repo as normal. The product repo stays the **canonical source of truth** — version-controlled, reviewed in PRs, evolves alongside the code.
+2. When the spec is ready to be discoverable team-wide, a human runs `/ingest <path-to-spec>` in the brain repo, pointing at the product repo's spec file.
+3. The brain detects the input is a spec (by frontmatter, path pattern, or template structure) and produces/updates `wiki/concepts/<feature-slug>.md` with:
+   - Title and summary/scope extracted from the spec
+   - Key decisions pulled out as links into `wiki/decisions/` where applicable
+   - A prominent **link back to the canonical spec** in the product repo (relative path or git URL)
+   - A `last_updated` timestamp
+4. Updates `wiki/index.md` and the project hub's "Built features" list.
+5. Idempotent by slug — re-ingesting an updated spec updates the concept page in place.
+
+### Why this shape
+
+- **Canonical stays in the product repo.** Specs live next to the code they describe. Nothing changes in dev workflow, code review, or versioning.
+- **Brain gains discoverability.** Humans and LLMs searching the brain find concept pages that point them at the canonical spec.
+- **No telephone-game loop.** The brain's concept page is a *reference*, not a rewrite. When D3 later refines the spec, it reads the spec in the product repo (the canonical), not the brain's distilled representation. Drift cannot compound.
+- **Different from transcript ingest.** A transcript is a raw conversation — ingest cleans it and extracts decisions. A spec is already authoritative — ingest just surfaces a summary + link, without rewriting.
+- **Manual, not automatic.** V1 relies on a human running `/ingest`. Auto-watching product repos is a later concern; same as auto-ingesting transcripts from meeting recorders.
+
+### Unresolved sub-questions
+
+- **Path format.** Relative paths work for local testing; a real deployment wants git URLs so links survive repo moves and work for team members with different clone locations.
+- **Re-ingestion cadence.** Every refine or only at milestones? Over-ingesting churns the concept page without adding signal. Likely: manual, user decides when the spec is "ready."
+- **ADR extraction.** If a spec references existing ADRs, should ingest cross-link them? If it contains new decisions, should ingest emit a decision file too? Probably yes to both, but shape TBD.
 
 ## D3 changes (on branch `llm-wiki`)
 
@@ -105,7 +155,7 @@ Seed product: **Pageturner**, a used-book marketplace. 5 transcripts across kick
 
 ## Open questions
 
-- ~~Publish D3-generated artifacts back to the brain?~~ **Decided: not D3's job.** D3 writes specs to the product repo (canonical, version-controlled with code). The *brain's* ingest gains a path-arg mode that reads a spec file and produces a `wiki/concepts/<feature>.md` page with a link back to the canonical spec. Keeps the product repo as source of truth, gives the brain discoverability, avoids the telephone-game loop (brain never becomes input to D3's own spec generation).
+- ~~Publish D3-generated artifacts back to the brain?~~ **Resolved** — see [Publishing D3 outputs to the brain](#publishing-d3-outputs-to-the-brain-brain-side). Short version: brain-side ingest, not D3-side publish.
 - ~~Remove `distill` / drop Transcripts artifact row once brain flow is proven?~~ **Decided: keep.** Brain is an alternative path, not a replacement. Teams without a brain still need `distill` and `/d3:create transcript`.
 - Topic taxonomy discipline — how to prevent naming drift across ingestions?
 

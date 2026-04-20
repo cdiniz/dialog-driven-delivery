@@ -39,7 +39,7 @@ Default: **false**. Only flip it on if the user explicitly asks for automation, 
 
 ### 3b. Ask about Brain Source (optional)
 
-The Brain Source setting points D3 at a team knowledge repo (an "llm-wiki" or "team brain") — a separate location where raw inputs like meeting transcripts and slack threads are ingested and distilled into a navigable wiki. When set, `create` and `refine` gain a "pull from brain" input option that reads context from there instead of requiring a pasted transcript.
+The Brain Source setting points D3 at a team knowledge repo (an "llm-wiki" or "team brain") — a separate location where raw inputs like meeting transcripts and slack threads are ingested and distilled into a navigable wiki. When set, the `d3:brain-pull` skill can read context from it, which other skills (like `d3:create` and `d3:refine`) can consume instead of requiring a pasted transcript.
 
 Ask:
 ```

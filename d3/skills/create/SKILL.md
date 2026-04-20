@@ -20,7 +20,6 @@ When AI drafts a spec from a sparse conversation, the tempting failure mode is t
 - Read `d3.config.md` at the repo root. If it doesn't exist, stop and tell the user to run the **d3:init** skill first.
 - Invoke the sibling **d3:uncertainty-markers** skill to load marker standards. These are used in step 5.
 - Read the Quiet Mode setting from the `### Settings` section.
-- Read the Brain Source setting from the `### Settings` section. If set to anything other than `_none_` (empty), option D in step 3 is enabled.
 
 ### 2. Determine the artifact type
 
@@ -40,23 +39,9 @@ How would you like to provide the information?
 A) Paste a meeting transcript
 B) Paste an existing document
 C) Describe it conversationally
-D) Pull context from the team brain  (only shown if Brain Source is set)
 ```
 
-**Quiet mode:** if the user's message already contains enough context (pasted text, a file reference, or a `brain:<topic>` reference), use it directly and skip the prompt.
-
-**If the user picks D (or the request already names a brain topic, e.g. "create a product spec for catalog-browse from the brain"):**
-
-1. Treat the Brain Source value as a readable location (filesystem path, relative or absolute). Find its entry-point index file — by convention `index.md` at the Brain Source root, or under a `wiki/` subfolder (try `<Brain Source>/index.md` first, then `<Brain Source>/wiki/index.md`). If neither exists, warn the user the brain has no readable index and fall back to options A/B/C.
-2. Read the index. Assume nothing about its internal structure — it may group entries into sections (People, Projects, Decisions, Concepts, Summaries, etc.) but D3 does not rely on specific section names. Each entry is a title plus a link.
-3. **Match the user's topic against entry titles using judgment, not strict string matching.** You are an LLM — recognise that `catalog-browse`, "Catalog browse: grid + pagination", and "Book grid layout" are the same concept. Consider synonyms, acronyms, rephrasings, and obviously-related concepts. Collect matching entries across all sections. Skip obviously irrelevant sections like "People" unless a person is the explicit subject. Err toward a broader candidate set — the user confirmation step below is cheap.
-4. **Follow hub pages.** If any matched entry is a hub (a project overview, a concept page, a topic overview — anything that aggregates links to other files), read it and merge its linked files into the candidate set. This is the main safety net against title drift between related files. Always follow hubs when their title matches the topic; follow them even when you only suspect they might aggregate relevant links.
-5. Show the user the full candidate set (paths + titles from the index) and ask for confirmation before reading. Err on the side of showing too many — it's cheaper for the user to prune one extra than to silently miss a relevant file. This step catches topic mismatches (e.g. "product recs" vs "recommendation engine") and over-reach.
-6. **Quiet mode:** skip confirmation only if there is a single unambiguous match. If multiple matches, always confirm.
-7. Read the confirmed files and use their concatenated content as the input context for step 4 of this workflow.
-8. If no entries match, tell the user and fall back to options A/B/C.
-
-The brain is read-only from this skill's perspective. Never write back to the Brain Source. Supersession / conflict resolution is the brain's responsibility — if two files conflict (e.g. a dated decision overrides an earlier one), read both and trust the later-dated file.
+**Quiet mode:** if the user's message already contains enough context (pasted text, a file reference), use it directly and skip the prompt.
 
 ### 4. Analyze input and propose a title
 
@@ -107,10 +92,7 @@ Write to the Location specified in the same row.
 Tell the user:
 - The title and path/URL of the new artifact
 - Coverage stats relevant to the artifact type (e.g. "4 of 8 sections filled, 3 open questions")
-- Suggested next steps — but only when they're actionable:
-  - **d3:refine** — suggest only if the artifact has uncertainty markers or placeholder sections. If all sections are filled and there are no markers, don't suggest refine; the artifact is complete until new information arrives.
-  - **d3:decompose** — suggest only for feature specs when the user wants to break them into stories.
-  - If no next step is actionable, say so. A complete artifact with no open questions doesn't need a follow-up skill.
+- Suggested next steps — typically **d3:refine** to iterate, or **d3:decompose** if this was a feature spec and the user wants to break it into stories
 
 ## Error handling
 

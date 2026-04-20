@@ -121,89 +121,37 @@
       ]
     },
     {
-      "id": 5,
-      "name": "Brain pull — direct topic match",
-      "prompt": "Create a product spec for catalog-browse. Pull from the team brain.",
-      "expected_output": "The skill reads the brain's index, finds catalog-browse entries (the two browse decisions, the epic concept, and at least one hub page), and writes a product spec under ./specs/product/. The spec reflects the 2026-04-06 supersession (sold books excluded from grid) and does not include unrelated content like ceremonies or people info.",
+      "id": 6,
+      "name": "Integration — composed 'from the team brain' prompt chains brain-pull + create",
+      "prompt": "Create a product spec for catalog-browse from the team brain.",
+      "expected_output": "Given a composed prompt that references both 'create a spec' and 'from the team brain', Claude invokes the d3:brain-pull skill first (reads index, matches catalog-browse entries, follows hubs, reads matched files), then the d3:create skill uses the pulled content as input to write a product spec under ./specs/product/. The spec reflects the 2026-04-06 supersession (sold books excluded from grid) and does not include unrelated content like ceremonies or people info. This eval verifies that the two skills compose — it is the backstop against the chain silently breaking. Brain fixtures and the Brain-Source-set d3.config.md are reused from the brain-pull skill's eval files to avoid duplication.",
       "files": [
-        "evals/files/d3.config.md",
+        "../brain-pull/evals/files/d3.config.md",
         "evals/files/.d3/templates/feature-product-spec.md",
         "evals/files/.d3/templates/feature-tech-spec.md",
         "evals/files/.d3/templates/user-story.md",
         "evals/files/.d3/templates/adr.md",
         "evals/files/.d3/templates/meeting-transcript.md",
-        "evals/files/team-brain/wiki/index.md",
-        "evals/files/team-brain/wiki/projects/pageturner.md",
-        "evals/files/team-brain/wiki/concepts/browse-and-buy-mvp-epic.md",
-        "evals/files/team-brain/wiki/decisions/2026-03-23-catalog-browse-grid.md",
-        "evals/files/team-brain/wiki/decisions/2026-04-06-grid-availability.md",
-        "evals/files/team-brain/wiki/decisions/2026-03-23-checkout-mechanics.md",
-        "evals/files/team-brain/wiki/decisions/2026-04-13-checkout-reservation-window.md",
-        "evals/files/team-brain/wiki/summaries/2026-03-23-backlog-refinement.md",
-        "evals/files/team-brain/wiki/summaries/2026-03-16-team-ceremonies.md",
-        "evals/files/team-brain/wiki/people/maya.md"
+        "../brain-pull/evals/files/team-brain/wiki/index.md",
+        "../brain-pull/evals/files/team-brain/wiki/projects/pageturner.md",
+        "../brain-pull/evals/files/team-brain/wiki/concepts/browse-and-buy-mvp-epic.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-03-23-catalog-browse-grid.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-04-06-grid-availability.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-03-23-checkout-mechanics.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-04-13-checkout-reservation-window.md",
+        "../brain-pull/evals/files/team-brain/wiki/summaries/2026-03-23-backlog-refinement.md",
+        "../brain-pull/evals/files/team-brain/wiki/summaries/2026-03-16-team-ceremonies.md",
+        "../brain-pull/evals/files/team-brain/wiki/people/maya.md"
       ],
       "expectations": [
-        "Reads the brain's index before reading individual brain files",
-        "Reads both the primary catalog-browse decision and the supersession decision (2026-03-23 + 2026-04-06)",
+        "Invokes d3:brain-pull before writing any artifact — the brain's index is read first",
+        "Reads both the primary catalog-browse decision and the supersession (2026-03-23 + 2026-04-06)",
         "Reads at least one hub page (project or concept)",
         "Does not read people or ceremonies files",
-        "Writes a product spec under ./specs/product/",
+        "Writes a product spec under ./specs/product/ using the pulled content",
         "The spec reflects the supersession — sold books are excluded from the grid",
-        "Does not invent checkout, fee, or payment content unrelated to catalog browse",
+        "Does not invent checkout, fee, or payment content unrelated to catalog-browse",
         "Final response reports the path of the created spec"
-      ]
-    },
-    {
-      "id": 6,
-      "name": "Brain pull — synonym/rephrasing match (judgment, not keyword)",
-      "prompt": "Create a product spec for the book grid page. Pull from the team brain.",
-      "expected_output": "The skill recognises that 'book grid page' and catalog-browse are the same concept and matches the catalog-browse decisions by judgment, not by strict string match. A regression to naive keyword matching would fail this eval — no brain entry title contains 'book grid'.",
-      "files": [
-        "evals/files/d3.config.md",
-        "evals/files/.d3/templates/feature-product-spec.md",
-        "evals/files/.d3/templates/feature-tech-spec.md",
-        "evals/files/.d3/templates/user-story.md",
-        "evals/files/.d3/templates/adr.md",
-        "evals/files/.d3/templates/meeting-transcript.md",
-        "evals/files/team-brain/wiki/index.md",
-        "evals/files/team-brain/wiki/projects/pageturner.md",
-        "evals/files/team-brain/wiki/concepts/browse-and-buy-mvp-epic.md",
-        "evals/files/team-brain/wiki/decisions/2026-03-23-catalog-browse-grid.md",
-        "evals/files/team-brain/wiki/decisions/2026-04-06-grid-availability.md",
-        "evals/files/team-brain/wiki/decisions/2026-03-23-checkout-mechanics.md",
-        "evals/files/team-brain/wiki/decisions/2026-04-13-checkout-reservation-window.md",
-        "evals/files/team-brain/wiki/summaries/2026-03-23-backlog-refinement.md",
-        "evals/files/team-brain/wiki/summaries/2026-03-16-team-ceremonies.md",
-        "evals/files/team-brain/wiki/people/maya.md"
-      ],
-      "expectations": [
-        "Recognises that 'book grid' is the same concept as catalog-browse — does not refuse or claim nothing matches",
-        "Reads the catalog-browse decision(s) in the brain",
-        "Writes a product spec under ./specs/product/ with grid/pagination content sourced from the brain",
-        "Does not invent book-grid details beyond what's in the brain",
-        "Final response reports the path of the created spec"
-      ]
-    },
-    {
-      "id": 7,
-      "name": "Brain pull — graceful fallback when index is missing",
-      "prompt": "Create a product spec for catalog-browse. Pull from the team brain.",
-      "expected_output": "Brain Source is set in the config but the brain directory is not present in the working dir. The skill tries to find the brain's index, fails, warns the user, and falls back to paste-based input options. Does not crash, invent content, or silently write a spec.",
-      "files": [
-        "evals/files/d3.config.md",
-        "evals/files/.d3/templates/feature-product-spec.md",
-        "evals/files/.d3/templates/feature-tech-spec.md",
-        "evals/files/.d3/templates/user-story.md",
-        "evals/files/.d3/templates/adr.md",
-        "evals/files/.d3/templates/meeting-transcript.md"
-      ],
-      "expectations": [
-        "Tries to read the brain's index at least once",
-        "Final response notes that the brain is unreachable",
-        "Final response offers paste-based input options or asks the user for input another way",
-        "No artifact file is written anywhere",
-        "Does not crash — degrades gracefully"
       ]
     }
   ]

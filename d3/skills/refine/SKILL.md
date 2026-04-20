@@ -19,12 +19,10 @@ The new input is a delta, not a replacement. Detect which sections it actually a
 
 - Read `d3.config.md`. If missing, stop and tell the user to run **d3:init** first.
 - Read Quiet Mode from `### Settings`.
-- Read Brain Source from `### Settings`. If set to anything other than `_none_` (empty), option F in step 5 is enabled.
 
 ### 2. Locate and fetch the artifact
 
 The user will identify the artifact by path, title, or description. Match it to a row in the Storage table by checking:
-
 1. Does the path fall under a Storage row's Location?
 2. If ambiguous, does the artifact's structure match the referenced template for one row better than the others?
 
@@ -51,22 +49,9 @@ B) Paste updated documentation
 C) Describe the changes
 D) Paste review feedback
 E) Resolve open questions & assumptions (walk through them one at a time)
-F) Pull new information from the team brain  (only shown if Brain Source is set)
 ```
 
 **Quiet mode:** if the user's message already contains the new content, use it directly and skip the question.
-
-### 5c. Option F — pull new information from the team brain
-
-If the user picks F (or their request already names a brain topic, e.g. "refine the spec with the latest from the brain on catalog-browse"):
-
-1. Find the brain's entry-point index — try `<Brain Source>/index.md` first, then `<Brain Source>/wiki/index.md`. If neither exists, warn and fall back to options A–E.
-2. Read the index. Assume nothing about its section names — D3 does not rely on specific categories. Each entry is a title plus a link.
-3. **Match the user's topic against entry titles using judgment, not strict string matching.** You are an LLM — recognise that `catalog-browse`, "Catalog browse: grid + pagination", and "Book grid layout" are the same concept. Consider synonyms, acronyms, rephrasings, and obviously-related concepts. If the user didn't give a topic, default to the current artifact's title. Skip obviously irrelevant sections like "People" unless a person is the explicit subject. Err toward a broader candidate set.
-4. **Follow hub pages.** If any matched entry is a hub (a project overview, a concept page, a topic overview — anything that aggregates links to other files), read it and merge its linked files into the candidate set. This is the main safety net against title drift. Always follow hubs when their title matches the topic; follow them even when you only suspect they might aggregate relevant links.
-5. Show the user the full candidate set (paths + titles) and ask for confirmation. Err on the side of showing too many. In quiet mode, only auto-confirm a single unambiguous match.
-6. Read the confirmed files and use their concatenated content as the new information for step 6 of this workflow.
-7. The brain is read-only. Never write back. Supersession / conflict resolution is the brain's responsibility — if two files conflict, trust the later-dated one.
 
 ### 5b. Option E — walk through open questions one at a time
 
@@ -81,13 +66,12 @@ This flow is valuable because the questions were written at a specific point in 
 
 ### 6. Analyze new information (non-greedy)
 
-For each section of the artifact, ask: _does the new input explicitly address this section?_
+For each section of the artifact, ask: *does the new input explicitly address this section?*
 
 - **Yes** → prepare an update using only information explicitly stated in the input.
 - **No** → leave the section completely alone. Do not fill empty placeholders just because they're empty. Do not elaborate on existing content. Do not rewrite for style.
 
 Things to avoid — these are the recurring failure modes:
-
 - Inventing details that weren't in the input
 - Elaborating beyond what was stated
 - Filling empty sections because they look lonely
@@ -95,7 +79,6 @@ Things to avoid — these are the recurring failure modes:
 - Treating template example text as a prompt to fill
 
 Things to do:
-
 - Add only explicitly stated information
 - Replace placeholders when they're now discussed
 - Add new uncertainty markers if the input introduces new ambiguity
@@ -111,7 +94,6 @@ Present the changes section-by-section: for each updated section, show the curre
 ### 8. Analyze related-artifact impact
 
 For each change proposed in step 7, check whether it affects the related artifacts identified in step 3. Common cases:
-
 - A new acceptance criterion in a spec might require updates to a story's ACs
 - A removed requirement might invalidate a story altogether
 - A resolved open question might unblock a story that had a "needs-clarification" label
@@ -140,27 +122,23 @@ Write the updated artifact back to its Location, following the Storage row's Ins
 ### 11. Report what changed
 
 Tell the user:
-
 - Which sections were updated
 - Which open questions / assumptions were resolved
 - Any new uncertainties introduced
 - Which related artifacts were updated (and with what)
-- Suggested next steps — but only when they're actionable:
-  - **d3:refine** — suggest only if the artifact still has uncertainty markers or placeholder sections after this pass. If everything resolved and no new uncertainties were introduced, don't suggest another refine; the artifact is settled until new information arrives.
-  - **d3:decompose** — suggest only for feature specs that are now complete enough to break into stories.
-  - If no next step is actionable, say so. A fully-resolved artifact doesn't need a follow-up skill.
+- Suggested next steps — another `d3:refine` pass if there's more input, or `d3:decompose` if the spec is ready for story creation
 
 ## Error handling
 
-| Issue                                         | Action                                                          |
-| --------------------------------------------- | --------------------------------------------------------------- |
-| `d3.config.md` missing                        | Stop. Ask the user to run **d3:init** first.                    |
-| No changes detected in input                  | Tell the user; ask for clarification or a different angle       |
+| Issue | Action |
+|-------|--------|
+| `d3.config.md` missing | Stop. Ask the user to run **d3:init** first. |
+| No changes detected in input | Tell the user; ask for clarification or a different angle |
 | Conflicting info (input contradicts existing) | Show the conflict, ask how to resolve — don't silently pick one |
-| Major scope change                            | Warn about downstream impact and confirm before proceeding      |
-| Write fails                                   | Provide the full updated text inline for manual update          |
-| Artifact can't be found                       | Verify the identifier; suggest a search                         |
-| Can't detect artifact type                    | Ask the user to specify                                         |
+| Major scope change | Warn about downstream impact and confirm before proceeding |
+| Write fails | Provide the full updated text inline for manual update |
+| Artifact can't be found | Verify the identifier; suggest a search |
+| Can't detect artifact type | Ask the user to specify |
 
 ## Related skills
 

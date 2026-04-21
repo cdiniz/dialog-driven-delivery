@@ -130,13 +130,12 @@ If your team maintains a separate knowledge repository ("team brain" / [llm-wiki
 - Brain Source: ../team-brain
 ```
 
-When Brain Source is set, the **`d3:brain-pull`** skill reads the brain's entry-point index (`index.md` at the root or under `wiki/`), matches entries to the topic using LLM judgment (synonyms, rephrasings, hub pages followed), confirms the selection with you, then reads the matched files. The content is then available to any skill you invoke next — typically `d3:create` or `d3:refine`.
+When Brain Source is set, `d3:create` and `d3:refine` can read the brain's entry-point index (`index.md` at the root or under `wiki/`) and pull matching content — by meaning, not keyword — before writing or editing artifacts.
 
 Example prompts:
 
-- *"Create a product spec for catalog-browse, pull from the team brain."* — triggers `d3:brain-pull` then `d3:create`.
-- *"Refine this spec using the brain."* — triggers `d3:brain-pull` (topic defaults to the spec's subject) then `d3:refine`.
-- *"Look up checkout mechanics in the brain."* — standalone brain read.
+- *"Create a product spec for catalog-browse from the team brain."*
+- *"Refine this spec using the team brain."*
 
 D3 only reads from the brain — it never writes to it. The brain is decoupled from D3's layout: D3 needs only an index file whose entries are topic-bearing titles with links to markdown files. Everything else (folder structure, section names, ingest tooling) is the brain repo's concern.
 

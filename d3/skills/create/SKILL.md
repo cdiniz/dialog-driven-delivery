@@ -92,10 +92,7 @@ Write to the Location specified in the same row.
 Tell the user:
 - The title and path/URL of the new artifact
 - Coverage stats relevant to the artifact type (e.g. "4 of 8 sections filled, 3 open questions")
-- Suggested next steps — but only when they're actionable:
-  - **d3:refine** — suggest only if the artifact has uncertainty markers or placeholder sections. If all sections are filled and there are no markers, don't suggest refine; the artifact is complete until new information arrives.
-  - **d3:decompose** — suggest only for feature specs when the user wants to break them into stories.
-  - If no next step is actionable, say so. A complete artifact with no open questions doesn't need a follow-up skill.
+- Suggested next steps — typically **d3:refine** to iterate, or **d3:decompose** if this was a feature spec and the user wants to break it into stories
 
 ## Error handling
 

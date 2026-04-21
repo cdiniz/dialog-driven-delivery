@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "Product spec from kickoff transcript",
       "prompt": "Create a feature spec for the product recommendations idea from this kickoff meeting transcript. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
       "expected_output": "A feature spec file written under ./specs/product/, derived from the feature-product-spec template, that captures the decided items (max 3 recommendations, bottom of page, category-based for MVP) and explicitly marks everything not discussed (selection algorithm within a category, mobile layout, fallback for tiny categories, success metrics, performance targets) using uncertainty markers. The final assistant message should report the artifact path, a coverage stat, and a suggested next step.",
       "files": [
@@ -31,6 +32,7 @@
     },
     {
       "id": 2,
+      "name": "ADR from database-decision discussion",
       "prompt": "Create an ADR for the database choice from this discussion. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
       "expected_output": "An ADR file written under ./adrs/, derived from the adr.md template, that captures Postgres as the chosen option with the actual reasons given in the discussion (existing operational experience, access pattern flexibility, transaction support, write volume well within Postgres capacity), lists ONLY the two options actually discussed (Postgres and DynamoDB), and marks parked items (schema design, retention strategy) as deferred rather than inventing answers.",
       "files": [
@@ -57,6 +59,7 @@
     },
     {
       "id": 3,
+      "name": "User story from conversational description",
       "prompt": "Create a user story for the following: customers should be able to filter products by price range on the catalog page. Min and max should both be required. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
       "expected_output": "A user story file written under ./stories/, derived from the user-story.md template, with a Description and at least two acceptance criteria in Given/When/Then form. One AC covers the happy-path filter behaviour and one covers the validation rule that both min and max are required. Everything not stated by the user (specific min/max bounds, error message wording, default values, sort behaviour, currency, what happens when no products match) is marked with uncertainty markers rather than silently invented.",
       "files": [
@@ -104,6 +107,7 @@
     },
     {
       "id": 4,
+      "name": "Stops when d3.config.md is missing",
       "prompt": "Create a feature spec for product recommendations from this kickoff transcript. The working directory is a normal project — there is no d3.config.md fixture provided this time.",
       "expected_output": "The skill detects that d3.config.md is missing and stops. It tells the user to run d3:init first and does NOT proceed to draft an artifact anyway. No spec file is written.",
       "files": [
@@ -114,6 +118,40 @@
         "The final assistant response explicitly states that d3.config.md is missing or that the user must run d3:init first",
         "The skill does NOT fall back to drafting a spec from the transcript without a config",
         "The skill does NOT silently invent its own storage location or template structure"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Integration — composed 'from the team brain' prompt chains brain-pull + create",
+      "prompt": "Create a product spec for catalog-browse from the team brain.",
+      "expected_output": "Given a composed prompt that references both 'create a spec' and 'from the team brain', Claude invokes the d3:brain-pull skill first (reads index, matches catalog-browse entries, follows hubs, reads matched files), then the d3:create skill uses the pulled content as input to write a product spec under ./specs/product/. The spec reflects the 2026-04-06 supersession (sold books excluded from grid) and does not include unrelated content like ceremonies or people info. This eval verifies that the two skills compose — it is the backstop against the chain silently breaking. Brain fixtures and the Brain-Source-set d3.config.md are reused from the brain-pull skill's eval files to avoid duplication.",
+      "files": [
+        "../brain-pull/evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "../brain-pull/evals/files/team-brain/wiki/index.md",
+        "../brain-pull/evals/files/team-brain/wiki/projects/pageturner.md",
+        "../brain-pull/evals/files/team-brain/wiki/concepts/browse-and-buy-mvp-epic.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-03-23-catalog-browse-grid.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-04-06-grid-availability.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-03-23-checkout-mechanics.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-04-13-checkout-reservation-window.md",
+        "../brain-pull/evals/files/team-brain/wiki/summaries/2026-03-23-backlog-refinement.md",
+        "../brain-pull/evals/files/team-brain/wiki/summaries/2026-03-16-team-ceremonies.md",
+        "../brain-pull/evals/files/team-brain/wiki/people/maya.md"
+      ],
+      "expectations": [
+        "Invokes d3:brain-pull before writing any artifact — the brain's index is read first",
+        "Reads both the primary catalog-browse decision and the supersession (2026-03-23 + 2026-04-06)",
+        "Reads at least one hub page (project or concept)",
+        "Does not read people or ceremonies files",
+        "Writes a product spec under ./specs/product/ using the pulled content",
+        "The spec reflects the supersession — sold books are excluded from the grid",
+        "Does not invent checkout, fee, or payment content unrelated to catalog-browse",
+        "Final response reports the path of the created spec"
       ]
     }
   ]

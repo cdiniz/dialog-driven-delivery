@@ -1,0 +1,98 @@
+{
+  "skill_name": "brain-pull",
+  "evals": [
+    {
+      "id": 1,
+      "name": "Direct topic match — reads catalog-browse entries + supersession",
+      "prompt": "Look up catalog-browse in the team brain.",
+      "expected_output": "The skill reads the brain's index, matches catalog-browse entries (the two browse decisions, the epic concept hub, and at least one project hub), follows the hub pages, confirms the selection with the user, reads the matched files, and returns the concatenated content in the conversation. The 2026-04-06 grid-availability decision is read alongside the 2026-03-23 catalog-browse-grid decision so the consumer can see the supersession. No artifact files are written anywhere — this skill only reads.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/team-brain/wiki/index.md",
+        "evals/files/team-brain/wiki/projects/pageturner.md",
+        "evals/files/team-brain/wiki/concepts/browse-and-buy-mvp-epic.md",
+        "evals/files/team-brain/wiki/decisions/2026-03-23-catalog-browse-grid.md",
+        "evals/files/team-brain/wiki/decisions/2026-04-06-grid-availability.md",
+        "evals/files/team-brain/wiki/decisions/2026-03-23-checkout-mechanics.md",
+        "evals/files/team-brain/wiki/decisions/2026-04-13-checkout-reservation-window.md",
+        "evals/files/team-brain/wiki/summaries/2026-03-23-backlog-refinement.md",
+        "evals/files/team-brain/wiki/summaries/2026-03-16-team-ceremonies.md",
+        "evals/files/team-brain/wiki/people/maya.md"
+      ],
+      "expectations": [
+        "Reads the brain's index (./team-brain/wiki/index.md) before reading individual brain files",
+        "Reads both the primary catalog-browse decision (2026-03-23-catalog-browse-grid.md) and the supersession (2026-04-06-grid-availability.md)",
+        "Reads at least one hub page — the project hub (pageturner.md) or the concept hub (browse-and-buy-mvp-epic.md)",
+        "Does not read the unrelated people file (maya.md) or the unrelated ceremonies summary (2026-03-16-team-ceremonies.md)",
+        "Does not write any artifact files — no file appears under ./specs/, ./adrs/, ./stories/, or ./transcripts/",
+        "The final assistant response lists the files that were read (paths + titles)",
+        "The final assistant response explicitly surfaces the 2026-04-06 supersession (or the fact that sold books are excluded from the grid) so the consumer of the content can rely on the later decision"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Synonym / rephrasing match — 'book grid page' finds catalog-browse",
+      "prompt": "Pull context from the team brain about the book grid page.",
+      "expected_output": "The skill recognises that 'book grid page' and catalog-browse are the same concept — no brain entry title contains the exact string 'book grid'. It matches by LLM judgment, reads the catalog-browse decisions, and returns their content. A regression to naive keyword matching would fail this eval.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/team-brain/wiki/index.md",
+        "evals/files/team-brain/wiki/projects/pageturner.md",
+        "evals/files/team-brain/wiki/concepts/browse-and-buy-mvp-epic.md",
+        "evals/files/team-brain/wiki/decisions/2026-03-23-catalog-browse-grid.md",
+        "evals/files/team-brain/wiki/decisions/2026-04-06-grid-availability.md",
+        "evals/files/team-brain/wiki/decisions/2026-03-23-checkout-mechanics.md",
+        "evals/files/team-brain/wiki/decisions/2026-04-13-checkout-reservation-window.md",
+        "evals/files/team-brain/wiki/summaries/2026-03-23-backlog-refinement.md",
+        "evals/files/team-brain/wiki/summaries/2026-03-16-team-ceremonies.md",
+        "evals/files/team-brain/wiki/people/maya.md"
+      ],
+      "expectations": [
+        "Recognises that 'book grid' is the same concept as catalog-browse — does not refuse or claim nothing matches",
+        "Reads the catalog-browse decision(s) in the brain",
+        "Does not write any artifact files anywhere in the working directory",
+        "The final assistant response reports the files that were read and confirms the topic was matched by meaning"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Hub follow — project/concept hub links pulled into candidate set",
+      "prompt": "Pull from the team brain about the pageturner book-sale project.",
+      "expected_output": "The skill matches the project hub (projects/pageturner.md), follows its links to related decisions and concept pages, merges them into the candidate set, confirms the selection, and reads them all. The eval checks the safety net against title drift — entries that don't literally say 'pageturner' in their title but are linked from the project hub must still end up being read.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/team-brain/wiki/index.md",
+        "evals/files/team-brain/wiki/projects/pageturner.md",
+        "evals/files/team-brain/wiki/concepts/browse-and-buy-mvp-epic.md",
+        "evals/files/team-brain/wiki/decisions/2026-03-23-catalog-browse-grid.md",
+        "evals/files/team-brain/wiki/decisions/2026-04-06-grid-availability.md",
+        "evals/files/team-brain/wiki/decisions/2026-03-23-checkout-mechanics.md",
+        "evals/files/team-brain/wiki/decisions/2026-04-13-checkout-reservation-window.md",
+        "evals/files/team-brain/wiki/summaries/2026-03-23-backlog-refinement.md",
+        "evals/files/team-brain/wiki/summaries/2026-03-16-team-ceremonies.md",
+        "evals/files/team-brain/wiki/people/maya.md"
+      ],
+      "expectations": [
+        "Reads the project hub at ./team-brain/wiki/projects/pageturner.md",
+        "Follows hub links — reads additional files linked from the project hub (at least one decision file AND the concept-epic hub) rather than stopping at the hub itself",
+        "Does not write any artifact files",
+        "The final assistant response reports a candidate set that includes files whose titles do not literally contain 'pageturner', demonstrating that hub-following expanded the set"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Missing index — stops cleanly, does not invent",
+      "prompt": "Pull context from the team brain about catalog-browse.",
+      "expected_output": "Brain Source is set in the config but the team-brain directory is not present in the working dir, so no index exists at either `<Brain Source>/index.md` or `<Brain Source>/wiki/index.md`. The skill tries both paths, reports that the index is unreachable, and stops. It does NOT invent content, silently fall back to reading random files, or write anywhere.",
+      "files": [
+        "evals/files/d3.config.md"
+      ],
+      "expectations": [
+        "The final assistant response states that the brain's index could not be found",
+        "The response communicates where the skill looked, not just that something went wrong (enough for the user to understand the search was against the configured Brain Source)",
+        "No files are written anywhere in the working directory",
+        "The skill does not invent brain content, does not fabricate file paths, and does not silently fall back to reading arbitrary files"
+      ]
+    }
+  ]
+}

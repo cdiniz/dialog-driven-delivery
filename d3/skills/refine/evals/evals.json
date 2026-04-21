@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "Refine spec with transcript — resolve some open questions, leave others alone",
       "prompt": "Refine the existing product spec at ./specs/product/recommendations-spec.md with the new information from this refinement meeting transcript (./refine-transcript.md). Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
       "expected_output": "The recommendations spec is updated in place: Q1 (selection algorithm) is resolved to bestsellers (top 3 by 30-day sales, excluding the current product), Q2 (small-category fallback) is resolved to 'show what we have, hide the slot if zero others', and the inline [OPEN QUESTION] markers tied to those questions are removed. Q3 (mobile layout), the Success Metrics section, and Constraints & Dependencies are NOT touched — they remain as they were. The final assistant response reports which sections changed and which open questions were resolved.",
       "files": [
@@ -34,6 +35,7 @@
     },
     {
       "id": 2,
+      "name": "Refine ADR — status change only, preserve everything else",
       "prompt": "Refine ADR-0001 at ./adrs/0001-use-postgres-for-events.md — architecture review approved the decision. Update the status accordingly. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
       "expected_output": "The ADR file is updated in place. The Status field changes from 'Proposed' to 'Accepted'. Nothing else changes — the Date stays as 2026-03-15 (NOT silently updated to today), Consequences still reads '_To be confirmed after implementation._', Confirmation still reads '_To be defined._', More Information still reads '_To be defined._', Decision Drivers / Considered Options / Decision Outcome / Pros and Cons are byte-identical to the fixture, and no new sections are added.",
       "files": [
@@ -64,6 +66,7 @@
     },
     {
       "id": 3,
+      "name": "Refine spec + propagate to related story (detects contradiction)",
       "prompt": "Refine the checkout fees spec at ./specs/product/checkout-fees-spec.md — we decided that taxes should be displayed as a single 'Tax' line, not itemized by jurisdiction. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
       "expected_output": "The spec is updated to reflect the single-line tax decision: Q1 is resolved and removed from Open Questions, the inline marker on the Tax display bullet is replaced with the decision. The related story at ./stories/show-checkout-fees-story.md contains a concrete AC2 that currently contradicts the new decision (it says tax is shown per jurisdiction on separate lines). A careful refiner must detect this contradiction, update the story's AC2 to match the single-line decision, and mention the story update in the final report. A lazy refiner that only updates the spec and leaves the story alone should fail this eval.",
       "files": [
@@ -124,6 +127,7 @@
     },
     {
       "id": 4,
+      "name": "Stops when d3.config.md is missing",
       "prompt": "Refine my product spec — we decided to launch with 5 recommendations instead of 3. The working directory is a normal project — there is no d3.config.md fixture provided this time.",
       "expected_output": "The skill detects that d3.config.md is missing and stops. It tells the user to run d3:init first and does NOT proceed to update or invent an artifact. No file is written.",
       "files": [],
@@ -136,6 +140,7 @@
     },
     {
       "id": 5,
+      "name": "Surfaces contradiction with existing decision instead of silently overwriting",
       "prompt": "Refine the existing recommendations spec at ./specs/product/recommendations-spec.md. Marketing ran a CTR test against a competitor and wants us to show 5 recommendations instead of 3 to maximize click-through. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
       "expected_output": "The skill detects that the new information ('show 5 recommendations') directly contradicts an existing decided requirement in the spec ('Maximum 3 recommendations'). Rather than silently overwriting, it surfaces the conflict to the user — showing both the existing value (3) and the proposed value (5) — and asks how to resolve. The spec file should NOT be silently changed to 5 without the user's explicit confirmation.",
       "files": [
@@ -155,6 +160,40 @@
         "Unrelated sections are preserved: Out of Scope, Q1 (selection algorithm), Q3 (mobile layout), Success Metrics ('_To be defined_'), and Constraints & Dependencies ('_To be defined_') are byte-identical to the fixture. Q2 (small-category) and the Edge Cases marker MAY be reworded to reference the now-contested threshold (e.g. 'fewer than the maximum count' instead of 'fewer than 3'), since the hardcoded '3' becomes stale — but their semantic intent (asking about the small-category case) must be preserved and they must not be resolved, deleted, or filled with invented answers",
         "Does NOT invent a justification (e.g. 'marketing data shows 5 is better') beyond what the user actually stated",
         "Does NOT silently move the original 'Maximum 3' to Out of Scope or quietly delete it"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Integration — composed 'using the team brain' prompt chains brain-pull + refine with supersession",
+      "prompt": "Refine ./specs/product/checkout-flow.md using the team brain. Focus on checkout.",
+      "expected_output": "Given a composed prompt that references both refining a spec and using the team brain, Claude invokes d3:brain-pull first (reads index, matches checkout entries, follows hubs), then d3:refine uses the pulled content as the new information. The skill detects the 2026-04-13 reservation-window decision superseding the 15-minute value and updates every reservation-window mention in the spec from 15 to 10 minutes. Everything else stays exactly the same. This eval is the backstop against the two-skill chain silently breaking. Brain fixtures and the Brain-Source-set d3.config.md are reused from the brain-pull skill's eval files to avoid duplication; the checkout-flow spec is refine-specific.",
+      "files": [
+        "../brain-pull/evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/specs/product/checkout-flow.md",
+        "../brain-pull/evals/files/team-brain/wiki/index.md",
+        "../brain-pull/evals/files/team-brain/wiki/projects/pageturner.md",
+        "../brain-pull/evals/files/team-brain/wiki/concepts/browse-and-buy-mvp-epic.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-03-23-catalog-browse-grid.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-04-06-grid-availability.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-03-23-checkout-mechanics.md",
+        "../brain-pull/evals/files/team-brain/wiki/decisions/2026-04-13-checkout-reservation-window.md",
+        "../brain-pull/evals/files/team-brain/wiki/summaries/2026-03-23-backlog-refinement.md",
+        "../brain-pull/evals/files/team-brain/wiki/summaries/2026-03-16-team-ceremonies.md",
+        "../brain-pull/evals/files/team-brain/wiki/people/maya.md"
+      ],
+      "expectations": [
+        "Invokes d3:brain-pull before editing the spec — the brain's index is read first",
+        "Reads both ./team-brain/wiki/decisions/2026-04-13-checkout-reservation-window.md and ./team-brain/wiki/decisions/2026-03-23-checkout-mechanics.md — the pair that shows the supersession",
+        "Updates ./specs/product/checkout-flow.md in place — no new file created",
+        "Every mention of the reservation window is updated from 15 minutes to 10 minutes (5 locations in the fixture)",
+        "Nothing else in the spec changes — all other requirements, sections, and open questions are preserved",
+        "Does NOT invent content beyond the reservation-window supersession",
+        "The final assistant response explicitly reports the 15 → 10 change and confirms unrelated sections were not touched"
       ]
     }
   ]

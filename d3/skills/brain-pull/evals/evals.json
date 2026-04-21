@@ -89,7 +89,7 @@
       ],
       "expectations": [
         "The final assistant response states that the brain's index could not be found",
-        "The response mentions the paths that were tried (either `./team-brain/index.md`, `./team-brain/wiki/index.md`, or both)",
+        "The response communicates where the skill looked, not just that something went wrong (enough for the user to understand the search was against the configured Brain Source)",
         "No files are written anywhere in the working directory",
         "The skill does not invent brain content, does not fabricate file paths, and does not silently fall back to reading arbitrary files"
       ]

@@ -187,7 +187,7 @@
         "../brain-pull/evals/files/team-brain/wiki/people/maya.md"
       ],
       "expectations": [
-        "Invokes d3:brain-pull before editing the spec — the brain's index is read first",
+        "Reads the brain's index before editing the spec",
         "Reads both ./team-brain/wiki/decisions/2026-04-13-checkout-reservation-window.md and ./team-brain/wiki/decisions/2026-03-23-checkout-mechanics.md — the pair that shows the supersession",
         "Updates ./specs/product/checkout-flow.md in place — no new file created",
         "Every mention of the reservation window is updated from 15 minutes to 10 minutes (5 locations in the fixture)",

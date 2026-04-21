@@ -144,7 +144,7 @@
         "../brain-pull/evals/files/team-brain/wiki/people/maya.md"
       ],
       "expectations": [
-        "Invokes d3:brain-pull before writing any artifact — the brain's index is read first",
+        "Reads the brain's index before writing any artifact",
         "Reads both the primary catalog-browse decision and the supersession (2026-03-23 + 2026-04-06)",
         "Reads at least one hub page (project or concept)",
         "Does not read people or ceremonies files",

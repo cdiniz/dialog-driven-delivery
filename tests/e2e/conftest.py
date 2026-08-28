@@ -5,7 +5,10 @@ import pytest
 from .claude_runner import REPO_ROOT
 
 FIXTURES_DIR = REPO_ROOT / "tests" / "e2e" / "fixtures"
-PLUGIN_DIRS = [REPO_ROOT / "d3"]
+PLUGIN_NAME = "d3"
+# The plugin lives at the repo root, so copy only its own content into the
+# fixture rather than the whole repo (which carries .git, .venv, tests, ...).
+PLUGIN_CONTENT = [".claude-plugin", "skills"]
 TEMPLATES_DIR = FIXTURES_DIR / "templates"
 FILE_SWAPS = {
     "skills/init/references/feature-product-spec.md": "product-spec.md",
@@ -33,16 +36,15 @@ def _init_plugins(worker_id):
     if base.exists():
         shutil.rmtree(base)
     base.mkdir(parents=True)
-    plugin_paths = []
-    for plugin_dir in PLUGIN_DIRS:
-        dest = base / plugin_dir.name
-        shutil.copytree(plugin_dir, dest)
-        for rel_path, fixture_name in FILE_SWAPS.items():
-            template_dest = dest / rel_path
-            if template_dest.exists():
-                shutil.copy(TEMPLATES_DIR / fixture_name, template_dest)
-        plugin_paths.append(str(dest))
-    return plugin_paths
+    dest = base / PLUGIN_NAME
+    dest.mkdir()
+    for entry in PLUGIN_CONTENT:
+        shutil.copytree(REPO_ROOT / entry, dest / entry)
+    for rel_path, fixture_name in FILE_SWAPS.items():
+        template_dest = dest / rel_path
+        if template_dest.exists():
+            shutil.copy(TEMPLATES_DIR / fixture_name, template_dest)
+    return [str(dest)]
 
 
 def _init_workspace(workspace_dir, d3_config_name="d3.config.md"):

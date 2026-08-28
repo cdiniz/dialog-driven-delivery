@@ -134,7 +134,7 @@ D3 ships default templates inside the `init` skill's `references/` directory. Th
 
 **To customise:**
 
-1. Copy default templates to your repo from `d3/skills/init/references/`
+1. Copy default templates to your repo from `skills/init/references/`
 2. Configure custom paths in the Templates section of `d3.config.md`:
    ```markdown
    ### Templates

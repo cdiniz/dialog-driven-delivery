@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Dialog Driven Delivery - A pragmatic workflow for building software through conversational, transcript-first documentation and development. Create specs, refine them, and decompose into user stories.",
-    "version": "0.1.1"
+    "version": "0.1.2"
   },
   "plugins": [
     {
@@ -28,7 +28,7 @@
         "transcripts",
         "d3"
       ],
-      "source": "./d3",
+      "source": ".",
       "category": "productivity"
     }
   ]

@@ -134,7 +134,7 @@ D3 ships default templates inside the `init` skill's `references/` directory. Th
 
 **To customise:**
 
-1. Copy default templates to your repo from `d3/skills/init/references/`
+1. Copy default templates to your repo from `skills/init/references/`
 2. Configure custom paths in the Templates section of `d3.config.md`:
    ```markdown
    ### Templates
@@ -180,15 +180,17 @@ Skills ask for meeting transcripts (preferred input), work conversationally if n
 
 ```
 dialog-driven-delivery/
-├── d3/                              # Core plugin
-│   └── skills/
-│       ├── init/                    # Bootstrap d3.config.md; bundles default templates
-│       ├── create/                  # Draft new artifacts
-│       ├── refine/                  # Update existing artifacts
-│       ├── decompose/               # Break specs into INVEST stories
-│       ├── align-spec/              # Detect spec/code drift
-│       ├── distill/                 # Clean and split transcripts
-│       └── uncertainty-markers/     # Uncertainty marking standards
+├── .claude-plugin/
+│   ├── plugin.json                  # Plugin manifest (plugin root is the repo root)
+│   └── marketplace.json             # Marketplace manifest
+├── skills/
+│   ├── init/                        # Bootstrap d3.config.md; bundles default templates
+│   ├── create/                      # Draft new artifacts
+│   ├── refine/                      # Update existing artifacts
+│   ├── decompose/                   # Break specs into INVEST stories
+│   ├── align-spec/                  # Detect spec/code drift
+│   ├── distill/                     # Clean and split transcripts
+│   └── uncertainty-markers/         # Uncertainty marking standards
 ├── config-samples/                  # Example configurations
 │   ├── d3.config.markdown.md        # Local markdown storage (default)
 │   └── d3.config.atlassian.md       # Confluence + Jira storage

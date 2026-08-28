@@ -1,11 +1,17 @@
 import os
 import shutil
+from pathlib import Path
+
 import pytest
 
 from .claude_runner import REPO_ROOT
 
 FIXTURES_DIR = REPO_ROOT / "tests" / "e2e" / "fixtures"
-PLUGIN_DIRS = [REPO_ROOT / "d3"]
+# The plugin root is the repo root, so the e2e fixture is assembled from the
+# plugin's own components rather than copied wholesale (which would drag in
+# .git, .venv and the workspaces dir we are copying into).
+PLUGIN_NAME = "d3"
+PLUGIN_COMPONENTS = [Path(".claude-plugin/plugin.json"), Path("skills")]
 TEMPLATES_DIR = FIXTURES_DIR / "templates"
 FILE_SWAPS = {
     "skills/init/references/feature-product-spec.md": "product-spec.md",
@@ -33,16 +39,20 @@ def _init_plugins(worker_id):
     if base.exists():
         shutil.rmtree(base)
     base.mkdir(parents=True)
-    plugin_paths = []
-    for plugin_dir in PLUGIN_DIRS:
-        dest = base / plugin_dir.name
-        shutil.copytree(plugin_dir, dest)
-        for rel_path, fixture_name in FILE_SWAPS.items():
-            template_dest = dest / rel_path
-            if template_dest.exists():
-                shutil.copy(TEMPLATES_DIR / fixture_name, template_dest)
-        plugin_paths.append(str(dest))
-    return plugin_paths
+    dest = base / PLUGIN_NAME
+    for component in PLUGIN_COMPONENTS:
+        src = REPO_ROOT / component
+        target = dest / component
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if src.is_dir():
+            shutil.copytree(src, target)
+        else:
+            shutil.copy(src, target)
+    for rel_path, fixture_name in FILE_SWAPS.items():
+        template_dest = dest / rel_path
+        if template_dest.exists():
+            shutil.copy(TEMPLATES_DIR / fixture_name, template_dest)
+    return [str(dest)]
 
 
 def _init_workspace(workspace_dir, d3_config_name="d3.config.md"):

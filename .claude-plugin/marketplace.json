@@ -28,7 +28,7 @@
         "transcripts",
         "d3"
       ],
-      "source": "./d3",
+      "source": ".",
       "category": "productivity"
     }
   ]

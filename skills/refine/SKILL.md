@@ -155,4 +155,5 @@ Tell the user:
 - **d3:create** — use that instead for brand-new artifacts; this skill only updates existing ones
 - **d3:decompose** — natural next step once a spec is refined enough to break into stories
 - **d3:align-spec** — complementary: compares a spec against code to find drift that this skill can then apply
+- **d3:align-source** — complementary: compares an artifact against its source input; paste its report in at step 5 as review feedback (option D)
 - **d3:distill** — preprocess messy transcripts before feeding them in as new information

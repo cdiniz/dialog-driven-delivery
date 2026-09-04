@@ -120,6 +120,7 @@ Tell the user:
 - Filenames / URLs and paths
 - Approximate percentage of the original transcript that was noise (removed)
 - If no template was used, suggest **d3:create** as the natural next step for each file
+- If a substantial share of the original was removed, or the transcript was split into multiple subjects, suggest **d3:align-source** to audit the distillation against the raw original before it feeds anything downstream
 
 ## Error handling
 
@@ -137,3 +138,4 @@ Tell the user:
 - **d3:create** — natural next step: feed each distilled subject into create to produce an artifact
 - **d3:refine** — alternative next step if the topic is an update to an existing artifact
 - **d3:uncertainty-markers** — invoked when generating template-structured output with ambiguous content
+- **d3:align-source** — audits a distilled transcript against the raw original: was everything removed genuinely noise, and were the splits right

@@ -198,3 +198,4 @@ Suggested next steps (based on findings):
 - **d3:refine** — natural follow-up when the report shows the spec is behind the code
 - **d3:decompose** — natural follow-up when the report shows missing implementation that needs stories
 - **d3:create** — if the spec is so far gone that a rewrite is easier than a refine
+- **d3:align-source** — the sibling audit in the other direction: compares the spec against the conversation it came from, rather than against the code it produced

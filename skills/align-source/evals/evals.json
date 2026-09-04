@@ -1,0 +1,149 @@
+{
+  "skill_name": "align-source",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Cross-check the product spec at ./specs/product/recommendations-spec.md against the kickoff transcript it was written from (./kickoff-transcript.md). The spec was created from that transcript and has not been refined since, so that transcript is the complete source. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "A findings report — the spec file is left untouched — that identifies the five planted defects: two unsupported claims (a 15-minute recommendation cache and an 8% click-through-rate target, neither of which appears in the transcript), one dropped concern (Priya's point that a three-item slot could push Add to Cart below the fold on mobile), one certainty drift (Rick's tentative 'Frequently bought together' heading, which he explicitly was not attached to and wanted copy review on, recorded in the spec as a decided Must Have), and one false uncertainty (the spec asks whether the cap is 3 or 4 when the transcript settles firmly on a maximum of three). It must NOT flag the faithful paraphrase of the placement decision, the '_To be defined_' Constraints section, the genuinely-parked within-category selection question, or the drinkware concern that the spec does capture. Coverage is reported as Complete, findings quote the transcript, the report stays inside the spec-vs-source question rather than drifting into document hygiene, and it ends with a summary and a d3:refine suggestion.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/specs/product/recommendations-spec.md",
+        "evals/files/kickoff-transcript.md"
+      ],
+      "expectations": [
+        "Reports the 'Recommendation caching ... cached for 15 minutes' requirement as a Fabrication — caching is never mentioned anywhere in the kickoff transcript",
+        "Reports the '8% click-through rate' success metric as a Fabrication — no target, metric, or percentage appears in the transcript",
+        "Reports an Omission for Priya's mobile concern (a three-item slot pushing the Add to Cart button below the fold), which appears nowhere in the spec",
+        "Reports Certainty Drift for the 'Frequently bought together' heading: the transcript has Rick saying 'we could maybe' and 'I'm not attached to it' with copy review pending, while the spec lists it as a decided Must Have",
+        "Reports False Uncertainty for '[OPEN QUESTION: Is the cap 3 or 4 items?]' — the transcript settles on a maximum of three explicitly ('three max. Hard cap.' / 'maximum three, that's settled')",
+        "Does NOT allege that the placement requirement's WORDING is fabricated, drifted, or inaccurate — 'renders at the bottom of the product detail page, below the main product information' is a faithful paraphrase of 'bottom of the product page. Under the main product info, under the picture'. (Separately reporting that the placement RATIONALE — 'I don't want it competing with the buy button' — was dropped is legitimate and does NOT fail this assertion.)",
+        "Does NOT report the '_To be defined_' Constraints & Dependencies section as an Omission, a Fabrication, or a finding of any kind — empty placeholder sections are by design",
+        "Does NOT flag the '[OPEN QUESTION: How are items selected from within the category...]' marker — the transcript genuinely parks this question, so the marker is correct",
+        "Does NOT report the drinkware / thin-category concern as an Omission — the spec captures it under Edge Cases",
+        "Precision: the report confines itself to spec-vs-source disagreement. Document-hygiene observations unrelated to the transcript — an unfilled 'TBD' page URL in the header, a 'TBD' References section, or where the transcript file is stored relative to d3.config.md — are not presented as alignment findings",
+        "States the source coverage as Complete",
+        "Each reported finding either quotes the supporting transcript line or states explicitly that no supporting line exists",
+        "The file ./specs/product/recommendations-spec.md is byte-for-byte unchanged — this is a report-only skill and must not edit the artifact",
+        "The report includes a summary with counts by category or severity",
+        "The final response suggests d3:refine as the way to act on the findings"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Cross-check ./specs/product/checkout-fees-spec.md against ./checkout-fees-kickoff.md. Fair warning: that kickoff is the original meeting, but the spec has been refined a couple of times since and I don't have the notes from those later sessions. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "A findings report that recognises the source set is incomplete and adapts accordingly: coverage is declared Partial, and the two requirements with no support in the kickoff (Currency handling with the daily FX rate, and the Breakdown tooltip) are reported as Unverified rather than accused of being fabricated, because they plausibly came from the later refinement sessions that aren't available. The omission direction is unaffected by the missing sources, so the legal requirement Nadia raised — that the fee must be visible before the shopper reaches the payment step, described as non-negotiable — is still reported at top severity. Faithful content, including the correctly-parked cart-page question, is not reported as a problem, and the spec file is not modified.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/specs/product/checkout-fees-spec.md",
+        "evals/files/checkout-fees-kickoff.md"
+      ],
+      "expectations": [
+        "States that the available source is incomplete — either using the literal label 'Partial' or an unambiguous equivalent statement that the kickoff is not the full set of inputs behind the spec. A report that never signals the source set is incomplete fails this",
+        "Reports the 'Currency handling' requirement (daily FX rate captured at 00:00 UTC) as unsourced/unverifiable and needing confirmation — it must NOT be called fabricated, invented, hallucinated, or made up",
+        "Reports the 'Breakdown tooltip' requirement the same way — unsourced and needing confirmation, NOT an invention",
+        "Reports the legal requirement that the fee must be visible before the shopper reaches the payment step as an Omission — this is absent from the spec entirely",
+        "The legal omission is reported at the report's own top severity tier (Critical, or whatever the report's highest band is called) and is NOT downgraded, softened, or folded into the unverified/unsourced group",
+        "Explains the reasoning for treating the two directions differently: unsupported content may originate from the later refinement inputs that were not provided, whereas an omission from the kickoff holds regardless of what came later",
+        "Quotes Nadia's line from the kickoff as evidence for the omission finding",
+        "Does NOT report any '_To be defined_' placeholder section (Success Metrics, Out of Scope) as a finding — placeholders are by design, not gaps in alignment",
+        "Does NOT report the open cart-page question (Q1) as a problem — Marco explicitly parked it in the kickoff, so carrying it as open is correct, not drift or false uncertainty",
+        "Precision: the report confines itself to spec-vs-source disagreement. Document-hygiene observations — an unfilled 'TBD' page URL, a 'TBD' References section, missing template sub-headings such as Technical/Business/Compliance lines, or a missing 'Context:' field on Q1 — are not presented as alignment findings",
+        "The file ./specs/product/checkout-fees-spec.md is byte-for-byte unchanged",
+        "The final response suggests d3:refine as the way to act on the findings"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "We distilled last week's planning meeting into the files under ./transcripts/. Audit them against the raw original at ./raw-planning-transcript.md — did the distillation lose anything or split it wrong? Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "A removal audit rather than a spec-style fidelity audit. It must catch that Dana's objection about needing a fallback for when the fee service times out — including her request to have it recorded as a blocker — was removed entirely despite being substantive dialogue, and that the checkout fee display subject was over-split into a UI file and an API file when the layout and the pricing-service field change are aspects of one feature. It must NOT complain about the removal of greetings, the 'you're on mute' exchange, or the weekend small talk, and must NOT flag the hiring-pipeline file, which is a genuinely unrelated subject correctly separated. It should also notice that one of Marco's lines was replaced with a summary ('The team agreed on the placement and expansion behaviour') instead of preserved verbatim. No files are modified.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/raw-planning-transcript.md",
+        "evals/files/transcripts/2026-02-18-checkout-fee-display-ui.md",
+        "evals/files/transcripts/2026-02-18-checkout-fee-display-api.md",
+        "evals/files/transcripts/2026-02-18-hiring-pipeline.md"
+      ],
+      "expectations": [
+        "Runs a removal/preservation audit comparing the distilled files against the raw transcript, rather than treating the distilled files as a spec to fact-check",
+        "Reports as a Critical Omission that Dana's objection about a fallback for the fee service timing out was removed from every distilled file",
+        "Identifies that Dana's 'I'd like it on the record that I think it's a blocker' line was also dropped — substantive dialogue, not noise",
+        "Flags the split of checkout fee display into separate UI and API files as an over-split, on the grounds that layout and the pricing-service field change are aspects of the same feature",
+        "Does NOT flag the separate hiring-pipeline file as an over-split — it is a genuinely unrelated subject and the split is correct",
+        "Does NOT report the removal of greetings, the 'you're on mute' exchange, or the weekend small talk as findings — these are the noise distill is meant to cut",
+        "Flags 'The team agreed on the placement and expansion behaviour' as a summarised or paraphrased replacement for Marco's actual line ('Collapsed by default, expands on tap. Yes, let's do that.'), which distill is supposed to preserve verbatim",
+        "Precision: findings are about what the distillation lost, altered, or mis-split. If the report also raises template conformance (the configured meeting-transcript template's headings not being applied), it explicitly marks that as a separate conformance concern rather than presenting it as lost or distorted source content",
+        "None of the files under ./transcripts/ are modified, and ./raw-planning-transcript.md is unchanged",
+        "The report includes a summary with counts by category or severity"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Check ./stories/price-filter-story.md against the discussion it came from (./price-filter-discussion.md) — that discussion is the only input it was written from. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "A clean report. This story is faithful to the discussion: every acceptance criterion traces to a line in it, the one item that was parked (whether the filter persists across pages) is correctly marked as an open question, and nothing substantive from the discussion is missing. The correct result is no findings and no proposed changes, stated plainly, with no follow-up skill suggested. The failure mode being tested is padding — manufacturing findings, or proposing 'minor, non-blocking' rewrites, so the audit looks thorough.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/stories/price-filter-story.md",
+        "evals/files/price-filter-discussion.md"
+      ],
+      "expectations": [
+        "Proposes no content change to any acceptance criterion, at any severity. Suggesting a rewrite, an added clause, or an extra Given/When/Then to AC1-AC4 fails this assertion even when labelled 'minor', 'optional', or 'non-blocking' — the story already matches the discussion, so there is nothing to change",
+        "Reports zero findings at Critical or Moderate severity",
+        "States plainly that the story is faithful to the discussion",
+        "Does NOT report any acceptance criterion (AC1-AC4) as a Fabrication — each one traces to a line in the discussion",
+        "Does NOT flag the '10 and 50' example values in AC1 as invented — those exact figures appear in the discussion, as does the inclusive-of-both-ends rule",
+        "Does NOT treat the Description's value clause ('so they only see products they can afford') as a Fabrication or unsourced content requiring change. Framing that restates the evident purpose of the feature is reasonable inference, not invented content; noting it as explicitly not-a-finding is fine",
+        "Does NOT flag the '[OPEN QUESTION: Does the price filter persist when the shopper moves to the next page of results?]' marker as False Uncertainty — the discussion explicitly parks that question",
+        "Does NOT report an Omission — every substantive point in the discussion (both bounds required, inclusive range, inline error text, empty-results message, parked pagination question) appears in the story",
+        "Precision: does not pad the report with document-hygiene observations unrelated to the discussion, such as the 'Feature spec: TBD' placeholder or the story adding an Open Questions section not present in the template",
+        "Says that no follow-up is needed rather than suggesting d3:refine for an artifact with nothing to fix",
+        "The file ./stories/price-filter-story.md is byte-for-byte unchanged"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Cross-check ./specs/product/loyalty-points-spec.md against the meeting it came from. Treat the working directory as a project that already has d3.config.md and .d3/templates/ set up (provided as fixture files).",
+      "expected_output": "No audit is possible. The workspace contains one loyalty-related transcript — a PointStack vendor demo — but it is not the source of this spec: it evaluates a third-party platform, decides nothing, and contains none of the spec's decisions (accrual on completed orders, redemption at checkout, the refund question), while containing its own unrelated material (three-tier model, per-MAU pricing, a DPA review). The correct behaviour is to notice the mismatch and surface the vendor demo as an unconfirmed candidate at most — never to silently adopt it as the source and audit against it, which would manufacture bogus findings such as 'the spec omits the tier structure' or 'the spec omits the per-MAU cost constraint'. The failure mode under test is accepting a plausible-but-wrong source.",
+      "files": [
+        "evals/files/d3.config.md",
+        "evals/files/.d3/templates/feature-product-spec.md",
+        "evals/files/.d3/templates/feature-tech-spec.md",
+        "evals/files/.d3/templates/user-story.md",
+        "evals/files/.d3/templates/adr.md",
+        "evals/files/.d3/templates/meeting-transcript.md",
+        "evals/files/specs/product/loyalty-points-spec.md",
+        "evals/files/transcripts/2026-03-11-loyalty-vendor-demo.md"
+      ],
+      "expectations": [
+        "Does NOT treat ./transcripts/2026-03-11-loyalty-vendor-demo.md as the confirmed source of the loyalty points spec",
+        "Produces NO alignment findings derived from the vendor demo's content — there is no Omission reported for the Bronze/Silver/Gold tier model, the per-MAU pricing, the 2,000/month floor, or the DPA review, and no Fabrication reported for spec content merely because the vendor demo does not mention it",
+        "If the vendor demo is surfaced at all, it is surfaced as a candidate requiring confirmation, with reasoning for why it is not evidently the source — it evaluates a third-party platform rather than specifying the in-house feature, and none of the spec's decisions (point accrual on completed orders, redemption at checkout, the refunded-order question) appear in it",
+        "States that the source of the spec could not be established, and stops rather than producing a spec-vs-source findings report",
+        "Reports having searched the configured Transcripts location from the Storage table, rather than giving up without looking",
+        "Does NOT invent, assume, or reconstruct the content of the meeting the spec actually came from",
+        "Does NOT silently substitute a different comparison — it must not audit the spec against itself, against the templates, or against the codebase",
+        "Names what it needs to proceed (the transcript or source document the spec was written from, or confirmation that the vendor demo really is intended as the source)",
+        "The file ./specs/product/loyalty-points-spec.md is unchanged"
+      ]
+    }
+  ]
+}

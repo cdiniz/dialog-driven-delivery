@@ -95,6 +95,7 @@ Tell the user:
 - Suggested next steps — but only when they're actionable:
   - **d3:refine** — suggest only if the artifact has uncertainty markers or placeholder sections. If all sections are filled and there are no markers, don't suggest refine; the artifact is complete until new information arrives.
   - **d3:decompose** — suggest only for feature specs when the user wants to break them into stories.
+  - **d3:align-source** — suggest only when the artifact was drafted from a substantial source (a transcript or an existing document) that is still available. A fresh pass over that source catches invented content and dropped signal that this pass could not see in itself. Don't suggest it when the input was a short conversational description — there is no separate record to check against.
   - If no next step is actionable, say so. A complete artifact with no open questions doesn't need a follow-up skill.
 
 ## Error handling
@@ -114,3 +115,4 @@ Tell the user:
 - **d3:refine** — natural next step to update the artifact as more information arrives
 - **d3:decompose** — natural next step for feature specs, to break them into user stories
 - **d3:distill** — pre-processes messy multi-topic transcripts before feeding them into this skill
+- **d3:align-source** — optional second pass: re-reads the source in a fresh context and reports where this artifact drifted from it

@@ -40,6 +40,7 @@ D3 is delivered as a set of Claude Code **skills** — they trigger from natural
 | `d3:refine` | Update any existing artifact with new information | "update the spec with these notes", "resolve the open questions" |
 | `d3:decompose` | Break a feature spec into INVEST-compliant user stories | "decompose this spec", "break this feature into stories" |
 | `d3:align-spec` | Compare specification against codebase to detect drift | "does the spec still match the code", "audit drift" |
+| `d3:align-source` | Cross-check an artifact against the transcript it came from | "did we lose anything from the meeting", "cross-check this spec against the transcript" |
 | `d3:distill` | Clean a raw transcript and split it by topic | "clean this transcript", "split this meeting by topic" |
 
 Skills can be used independently or combined in whatever order fits your team's process. Here's one possible flow:
@@ -53,6 +54,8 @@ d3:create (transcript) → Structured Transcript artifact
         |
 d3:create (spec) → Specification with Product & Technical Specs
 (fills what's known, leaves rest empty)
+        |
+d3:align-source (optional) → findings report: spec vs the transcript it came from
         |
 [Progressive Refinement as information becomes available]
         |
@@ -180,18 +183,21 @@ Skills ask for meeting transcripts (preferred input), work conversationally if n
 
 ```
 dialog-driven-delivery/
-├── d3/                              # Core plugin
-│   └── skills/
-│       ├── init/                    # Bootstrap d3.config.md; bundles default templates
-│       ├── create/                  # Draft new artifacts
-│       ├── refine/                  # Update existing artifacts
-│       ├── decompose/               # Break specs into INVEST stories
-│       ├── align-spec/              # Detect spec/code drift
-│       ├── distill/                 # Clean and split transcripts
-│       └── uncertainty-markers/     # Uncertainty marking standards
+├── .claude-plugin/                  # Plugin + marketplace manifests
+├── skills/
+│   ├── init/                        # Bootstrap d3.config.md; bundles default templates
+│   ├── create/                      # Draft new artifacts
+│   ├── refine/                      # Update existing artifacts
+│   ├── decompose/                   # Break specs into INVEST stories
+│   ├── align-spec/                  # Detect spec/code drift
+│   ├── align-source/                # Detect artifact/source drift
+│   ├── distill/                     # Clean and split transcripts
+│   └── uncertainty-markers/         # Uncertainty marking standards
 ├── config-samples/                  # Example configurations
 │   ├── d3.config.markdown.md        # Local markdown storage (default)
-│   └── d3.config.atlassian.md       # Confluence + Jira storage
+│   ├── d3.config.atlassian.md       # Confluence + Jira storage
+│   ├── d3.config.azure-devops.md    # Azure DevOps storage
+│   └── d3.config.linear.md          # Linear storage
 └── tests/                           # E2E tests
 ```
 
